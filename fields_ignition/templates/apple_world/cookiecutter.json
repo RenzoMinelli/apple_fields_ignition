@@ -1,0 +1,14 @@
+{
+  "models": {
+    "list": [
+      {
+        "model": "model_name",
+        "name": "instance_name",
+        "pose": "0 0 0 0 0 0"
+      }
+    ]
+  },
+  "world_name": "tomato.world",
+  "camera_position": "0 0 0 0 0 0",
+  "husky_position": "0 0 0 0 0 0"
+}

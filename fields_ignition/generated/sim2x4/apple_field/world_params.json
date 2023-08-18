@@ -1,0 +1,12 @@
+{
+    "crop_dist": "2",
+    "file": "/home/facundo/catkin_ws/src/fields_ingnition/fields_ignition/one_leader_tree.json",
+    "model_name_prefix": "apple",
+    "out_path": "/home/facundo/catkin_ws/src/fields_ingnition/fields_ignition/generated/test01",
+    "row_count": "2",
+    "row_dist": "4",
+    "row_length": "4",
+    "seed": 7245,
+    "tree_properties": "eyJtYWluIjogeyJlbGVtZW50c19vZmZzZXRfcmFuZ2UiOiBbMC41LCAwLjZdLCAiaGVpZ2h0X3JhbmdlIjogWzIuMiwgMi4zXX0sICJicmFuY2hlcyI6IHsiY291bnQiOiAxLCAicmFkaXVzX3JhbmdlIjogWzAuMDUsIDAuMDddLCAicmFkaXVzX2RlY3JlYXNlIjogMC4yLCAiYnJpbmRpbGxhcyI6IHsib2Zmc2V0X3JhbmdlIjogWzAuNSwgMC42XSwgImxlbmd0aF9yYW5nZSI6IFswLjIsIDEuMF0sICJkaXN0YW5jZV9iZXR3ZWVuIjogWzAuMDIsIDAuMDNdLCAicmFkaXVzX3JhbmdlIjogWzAuMDA2LCAwLjAxXSwgInJhZGl1c19kZWNyZWFzZSI6IDAuMiwgImVsZW1lbnRfb2Zmc2V0IjogMC4xfX0sICJmcnVpdHMiOiB7ImNvdW50X3Byb3BvcnRpb24iOiAwLjA1LCAic2l6ZV9yYW5nZSI6IFswLjA3LCAwLjA5XX0sICJsZWF2ZXMiOiB7ImNvdW50X3Byb3BvcnRpb24iOiAwLjIsICJzaXplX3JhbmdlIjogWzAuMSwgMC4xNV19fQ==",
+    "world_name": "apple_field"
+}

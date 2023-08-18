@@ -1,0 +1,9 @@
+{
+    "count_apples": 0,
+    "count_leaves": 0,
+    "elements": []
+}{
+    "count_apples": 0,
+    "count_leaves": 0,
+    "elements": []
+}

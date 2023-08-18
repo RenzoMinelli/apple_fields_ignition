@@ -1,0 +1,21 @@
+version: "3.9"
+services:
+  simulator:
+    container_name: fields_ignition
+    build: .
+    environment:
+      - WORLD_DIR=/catkin_ws/src/fields_ignition/generated/test01/apple_field
+      - DISPLAY
+      - QT_X11_NO_MITSHM=1 
+      # - XAUTHORITY=$XAUTH 
+    volumes:
+      - "/tmp/.X11-unix:/tmp/.X11-unix"
+      # - "$XAUTH:$XAUTH"
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/dev/input:/dev/input"
+      - ".:/catkin_ws/src/fields_ignition"
+    network_mode: "host"
+    privileged: true
+    #command: bash -c "source /catkin_ws/devel/setup.bash && roslaunch fields_ignition field.launch world_dir:=$${WORLD_DIR}"
+    command:  bash -c "source /catkin_ws/devel/setup.bash && python3 api/api.py"
+    #tail -f /dev/null

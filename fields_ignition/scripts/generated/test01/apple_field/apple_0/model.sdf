@@ -1,0 +1,32 @@
+<sdf version="1.6">
+  <model name="apple_0">
+    <static>true</static>
+    <link name="link">
+      <collision name="collision">
+        <geometry>
+          <box>
+            <size>.1 .1 1</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name="branch">
+        <geometry>
+          <mesh>
+            <uri>file://apple_0/meshes/apple.dae</uri>
+            <submesh>
+              <name>Branch1</name>
+            </submesh>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>1.0 1.0 1.0</diffuse>
+          <pbr>
+            <metal>
+              <albedo_map>file://apple_0/materials/textures/AG15brn1.png</albedo_map>
+            </metal>
+          </pbr>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>

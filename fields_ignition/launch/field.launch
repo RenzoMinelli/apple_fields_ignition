@@ -1,0 +1,24 @@
+<launch>
+    <param name="use_sim_time" value="True" />
+
+    <arg name="world_dir" default="$(find fields_ignition)/generated_examples/apple_field" />
+    <arg name="use_rviz" default="True" doc="publish visualization messages for rviz" />
+
+    <!-- <node type="rviz" name="rviz" pkg="rviz" args="-d $(find fields_ignition)/tomato.rviz" /> -->
+
+    <include file="$(find ros_ign_gazebo)/launch/ign_gazebo.launch">
+        <env name="IGN_GAZEBO_MODEL_PATH" value="$(arg world_dir)" />
+        <env name="IGN_GAZEBO_RESOURCE_PATH" value="$(arg world_dir)" />
+        <arg name="ign_args" value="-v 5  apple_field.sdf" />
+    </include>
+
+    <node name="ground_truth" pkg="fields_ignition" type="ground_truth.py" output="screen">
+        <param name="world_dir" value="$(arg world_dir)" />
+        <param name="use_rviz" value="$(arg use_rviz)" />
+    </node>
+    <include file="$(find fields_ignition)/launch/husky_topics.launch" />
+    <!-- <include file="$(find fields_ignition)/launch/teleop_joy.launch" /> -->
+
+    <node name="pose_tf_broadcaster" pkg="fields_ignition" type="pose_tf_broadcaster"
+        output="screen"></node>
+</launch>

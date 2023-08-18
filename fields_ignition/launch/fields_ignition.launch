@@ -1,0 +1,4 @@
+<launch>
+    <node name="fields_ignition_simulator" pkg="fields_ignition" type="sim_controller.py" output="screen"></node>
+
+</launch>
