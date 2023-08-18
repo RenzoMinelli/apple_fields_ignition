@@ -8,7 +8,7 @@ import subprocess
 
 
 class Nodo(object):
-    # Nodo de ROS que captura imágenes del tópico "/costar_husky_sensor_config_1/front/image_raw" 
+    # Nodo de ROS que captura imágenes del tópico "/costar_husky_sensor_config_1/left/image_raw" 
     # y las guarda en una carpeta de frames, también graba un video de las imágenes capturadas.
     counter = 0
    
@@ -32,7 +32,7 @@ class Nodo(object):
         self.pub = rospy.Publisher('imagetimer', Image,queue_size=10)
 
         # Subscribers
-        rospy.Subscriber("/costar_husky_sensor_config_1/front/image_raw",Image,self.callback)
+        rospy.Subscriber("/costar_husky_sensor_config_1/left/image_raw",Image,self.callback)
 
 
     def callback(self, msg):

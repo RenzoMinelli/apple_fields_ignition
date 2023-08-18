@@ -11,4 +11,4 @@ angular:
 
 LC_ALL=C LANG=C roslaunch fields_ignition field.launch world_dir:=$(rospack find fields_ignition)/generated/test01/apple_field
 
-rosrun image_view video_recorder image:=/costar_husky_sensor_config_1/front/image_raw _fps:=30 _filename:="output.mp4" _codec:=MP4V
+rosrun image_view video_recorder image:=/costar_husky_sensor_config_1/left/image_raw _fps:=30 _filename:="output.mp4" _codec:=MP4V
