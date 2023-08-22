@@ -104,7 +104,7 @@
       <remap from="output/camera_info" to="left/optical/camera_info" />
     </node> -->
 
-    <node
+    <!-- <node
       pkg="ros_ign_bridge"
       type="parameter_bridge"
       name="ros_ign_bridge_rgbd"
@@ -117,7 +117,7 @@
       name="ros_ign_image_depth"
       args="$(arg sensor_prefix)/camera_left/depth_image">
       <remap from="$(arg sensor_prefix)/camera_left/depth_image" to="left/depth" />
-    </node>
+    </node> -->
 
     <!-- <node
       pkg="subt_ros"
