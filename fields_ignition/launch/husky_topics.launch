@@ -63,6 +63,15 @@
 
     <!--left RGBD camera -->
     <node
+      pkg="ros_ign_image"
+      type="image_bridge"
+      name="ros_ign_image_stereo_camera"
+      args="$(arg sensor_prefix)/multisense_sl/camera/image_raw"
+    >
+      <remap from="$(arg sensor_prefix)/multisense_sl/camera/image_raw" to="stereo_camara/image_raw" />
+    </node>
+
+    <!-- <node
       pkg="ros_ign_bridge"
       type="parameter_bridge"
       name="ros_ign_bridge_camera_left"
@@ -92,7 +101,7 @@
       args="$(arg sensor_prefix)/camera_right/image"
     >
       <remap from="$(arg sensor_prefix)/camera_right/image" to="right/image_raw" />
-    </node>
+    </node> -->
 
     <!-- <node
       pkg="subt_ros"
