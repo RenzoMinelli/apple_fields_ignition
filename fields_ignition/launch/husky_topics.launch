@@ -103,14 +103,14 @@
       <remap from="$(arg sensor_prefix)/camera_front/depth_image" to="front/depth" />
     </node>
 
-    <!-- <node
+    <node
       pkg="subt_ros"
       type="optical_frame_publisher"
       name="optical_frame_publisher_depth"
       args="depth">
       <remap from="input/image" to="front/depth" />
       <remap from="output/image" to="front/optical/depth" />
-    </node> -->
+    </node>
 
     <!--Front Laser-->
     <node
