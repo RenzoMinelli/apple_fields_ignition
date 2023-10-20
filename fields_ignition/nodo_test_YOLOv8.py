@@ -29,7 +29,7 @@ def process_data(data):
                 cv2.rectangle(global_frame, r[:2], r[2:], (255, 255, 255), 2)   # draw boxes on img
 
         # Save the image
-        current_time = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+        current_time = datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")
         cv2.imwrite("detected_images_YOLOv8/" + current_time + "_detected.jpg", global_frame)
     except CvBridgeError as e:
         throw(e)
