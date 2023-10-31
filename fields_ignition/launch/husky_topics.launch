@@ -61,13 +61,13 @@
       <remap from="/model/$(arg name)/battery/linear_battery/state" to="battery_state" />
     </node>
 
-    <!--Front RGBD camera -->
+    <!--Front RGB camera -->
     <node
       pkg="ros_ign_bridge"
       type="parameter_bridge"
-      name="ros_ign_bridge_camera"
+      name="ros_ign_bridge_camera_img"
       args="$(arg sensor_prefix)/camera_front/camera_info@sensor_msgs/CameraInfo[ignition.msgs.CameraInfo">
-      <remap from="$(arg sensor_prefix)/camera_front/camera_info" to="front/camera_info" />
+      <remap from="$(arg sensor_prefix)/camera_front/camera_info" to="front/camera_info_rbg" />
     </node>
     <node
       pkg="ros_ign_image"
@@ -95,12 +95,21 @@
       args="$(arg sensor_prefix)/camera_front/points@sensor_msgs/PointCloud2[ignition.msgs.PointCloudPacked">
       <remap from="$(arg sensor_prefix)/camera_front/points" to="rgbd_camera/depth/points" />
     </node>
+
+    <!--Front Depth camera -->
+    <node
+      pkg="ros_ign_bridge"
+      type="parameter_bridge"
+      name="ros_ign_bridge_camera_depth"
+      args="$(arg sensor_prefix)/camera_depth/camera_info@sensor_msgs/CameraInfo[ignition.msgs.CameraInfo">
+      <remap from="$(arg sensor_prefix)/camera_depth/camera_info" to="front/camera_info_depth" />
+    </node>
     <node
       pkg="ros_ign_image"
       type="image_bridge"
       name="ros_ign_image_depth"
-      args="$(arg sensor_prefix)/camera_front/depth_image">
-      <remap from="$(arg sensor_prefix)/camera_front/depth_image" to="front/depth" />
+      args="$(arg sensor_prefix)/camera_depth/depth_image">
+      <remap from="$(arg sensor_prefix)/camera_depth/depth_image" to="front/depth" />
     </node>
 
     <node
