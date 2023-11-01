@@ -167,8 +167,8 @@
       <self_collide>0</self_collide>
       <enable_wind>0</enable_wind>
       <kinematic>0</kinematic>
-      <sensor name="camera_front" type="camera">
-        <camera name="camera_front">
+      <sensor name="camera_left" type="camera">
+        <camera name="camera_left">
           <horizontal_fov>1.5708</horizontal_fov> <!-- 1.0472 -->
           <lens>
             <intrinsics>
@@ -217,8 +217,8 @@
         <pose frame="">0.0012 0 0.716 0 -0.3 1.57079632679</pose> <!--<pose frame="">0.438 0 0.272 0
         -0 0</pose>-->
       </sensor>
-      <sensor name="camera_depth" type="depth">
-        <camera name="camera_depth">
+      <sensor name="camera_right" type="camera">
+        <camera name="camera_right">
           <horizontal_fov>1.5708</horizontal_fov> <!-- 1.0472 -->
           <lens>
             <intrinsics>
@@ -264,7 +264,7 @@
         <always_on>1</always_on>
         <update_rate>30</update_rate>
         <visualize>1</visualize>
-        <pose frame="">0.0012 0 0.716 0 -0.3 1.57079632679</pose> <!--<pose frame="">0.438 0 0.272 0
+        <pose frame="">0.1012 0 0.716 0 -0.3 1.57079632679</pose> <!--<pose frame="">0.438 0 0.272 0
         -0 0</pose>-->
       </sensor>
       <gravity>1</gravity>
