@@ -41,7 +41,7 @@ if __name__ == '__main__':
     YOLOv8_model = YOLO('weights_YOLOv8.pt')
 
     rospy.init_node('test_node')    
-    sub = rospy.Subscriber("/zed_lateral/zed_lateral/left/image_rect_color/compressed", CompressedImage, process_data, queue_size = 10)
+    sub = rospy.Subscriber("/costar_husky_sensor_config_1/left/image_raw/compressed", CompressedImage, process_data, queue_size = 10)
     #sub2 = rospy.Subscriber("/zed_lateral/zed_lateral/imu/data", Imu, process_data)
     #sub3 = rospy.Subscriber("/zed_front/zed_node_front/imu/data", Imu, process_data)
 
