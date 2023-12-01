@@ -167,8 +167,8 @@
       <self_collide>0</self_collide>
       <enable_wind>0</enable_wind>
       <kinematic>0</kinematic>
-      <sensor name="camera_front" type="camera">
-        <camera name="camera_front">
+      <sensor name="camera_left" type="camera">
+        <camera name="camera_left">
           <horizontal_fov>1.5708</horizontal_fov> <!-- 1.0472 -->
           <lens>
             <intrinsics>
@@ -215,6 +215,56 @@
         <update_rate>30</update_rate>
         <visualize>1</visualize>
         <pose frame="">0.0012 0 0.716 0 -0.3 1.57079632679</pose> <!--<pose frame="">0.438 0 0.272 0
+        -0 0</pose>-->
+      </sensor>
+      <sensor name="camera_right" type="camera">
+        <camera name="camera_right">
+          <horizontal_fov>1.5708</horizontal_fov> <!-- 1.0472 -->
+          <lens>
+            <intrinsics>
+              <!-- fx = fy = width / ( 2 * tan (hfov / 2 ) ) -->
+              <!-- <fx>3000</fx> 277.1 -->
+              <!-- <fy>3000</fy> 277.1 -->
+              <!-- cx = ( width + 1 ) / 2 -->
+              <cx>960.5</cx> <!-- 160.5-->
+              <!-- cy = ( height + 1 ) / 2 -->
+              <cy>540.5</cy> <!-- 120.5-->
+              <s>0</s>
+            </intrinsics>
+          </lens>
+          <distortion>
+            <k1>0.0</k1>
+            <k2>0.0</k2>
+            <k3>0.0</k3>
+            <p1>0.0</p1>
+            <p2>0.0</p2>
+            <center>0.5 0.5</center>
+          </distortion>
+          <image>
+            <width>1920</width> <!-- initial 320 x 240 -->
+            <height>1080</height>
+            <format>R8G8B8</format>
+          </image>
+          <clip>
+            <near>0.1</near>
+            <far>100</far>
+          </clip>
+          <depth_camera>
+            <clip>
+              <near>0.1</near>
+              <far>100</far>
+            </clip>
+          </depth_camera>
+          <noise>
+            <type>gaussian</type>
+            <mean>0</mean>
+            <stddev>0.007</stddev>
+          </noise>
+        </camera>
+        <always_on>1</always_on>
+        <update_rate>30</update_rate>
+        <visualize>1</visualize>
+        <pose frame="">0.1012 0 0.716 0 -0.3 1.57079632679</pose> <!--<pose frame="">0.438 0 0.272 0
         -0 0</pose>-->
       </sensor>
       <gravity>1</gravity>
