@@ -20,10 +20,11 @@ def process_data(data):
         global_frame = bridge.compressed_imgmsg_to_cv2(data)
         #results = YOLOv8_model.predict(global_frame, stream=True)
         results = YOLOv8_model.track(global_frame, persist=True)
-
+        
         # Visualize the results on the frame
         annotated_frame = results[0].plot()
-
+        print('id of first box in frame')
+        print(results[0].boxes[0].id)
         # Save the image
         current_time = datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")
         cv2.imwrite("detected_images_YOLOv8/" + current_time + "_detected.jpg", annotated_frame)
