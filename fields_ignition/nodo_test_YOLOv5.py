@@ -30,7 +30,7 @@ def process_data(data):
         current_time = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
         cv2.imwrite("detected_images_YOLOv5/" + current_time + "_detected.jpg", global_frame)
     except CvBridgeError as e:
-        throw(e)
+        raise(e)
 
 
 if __name__ == '__main__':
