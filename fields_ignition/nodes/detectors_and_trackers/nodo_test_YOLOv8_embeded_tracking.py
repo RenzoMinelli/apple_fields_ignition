@@ -13,6 +13,46 @@ import pdb
 bridge = CvBridge()
 YOLOv8_model = None
 
+def encontrar_punto_de_corte(lista):
+    """
+    Encuentra el punto que divide una lista ordenada de enteros en dos clusters,
+    minimizando la suma de las varianzas internas de los clusters.
+    """
+    # Ordenar la lista
+    lista_ordenada = sorted(lista)
+
+    # Inicializar el mejor punto de corte y la menor suma de varianzas encontrada
+    mejor_punto = None
+    menor_varianza_suma = float('inf')
+
+    # Iterar sobre todos los puntos posibles (excepto los extremos)
+    for i in range(1, len(lista_ordenada)):
+        # Dividir la lista en dos clusters basándonos en el punto actual
+        cluster_1 = lista_ordenada[:i]
+        cluster_2 = lista_ordenada[i:]
+
+        # Calcular la varianza de cada cluster
+        varianza_1 = varianza(cluster_1) if cluster_1 else 0
+        varianza_2 = varianza(cluster_2) if cluster_2 else 0
+
+        # Sumar las varianzas
+        varianza_suma = varianza_1 + varianza_2
+
+        # Actualizar el mejor punto y la menor varianza suma si es necesario
+        if varianza_suma < menor_varianza_suma:
+            menor_varianza_suma = varianza_suma
+            mejor_punto = lista_ordenada[i - 1]
+
+    return mejor_punto
+
+def varianza(lista):
+    """
+    Calcula la varianza de una lista de números.
+    """
+    media = sum(lista) / len(lista)
+    varianza = sum((x - media) ** 2 for x in lista) / len(lista)
+    return varianza
+
 
 def process_data(data):
     #rospy.loginfo(data)
