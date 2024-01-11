@@ -60,9 +60,6 @@ def process_data(data):
 # main function
 if __name__ == '__main__':
 
-    model = YOLO(YOLO_WEIGHTS)
-    model = YOLO("weights/weights_YOLOv8.pt")
-
     bridge = CvBridge()
 
     rospy.init_node('test_node')
