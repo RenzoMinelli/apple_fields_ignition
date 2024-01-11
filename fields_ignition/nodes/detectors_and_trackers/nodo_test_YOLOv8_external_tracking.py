@@ -15,10 +15,10 @@ import subprocess
 import os
 
 # clone repository with tracker and tracker evaluator - after running the node for the first time, run `pip install --upgrade sentry-sdk`
-subprocess.run(["git", "clone", "--recurse-submodules", "https://github.com/roxana-garderes/yolov8_tracking.git"])
-# subprocess.run(["pip", "install", "-r", "yolov8_tracking/requirements.txt"])
-subprocess.run(["git", "clone", "https://github.com/JonathonLuiten/TrackEval.git", "yolov8_tracking/val_utils"])
-subprocess.run(["cp", "-r", "yolov8_tracking/boxmot", "yolov8_tracking/examples"])
+subprocess.run(["git", "clone", "--recurse-submodules", "https://github.com/Geromendez135/yolo_tracking.git"])
+subprocess.run(["pip", "install", "-r", "yolo_tracking/requirements.txt"])
+subprocess.run(["git", "clone", "https://github.com/JonathonLuiten/TrackEval.git", "yolo_tracking/val_utils"])
+subprocess.run(["cp", "-r", "yolo_tracking/boxmot", "yolo_tracking/examples"])
 
 
 # global variables
@@ -35,9 +35,9 @@ def exit_handler():
 
     # if for some reason you want to run the tracker separately, run the following command in the terminal: (make sure you type in the correct arguments)
     # python3 yolov8_tracking/examples/track.py --yolo-model weights_yolov8l.pt --tracking-method bytetrack --source detected_images_YOLOv8 --save --hide-label --hide-conf
-    subprocess.run(["python3", "yolov8_tracking/examples/track.py", "--yolo-model", YOLO_WEIGHTS, "--tracking-method", TRACKING_METHOD, "--source", SOURCE, "--save", "--save-txt"]) 
+    subprocess.run(["python3", "yolo_tracking/examples/track.py", "--yolo-model", YOLO_WEIGHTS, "--tracking-method", TRACKING_METHOD, "--source", SOURCE, "--save", "--save-txt"]) 
 
-    # evaluate the tracking
+    # filter the results using depth data
 
 # saves an image and returns its name
 def save_image(save_path, saved_image_name, global_frame):
@@ -62,25 +62,20 @@ if __name__ == '__main__':
 
     model = YOLO(YOLO_WEIGHTS)
     model = YOLO("weights/weights_YOLOv8.pt")
-    # pdb.set_trace()
 
-    SOURCE = "detected_images_YOLOv8"
-    subprocess.run(["python3", "yolov8_tracking/examples/track.py", "--yolo-model", YOLO_WEIGHTS, "--tracking-method", TRACKING_METHOD, "--source", SOURCE, "--save", "--save-txt"]) 
+    bridge = CvBridge()
 
-
-    # bridge = CvBridge()
-
-    # rospy.init_node('test_node')
+    rospy.init_node('test_node')
     
-    # # read from simulation
-    # sub = rospy.Subscriber("/costar_husky_sensor_config_1/left/image_raw/compressed", CompressedImage, process_data, queue_size = 10) 
+    # read from simulation
+    sub = rospy.Subscriber("/costar_husky_sensor_config_1/left/image_raw/compressed", CompressedImage, process_data, queue_size = 10) 
 
-    # # read from bag
-    # # sub = rospy.Subscriber("/zed_lateral/zed_lateral/left/image_rect_color/compressed", CompressedImage, process_data, queue_size = 10) 
+    # read from bag
+    # sub = rospy.Subscriber("/zed_lateral/zed_lateral/left/image_rect_color/compressed", CompressedImage, process_data, queue_size = 10) 
 
-    # rospy.loginfo('test node has been started...')
+    rospy.loginfo('test node has been started...')
 
-    # # when the node is killed, run the tracker and the tracker evaluator
-    # rospy.on_shutdown(exit_handler)
+    # when the node is killed, run the tracker and the tracker evaluator
+    rospy.on_shutdown(exit_handler)
     
-    # rospy.spin() #blocks until node is shutdown, Yields activity on other threads
+    rospy.spin() #blocks until node is shutdown, Yields activity on other threads
