@@ -41,15 +41,18 @@ def image_callback(imageL, imageR):
     rospy.loginfo("showing depth image")
     # Process images...
 
-    pub = rospy.Publisher('/left_camera', Image, queue_size=1)
-    cv.imshow('disparity', disparity)
-    msg = br.cv2_to_imgmsg(disparity, encoding='16SC1')
-    pub2 = rospy.Publisher('/Right_camera', Image, queue_size=1)
-    msg2 = br.cv2_to_imgmsg(disparity, encoding='16SC1')
+    # pub = rospy.Publisher('/left_camera', Image, queue_size=1)
+    # cv.imshow('disparity', disparity)
+    # msg = br.cv2_to_imgmsg(disparity, encoding='16SC1')
+    # pub2 = rospy.Publisher('/Right_camera', Image, queue_size=1)
+    # msg2 = br.cv2_to_imgmsg(disparity, encoding='16SC1')
+    # save the images in the folder detected_images_depth_data
+    seq = imageL.header.seq
+    cv.imwrite('detected_images_depth_data/disparity_{}.png'.format(seq), disparity)
 
     
-    pub.publish(msg)
-    pub2.publish(msg2)
+    # pub.publish(msg)
+    # pub2.publish(msg2)
      
 
     
