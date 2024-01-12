@@ -72,11 +72,19 @@ def read_bounding_boxes():
     # read the bounding boxes from the file
     with open("yolo_tracking/runs/track/exp/labels/detected_images_YOLOv8.txt", "r") as bb_file:
         lines = bb_file.readlines()
-        bounding_boxes = []
+        bounding_boxes = {}
         for line in lines:
+            seq_number = int(line.split(" ")[0]) - 1
+
             x,y = line.split(" ")[2:4]
             h,w = line.split(" ")[4:6]
-            bounding_boxes.append([int(x) + int(w)/2, int(y) + int(h)/2])
+
+            bb_center = [int(x) + int(w)/2, int(y) + int(h)/2]
+
+            if (seq_number in bounding_boxes):
+                bounding_boxes[seq_number].append(bb_center)
+            else:
+                bounding_boxes[seq_number] = [bb_center]
     return bounding_boxes
 
 # when the nodes ends track the apples and evaluate the tracking
@@ -87,8 +95,11 @@ def exit_handler():
 
     # if for some reason you want to run the tracker separately, run the following command in the terminal: (make sure you type in the correct arguments)
     # python3 yolov8_tracking/examples/track.py --yolo-model weights_yolov8l.pt --tracking-method bytetrack --source detected_images_YOLOv8 --save --hide-label --hide-conf
-    subprocess.run(["python3", "yolo_tracking/examples/track.py", "--yolo-model", YOLO_WEIGHTS, "--tracking-method", TRACKING_METHOD, "--source", SOURCE, "--save", "--save-txt"]) 
+    # subprocess.run(["python3", "yolo_tracking/examples/track.py", "--yolo-model", YOLO_WEIGHTS, "--tracking-method", TRACKING_METHOD, "--source", SOURCE, "--save", "--save-txt"]) 
 
+    # get the bounding boxes from the file
+    bounding_boxes = read_bounding_boxes()
+    print(bounding_boxes)
     # filter the results using depth data
 
 # saves an image and returns its name
@@ -121,10 +132,12 @@ if __name__ == '__main__':
 
     # read from bag
     # sub = rospy.Subscriber("/zed_lateral/zed_lateral/left/image_rect_color/compressed", CompressedImage, process_data, queue_size = 10) 
+    
+    rospy.on_shutdown(exit_handler)
 
     rospy.loginfo('test node has been started...')
 
     # when the node is killed, run the tracker and the tracker evaluator
-    rospy.on_shutdown(exit_handler)
     
     rospy.spin() #blocks until node is shutdown, Yields activity on other threads
+    
