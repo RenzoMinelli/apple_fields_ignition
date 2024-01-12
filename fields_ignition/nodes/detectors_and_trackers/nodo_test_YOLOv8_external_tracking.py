@@ -67,6 +67,18 @@ def varianza(lista):
     varianza = sum((x - media) ** 2 for x in lista) / len(lista)
     return varianza
 
+# read bounding boxes from the bounding box file
+def read_bounding_boxes():
+    # read the bounding boxes from the file
+    with open("yolo_tracking/runs/track/exp/labels/detected_images_YOLOv8.txt", "r") as bb_file:
+        lines = bb_file.readlines()
+        bounding_boxes = []
+        for line in lines:
+            x,y = line.split(" ")[2:4]
+            h,w = line.split(" ")[4:6]
+            bounding_boxes.append([int(x) + int(w)/2, int(y) + int(h)/2])
+    return bounding_boxes
+
 # when the nodes ends track the apples and evaluate the tracking
 def exit_handler():
     print('Running tracker and tracker evaluator...')
