@@ -21,24 +21,25 @@ def image_callback(imageL, imageR):
     br = CvBridge()
     rospy.loginfo("receiving Image")
 
-    imageLeft = br.compressed_imgmsg_to_cv2(imageL, "rgb8")
-    imageRight = br.compressed_imgmsg_to_cv2(imageR, "rgb8")
+    cv_image_left = br.compressed_imgmsg_to_cv2(imageL)
+    cv_image_right = br.compressed_imgmsg_to_cv2(imageR)
+    cv_image_left_new = cv.cvtColor(cv_image_left, cv.COLOR_BGR2GRAY)
+    cv_image_right_new = cv.cvtColor(cv_image_right, cv.COLOR_BGR2GRAY)
 
-    imageL_new=cv.cvtColor(imageLeft, cv.COLOR_BGR2GRAY)
-
-    imageR_new=cv.cvtColor(imageRight, cv.COLOR_BGR2GRAY)
-
-   
-
-    stereo = cv.StereoBM_create(numDisparities=16, blockSize=15)
-    disparity = stereo.compute(imageR_new,imageL_new)
-
-
-
+    print("creating stereo image")
+    stereo = cv.StereoBM_create(numDisparities=32, blockSize=5)
+    depth = stereo.compute(cv_image_left_new, cv_image_right_new)
+    # save the images in the folder detected_images_depth_data
+    seq = imageL.header.seq
+    cv.imwrite('detected_images_depth_data/depth_{}.png'.format(seq), depth)
+    cv.imwrite('detected_images_YOLOv8/left_{}.png'.format(seq), cv_image_left)
 
 
 
-    rospy.loginfo("showing depth image")
+
+
+
+    # rospy.loginfo("showing depth image")
     # Process images...
 
     # pub = rospy.Publisher('/left_camera', Image, queue_size=1)
@@ -47,8 +48,8 @@ def image_callback(imageL, imageR):
     # pub2 = rospy.Publisher('/Right_camera', Image, queue_size=1)
     # msg2 = br.cv2_to_imgmsg(disparity, encoding='16SC1')
     # save the images in the folder detected_images_depth_data
-    seq = imageL.header.seq
-    cv.imwrite('detected_images_depth_data/disparity_{}.png'.format(seq), disparity)
+    # seq = imageL.header.seq
+    # cv.imwrite('detected_images_depth_data/disparity_{}.png'.format(seq), disparity)
 
     
     # pub.publish(msg)
