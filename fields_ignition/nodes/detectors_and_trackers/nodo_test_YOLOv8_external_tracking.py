@@ -13,6 +13,7 @@ import datetime
 import pdb
 import subprocess
 import os
+import numpy
 
 # clone repository with tracker and tracker evaluator - after running the node for the first time, run `pip install --upgrade sentry-sdk`
 subprocess.run(["git", "clone", "--recurse-submodules", "https://github.com/Geromendez135/yolo_tracking.git"])
@@ -85,22 +86,43 @@ def read_bounding_boxes():
                 bounding_boxes[seq_number].append(bb_center)
             else:
                 bounding_boxes[seq_number] = [bb_center]
+    # the return value is a dictionary with the sequence number as the key and and array with the bounding boxes centers of the corresponding frame as the value.
     return bounding_boxes
 
 # when the nodes ends track the apples and evaluate the tracking
+
+# given a sequence number (seq and a dictionary with the bounding boxes (bounding_boxes), return an array with the depths of the bounding boxes
+def get_depths(seq, bounding_boxes):
+    # read the depth image
+    print("warning: reading depth image from file using grayscale parameter. For other kinds of images, change the code.")
+    depth_image = cv2.imread("detected_images_depth_data/" + "depth_" + str(seq) + ".png", cv2.IMREAD_GRAYSCALE)
+
+    # get the depths of the bounding boxes
+    depths = []
+    for bb_center in bounding_boxes[seq]:
+        if type(depth_image) == numpy.ndarray:
+            depths.append(depth_image[int(bb_center[1]), int(bb_center[0])])
+        else:
+            print('seq number ' + str(seq) + ' not found in detected_images_depth_data folder')
+    return depths
+
+# when the node is killed, run the tracker and filter the results
 def exit_handler():
     print('Running tracker and tracker evaluator...')
     
     SOURCE = "detected_images_YOLOv8"
 
-    # if for some reason you want to run the tracker separately, run the following command in the terminal: (make sure you type in the correct arguments)
-    # python3 yolov8_tracking/examples/track.py --yolo-model weights_yolov8l.pt --tracking-method bytetrack --source detected_images_YOLOv8 --save --hide-label --hide-conf
-    # subprocess.run(["python3", "yolo_tracking/examples/track.py", "--yolo-model", YOLO_WEIGHTS, "--tracking-method", TRACKING_METHOD, "--source", SOURCE, "--save", "--save-txt"]) 
-
     # get the bounding boxes from the file
     bounding_boxes = read_bounding_boxes()
     print(bounding_boxes)
+    # get the depths of the bounding boxes
+    depths = []
+    for seq in bounding_boxes:
+        depths.append(get_depths(seq, bounding_boxes))
+    print(depths)
+
     # filter the results using depth data
+
 
 # saves an image and returns its name
 def save_image(save_path, saved_image_name, global_frame):
@@ -123,6 +145,7 @@ def process_data(data):
 # main function
 if __name__ == '__main__':
 
+    '''
     bridge = CvBridge()
 
     rospy.init_node('test_node')
@@ -132,12 +155,12 @@ if __name__ == '__main__':
 
     # read from bag
     # sub = rospy.Subscriber("/zed_lateral/zed_lateral/left/image_rect_color/compressed", CompressedImage, process_data, queue_size = 10) 
-    
-    rospy.on_shutdown(exit_handler)
 
     rospy.loginfo('test node has been started...')
 
     # when the node is killed, run the tracker and the tracker evaluator
     
-    rospy.spin() #blocks until node is shutdown, Yields activity on other threads
     
+    rospy.spin() #blocks until node is shutdown, Yields activity on other threads
+    '''
+    rospy.on_shutdown(exit_handler)
