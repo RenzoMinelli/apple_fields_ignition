@@ -21,13 +21,23 @@ def image_callback(imageL, imageR):
     br = CvBridge()
     rospy.loginfo("receiving Image")
 
+    # print("Sequence numbers:")
+    # print("     Left: ", imageL.header.seq)
+    # print("    Right: ", imageR.header.seq)
+    if imageL.header.seq != imageR.header.seq:
+        rospy.logerr("Images are not synchronized")
+        # print the sequence numbers of the images
+        print("Left: ", imageL.header)
+        print("Right: ", imageR.header)
+        # return
+
     cv_image_left = br.compressed_imgmsg_to_cv2(imageL)
     cv_image_right = br.compressed_imgmsg_to_cv2(imageR)
     cv_image_left_new = cv.cvtColor(cv_image_left, cv.COLOR_BGR2GRAY)
     cv_image_right_new = cv.cvtColor(cv_image_right, cv.COLOR_BGR2GRAY)
 
     print("creating stereo image")
-    stereo = cv.StereoBM_create(numDisparities=32, blockSize=5)
+    stereo = cv.StereoBM_create(numDisparities=64, blockSize=11)
     depth = stereo.compute(cv_image_left_new, cv_image_right_new)
     # save the images in the folder detected_images_depth_data
     seq = imageL.header.seq
