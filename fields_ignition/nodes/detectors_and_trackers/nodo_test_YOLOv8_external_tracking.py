@@ -76,17 +76,18 @@ def read_bounding_boxes():
         bounding_boxes = {}
         for line in lines:
             seq_number = int(line.split(" ")[0]) - 1
+            bb_id = int(line.split(" ")[1])
 
             x,y = line.split(" ")[2:4]
             h,w = line.split(" ")[4:6]
 
-            bb_center = [int(x) + int(w)/2, int(y) + int(h)/2]
+            bb_center = [int(x) + int(w)/2, int(y) + int(h)/2, bb_id]
 
             if (seq_number in bounding_boxes):
                 bounding_boxes[seq_number].append(bb_center)
             else:
                 bounding_boxes[seq_number] = [bb_center]
-    # the return value is a dictionary with the sequence number as the key and and array with the bounding boxes centers of the corresponding frame as the value.
+    # the return value is a dictionary with the sequence number as the key and an array with the bounding boxes centers of the corresponding frame as the value, and as a third value, the bounding box id.
     return bounding_boxes
 
 # when the nodes ends track the apples and evaluate the tracking
@@ -97,13 +98,17 @@ def get_depths(seq, bounding_boxes):
     print("warning: reading depth image from file using grayscale parameter. For other kinds of images, change the code.")
     depth_image = cv2.imread("detected_images_depth_data/" + "depth_" + str(seq) + ".png", cv2.IMREAD_GRAYSCALE)
 
+    if type(depth_image) != numpy.ndarray:
+        print('seq number ' + str(seq) + ' not found in detected_images_depth_data folder')
+        return []
+
     # get the depths of the bounding boxes
     depths = []
     for bb_center in bounding_boxes[seq]:
-        if type(depth_image) == numpy.ndarray:
-            depths.append(depth_image[int(bb_center[1]), int(bb_center[0])])
-        else:
-            print('seq number ' + str(seq) + ' not found in detected_images_depth_data folder')
+        bb_id = bb_center[2]
+        depth = depth_image[int(bb_center[1]), int(bb_center[0])]
+
+        depths.append([bb_id, depth])
     return depths
 
 # when the node is killed, run the tracker and filter the results
@@ -114,18 +119,18 @@ def exit_handler():
 
     subprocess.run(["python3", "yolo_tracking/examples/track.py", "--yolo-model", YOLO_WEIGHTS, "--tracking-method", TRACKING_METHOD, "--source", SOURCE, "--save", "--save-txt"]) 
 
-    # # TODO: WAIT FOR DEPTH NODE TO FINISH 
+    # TODO: WAIT FOR DEPTH NODE TO FINISH 
 
-    # # get the bounding boxes from the file
-    # bounding_boxes = read_bounding_boxes()
-    # print(bounding_boxes)
-    # # get the depths of the bounding boxes
-    # depths = []
-    # for seq in bounding_boxes:
-    #     depths.append(get_depths(seq, bounding_boxes))
-    # print(depths)
+    # get the bounding boxes from the file
+    bounding_boxes = read_bounding_boxes()
+    print(bounding_boxes)
+    # get the depths of the bounding boxes
+    depths = []
+    for seq in bounding_boxes:
+        depths.append(*get_depths(seq, bounding_boxes))
+    print(depths)
 
-    # # filter the results using depth data
+    # filter the results using depth data
 
 
 # saves an image and returns its name
@@ -137,6 +142,7 @@ def save_image(save_path, saved_image_name, global_frame):
 # callback function
 def process_data(data):
     try:
+        pdb.set_trace()
         global_frame = bridge.compressed_imgmsg_to_cv2(data)
         # save image with no annotations first
         saved_image_name = save_image("detected_images_YOLOv8", "detected.jpg", global_frame)
