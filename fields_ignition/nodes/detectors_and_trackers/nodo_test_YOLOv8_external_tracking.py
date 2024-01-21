@@ -112,16 +112,20 @@ def exit_handler():
     
     SOURCE = "detected_images_YOLOv8"
 
-    # get the bounding boxes from the file
-    bounding_boxes = read_bounding_boxes()
-    print(bounding_boxes)
-    # get the depths of the bounding boxes
-    depths = []
-    for seq in bounding_boxes:
-        depths.append(get_depths(seq, bounding_boxes))
-    print(depths)
+    subprocess.run(["python3", "yolo_tracking/examples/track.py", "--yolo-model", YOLO_WEIGHTS, "--tracking-method", TRACKING_METHOD, "--source", SOURCE, "--save", "--save-txt"]) 
 
-    # filter the results using depth data
+    # # TODO: WAIT FOR DEPTH NODE TO FINISH 
+
+    # # get the bounding boxes from the file
+    # bounding_boxes = read_bounding_boxes()
+    # print(bounding_boxes)
+    # # get the depths of the bounding boxes
+    # depths = []
+    # for seq in bounding_boxes:
+    #     depths.append(get_depths(seq, bounding_boxes))
+    # print(depths)
+
+    # # filter the results using depth data
 
 
 # saves an image and returns its name
@@ -145,7 +149,7 @@ def process_data(data):
 # main function
 if __name__ == '__main__':
 
-    '''
+    
     bridge = CvBridge()
 
     rospy.init_node('test_node')
@@ -159,8 +163,8 @@ if __name__ == '__main__':
     rospy.loginfo('test node has been started...')
 
     # when the node is killed, run the tracker and the tracker evaluator
-    
+    rospy.on_shutdown(exit_handler)
     
     rospy.spin() #blocks until node is shutdown, Yields activity on other threads
-    '''
-    rospy.on_shutdown(exit_handler)
+    
+    
