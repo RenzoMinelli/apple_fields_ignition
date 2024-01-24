@@ -8,12 +8,12 @@ from sensor_msgs.msg import Image, CompressedImage
 import message_filters
 
 def read_cameras():
-    imageL = message_filters.Subscriber("/costar_husky_sensor_config_1/left/image_raw/compressed", CompressedImage)
-    imageR = message_filters.Subscriber("/costar_husky_sensor_config_1/right/image_raw/compressed", CompressedImage)
+    imageL = message_filters.Subscriber("/zed_lateral/zed_lateral/left/image_rect_color/compressed", CompressedImage)
+    imageR = message_filters.Subscriber("/zed_lateral/zed_lateral/right/image_rect_color/compressed", CompressedImage)
     
 
     # Synchronize images
-    ts = message_filters.ApproximateTimeSynchronizer([imageL, imageR], queue_size=10, slop=0.5)
+    ts = message_filters.TimeSynchronizer([imageL, imageR], queue_size=20)
     ts.registerCallback(image_callback)
     rospy.spin()
 
@@ -37,7 +37,7 @@ def image_callback(imageL, imageR):
     cv_image_right_new = cv.cvtColor(cv_image_right, cv.COLOR_BGR2GRAY)
 
     print("creating stereo image")
-    stereo = cv.StereoBM_create(numDisparities=64, blockSize=11)
+    stereo = cv.StereoBM_create(numDisparities=32, blockSize=13)
     depth = stereo.compute(cv_image_left_new, cv_image_right_new)
     # save the images in the folder detected_images_depth_data
     seq = imageL.header.seq
@@ -75,3 +75,7 @@ if __name__ == '__main__':
         
     except rospy.ROSInterruptException:
         pass
+
+
+# rosrun fields_ignition save_depth_images.py
+# rosbag play /home/paolo/catkin_ws/s1_230228.bag
