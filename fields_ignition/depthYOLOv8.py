@@ -59,3 +59,9 @@ if __name__ == '__main__':
 # investigar como poder guardar la imagen de profundidad generada por rosrun image_view stereo_view stereo:=/stereo image:=image_rect_color
 # probar de configurar bien la camara para ver si obtengo cosas decentes
 # porbar la simulacion con el depth a ver que tipo tiene, capaz puedo bypassear algo ahi y despues cuando tenga lo otro bien lo hago con eso otro noc
+        
+# notas:
+# la nuve de puntos no anda en la sim, calibrar la camara
+# las depth a mano de mercedes andan maso maso, no hay tanto detalle, la imagen tiene poca calidad
+# la depth del stereo image proc anda maso tmb para el bag de mercedes, hay muchos huecos
+# en general ver si se puede mejorar la depth de mercedes y arreglar la sim para que compute mejor las cosas (que anden tmb las nubes de puntos)
