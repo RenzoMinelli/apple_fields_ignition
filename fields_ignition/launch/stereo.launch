@@ -23,3 +23,7 @@
     <param name="approximate_sync" value="true"/>
   </node> -->
 </launch>
+
+<!-- roslaunch fields_ignition stereo.launch -->
+<!-- ROS_NAMESPACE=stereo rosrun stereo_image_proc stereo_image_proc -->
+<!-- rosrun image_view stereo_view stereo:=/stereo image:=image_rect_color -->
