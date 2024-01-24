@@ -54,10 +54,8 @@ if __name__ == '__main__':
 # ROS_NAMESPACE=costar_husky_sensor_config_1 rosrun stereo_image_proc stereo_image_proc
 # rosrun fields_ignition depthYOLOv8.py
 
+# computar a mano las profundidades pero en el bag de mercedez a ver como se ve, el stereo image proc anda maso, pero al menos si se ven imagenes de pointcloud
 # VER LINK FAVORITO DE COMO CONFIGURAR BIEN LA CAMARA OSEA LOS PARAMETROS
-
-# probar con el bag de mercedes a ver como se ven las computed depth o el pointcloud DESCARGARLO
 # investigar como poder guardar la imagen de profundidad generada por rosrun image_view stereo_view stereo:=/stereo image:=image_rect_color
-# no tengo el bag de mercedez, preguntar con quien lopuedo conseguir
 # probar de configurar bien la camara para ver si obtengo cosas decentes
 # porbar la simulacion con el depth a ver que tipo tiene, capaz puedo bypassear algo ahi y despues cuando tenga lo otro bien lo hago con eso otro noc
