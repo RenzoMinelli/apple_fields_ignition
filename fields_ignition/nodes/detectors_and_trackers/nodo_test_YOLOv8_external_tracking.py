@@ -70,41 +70,75 @@ def varianza(lista):
 
 # read bounding boxes from the bounding box file
 def read_bounding_boxes():
-    # read the bounding boxes from the file
-    with open("yolo_tracking/runs/track/exp/labels/detected_images_YOLOv8.txt", "r") as bb_file:
-        lines = bb_file.readlines()
-        bounding_boxes = {}
-        for line in lines:
-            seq_number = int(line.split(" ")[0]) - 1
-            bb_id = int(line.split(" ")[1])
 
-            x,y = line.split(" ")[2:4]
-            h,w = line.split(" ")[4:6]
+    # get all detections except the file detected_images_YOLOv8.txt
 
-            bb_center = [int(x) + int(w)/2, int(y) + int(h)/2, bb_id]
+    # especifica la ruta del directorio
+    dir_path = 'yolo_tracking/runs/track/exp/labels/'
+    ignored_file = 'detected_images_YOLOv8.txt'
 
-            if (seq_number in bounding_boxes):
-                bounding_boxes[seq_number].append(bb_center)
-            else:
-                bounding_boxes[seq_number] = [bb_center]
-    # the return value is a dictionary with the sequence number as the key and an array with the bounding boxes centers of the corresponding frame as the value, and as a third value, the bounding box id.
+    # usa os.listdir para obtener los nombres de los archivos ignorando el archivo ignored_file
+    # breakpoint()
+    file_names = os.listdir(dir_path)
+    file_names.remove(ignored_file)
+
+    #defino bouding boxes como un diccionario vacio
+    bounding_boxes = {}
+
+    # itera sobre los nombres de los archivos
+    for file_name in file_names:
+        # parseamos el nombre del archivo para sacar el timestamp (sacar la extension)
+        timestamp = file_name.split(".")[0]
+
+        # obtengo las bouding boxes de ese archivo
+        with open(os.path.join(dir_path, file_name), 'r') as bb_file:
+            lines = bb_file.readlines()
+
+            for line in lines:
+                line_split = line.split(" ")
+                bb_id = int(line_split[5][:-1]) if len(line_split) == 6 else 0
+                x,y = line_split[1:3]
+                h,w = line_split[3:5]
+                # primero convertimos de string a float porque sino de string con coma a int se rompe
+                x = float(x)
+                y = float(y)
+                h = float(h)
+                w = float(w)
+                # luego como esta normalizado entre 0 y 1 lo multiplicamos por la resolucion de la imagen
+                x = x * 1280
+                y = y * 720
+                h = h * 1280
+                w = w * 720
+                # luego lo convertimos a int
+                x = int(x)
+                y = int(y)
+                h = int(h)
+                w = int(w)
+                bb_center = [int(x + w/2), int(y + h/2), bb_id]
+
+                if (timestamp in bounding_boxes):
+                    bounding_boxes[timestamp].append(bb_center)
+                else:
+                    bounding_boxes[timestamp] = [bb_center]
+
+    # the return value is a dictionary with the timestamp as the key and an array with the bounding boxes centers of the corresponding frame as the value, and as a third value, the bounding box id.
     return bounding_boxes
 
 # when the nodes ends track the apples and evaluate the tracking
 
 # given a sequence number (seq and a dictionary with the bounding boxes (bounding_boxes), return an array with the depths of the bounding boxes
-def get_depths(seq, bounding_boxes):
+def get_depths(timestamp, bounding_boxes):
     # read the depth image
     print("warning: reading depth image from file using grayscale parameter. For other kinds of images, change the code.")
-    depth_image = cv2.imread("detected_images_depth_data/" + "depth_" + str(seq) + ".png", cv2.IMREAD_GRAYSCALE)
+    depth_image = cv2.imread("detected_images_depth_data/" + str(timestamp) + ".png", cv2.IMREAD_GRAYSCALE)
 
     if type(depth_image) != numpy.ndarray:
-        print('seq number ' + str(seq) + ' not found in detected_images_depth_data folder')
+        print('timestamp ' + str(timestamp) + ' not found in detected_images_depth_data folder')
         return []
 
     # get the depths of the bounding boxes
     depths = []
-    for bb_center in bounding_boxes[seq]:
+    for bb_center in bounding_boxes[timestamp]:
         bb_id = bb_center[2]
         depth = depth_image[int(bb_center[1]), int(bb_center[0])]
 
@@ -117,7 +151,7 @@ def exit_handler():
     
     SOURCE = "detected_images_YOLOv8"
 
-    subprocess.run(["python3", "yolo_tracking/examples/track.py", "--yolo-model", YOLO_WEIGHTS, "--tracking-method", TRACKING_METHOD, "--source", SOURCE, "--save", "--save-txt"]) 
+    # subprocess.run(["python3", "yolo_tracking/examples/track.py", "--yolo-model", YOLO_WEIGHTS, "--tracking-method", TRACKING_METHOD, "--source", SOURCE, "--save", "--save-txt"]) 
 
     # TODO: WAIT FOR DEPTH NODE TO FINISH 
 
@@ -125,10 +159,10 @@ def exit_handler():
     bounding_boxes = read_bounding_boxes()
     print(bounding_boxes)
     # get the depths of the bounding boxes
-    depths = []
-    for seq in bounding_boxes:
-        depths.append(*get_depths(seq, bounding_boxes))
-    print(depths)
+    #depths = []
+    #for seq in bounding_boxes:
+    #    depths.append(*get_depths(seq, bounding_boxes))
+    #print(depths)
 
     # filter the results using depth data
 
@@ -144,8 +178,10 @@ def process_data(data):
     try:
         pdb.set_trace()
         global_frame = bridge.compressed_imgmsg_to_cv2(data)
+        timestamp = data.header.stamp
         # save image with no annotations first
-        saved_image_name = save_image("detected_images_YOLOv8", "detected.jpg", global_frame)
+        # guardamos la imagen con el timestamp como nombre para matchear con el de profundidad luego
+        save_image("detected_images_YOLOv8", str(timestamp) + ".jpg", global_frame)
 
         # pdb.set_trace()
     except CvBridgeError as e:
@@ -161,7 +197,7 @@ if __name__ == '__main__':
     rospy.init_node('test_node')
     
     # read from simulation
-    sub = rospy.Subscriber("/costar_husky_sensor_config_1/left/image_raw/compressed", CompressedImage, process_data, queue_size = 10) 
+    # sub = rospy.Subscriber("/costar_husky_sensor_config_1/left/image_raw/compressed", CompressedImage, process_data, queue_size = 10) 
 
     # read from bag
     # sub = rospy.Subscriber("/zed_lateral/zed_lateral/left/image_rect_color/compressed", CompressedImage, process_data, queue_size = 10) 
