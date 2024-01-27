@@ -69,3 +69,4 @@ if __name__ == '__main__':
 # rosrun fields_ignition save_disparity_and_rgb.py
 # rosbag play /home/paolo/catkin_ws/s1_230228.bag
 # ROS_NAMESPACE=stereo rosrun stereo_image_proc stereo_image_proc
+# no se xq por un momento se veian bien y despues se ven medias negras, tengo que pasarle los args del yaml a stereo_image_proc?
