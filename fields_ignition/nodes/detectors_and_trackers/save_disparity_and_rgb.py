@@ -66,7 +66,9 @@ if __name__ == '__main__':
         pass
 
 
-# rosrun fields_ignition save_disparity_and_rgb.py
-# rosbag play /home/paolo/catkin_ws/s1_230228.bag
+# roslaunch fields_ignition stereo.launch
 # ROS_NAMESPACE=stereo rosrun stereo_image_proc stereo_image_proc
-# no se xq por un momento se veian bien y despues se ven medias negras, tengo que pasarle los args del yaml a stereo_image_proc?
+# rosrun rqt_reconfigure rqt_reconfigure y lodear el yaml en /home/paolo/catkin_ws/src/apple_fields_ignition/fields_ignition/config/stereoConfigMercedez.yaml
+# rosrun image_view stereo_view stereo:=/stereo image:=image_rect_color para verificacion visual de que se ve bien]
+# rosrun fields_ignition save_disparity_and_rgb.py
+# no se xq por un momento se veian bien y despues se ven medias negras, tengo que pasarle los args del yaml a stereo_image_proc
