@@ -79,3 +79,4 @@ if __name__ == '__main__':
 
 # rosrun fields_ignition save_depth_images.py
 # rosbag play /home/paolo/catkin_ws/s1_230228.bag
+# para calibrar en vivo: rosrun rqt_reconfigure rqt_reconfigure y rosrun image_view stereo_view stereo:=/stereo image:=image_rect_color

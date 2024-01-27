@@ -61,7 +61,5 @@ if __name__ == '__main__':
 # porbar la simulacion con el depth a ver que tipo tiene, capaz puedo bypassear algo ahi y despues cuando tenga lo otro bien lo hago con eso otro noc
         
 # notas:
-# la nuve de puntos no anda en la sim, calibrar la camara
-# las depth a mano de mercedes andan maso maso, no hay tanto detalle, la imagen tiene poca calidad
-# la depth del stereo image proc anda maso tmb para el bag de mercedes, hay muchos huecos
-# en general ver si se puede mejorar la depth de mercedes y arreglar la sim para que compute mejor las cosas (que anden tmb las nubes de puntos)
+# la nuve de puntos no anda en la sim, calibrar la camara? se ve doble, ver como arreglar eso
+# ya tengo los mejores params, pero como genero esas mismas imagenes que genera el stereo_view
