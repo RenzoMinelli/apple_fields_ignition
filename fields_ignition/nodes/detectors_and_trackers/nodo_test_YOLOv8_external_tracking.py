@@ -71,49 +71,57 @@ def varianza(lista):
 # read bounding boxes from the bounding box file
 def read_bounding_boxes():
 
-    # get all detections except the file detected_images_YOLOv8.txt
+    # Get all detections except the file detected_images_YOLOv8.txt
 
-    # especifica la ruta del directorio
+    # Specify dir path
     dir_path = 'yolo_tracking/runs/track/exp/labels/'
     ignored_file = 'detected_images_YOLOv8.txt'
 
-    # usa os.listdir para obtener los nombres de los archivos ignorando el archivo ignored_file
-    # breakpoint()
+    # Use os.listdir to obtain the file names skipping ignored_file
+    
     file_names = os.listdir(dir_path)
     file_names.remove(ignored_file)
+    breakpoint()
 
-    #defino bouding boxes como un diccionario vacio
+    # Define bounding_boxes as an empty dictionary 
     bounding_boxes = {}
 
-    # itera sobre los nombres de los archivos
+    # Iterate over file names
     for file_name in file_names:
-        # parseamos el nombre del archivo para sacar el timestamp (sacar la extension)
+        # Obtain the timestamp out of the file name (it is suppose to be te string before the first dot)
         timestamp = file_name.split(".")[0]
 
-        # obtengo las bouding boxes de ese archivo
+        # Obtain bounding boxes from the file
         with open(os.path.join(dir_path, file_name), 'r') as bb_file:
             lines = bb_file.readlines()
 
             for line in lines:
                 line_split = line.split(" ")
+
+                # If the line has 6 elements, the bounding box has an id, otherwise it is 0
                 bb_id = int(line_split[5][:-1]) if len(line_split) == 6 else 0
                 x,y = line_split[1:3]
                 h,w = line_split[3:5]
-                # primero convertimos de string a float porque sino de string con coma a int se rompe
+
+                # Convert everything to float first
                 x = float(x)
                 y = float(y)
                 h = float(h)
                 w = float(w)
-                # luego como esta normalizado entre 0 y 1 lo multiplicamos por la resolucion de la imagen
-                x = x * 1280
+
+                # As the values are normalized we need to multiply them by the image size
+                x = x * 1280 # ESTO HARDCODEADO NO ME PARECE MUCHO PORQUE SI ALGUIEN EN EL FUTURO QUIERE CAMBIAR EL SENSOR SE COMPLICA REVISAR EL CODIGO, ME PARECE QUE DEBERIA SER UN PARAMETRO O UNA VARIABLE GLOABL MINIMO
                 y = y * 720
                 h = h * 1280
                 w = w * 720
-                # luego lo convertimos a int
+
+                # Convert everything to int
                 x = int(x)
                 y = int(y)
                 h = int(h)
                 w = int(w)
+
+                # Create a list with the bounding box center and the bounding box id which is what will be saved in the dictionary
                 bb_center = [int(x + w/2), int(y + h/2), bb_id]
 
                 if (timestamp in bounding_boxes):
@@ -121,7 +129,7 @@ def read_bounding_boxes():
                 else:
                     bounding_boxes[timestamp] = [bb_center]
 
-    # the return value is a dictionary with the timestamp as the key and an array with the bounding boxes centers of the corresponding frame as the value, and as a third value, the bounding box id.
+    # The return value is a dictionary with the timestamp as the key and an array with the bounding boxes centers of the corresponding frame as the value, and as a third value, the bounding box id.
     return bounding_boxes
 
 # when the nodes ends track the apples and evaluate the tracking
