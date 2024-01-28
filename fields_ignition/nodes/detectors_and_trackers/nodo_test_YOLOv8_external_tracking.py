@@ -153,12 +153,14 @@ def get_depths(timestamp, bounding_boxes):
     return depths
 
 # when the node is killed, run the tracker and filter the results
-def run_tracker_and_filter():
+def exit_handler():
     print('Running tracker and tracker evaluator...')
     
     SOURCE = "detected_images_YOLOv8"
 
     # subprocess.run(["python3", "yolo_tracking/examples/track.py", "--yolo-model", YOLO_WEIGHTS, "--tracking-method", TRACKING_METHOD, "--source", SOURCE, "--save", "--save-txt"]) 
+
+    # TODO: WAIT FOR DEPTH NODE TO FINISH 
 
     # get the bounding boxes from the file
     bounding_boxes = read_bounding_boxes()
@@ -179,9 +181,39 @@ def save_image(save_path, saved_image_name, global_frame):
     cv2.imwrite(save_path + '/' + current_time + saved_image_name, global_frame)
     return current_time + saved_image_name
 
-if __name__ == '__main__':
-    # TODO: WAIT FOR DEPTH NODE TO FINISH 
+# callback function
+def process_data(data):
+    try:
+        pdb.set_trace()
+        global_frame = bridge.compressed_imgmsg_to_cv2(data)
+        timestamp = data.header.stamp
 
-    # when depth processing node finishes, run the tracker and filter the results
-    run_tracker_and_filter()
+        # save image named as timestamp in order to match with the depth data
+        save_image("detected_images_YOLOv8", str(timestamp) + ".jpg", global_frame)
+
+    except CvBridgeError as e:
+        raise(e)
+
+
+# main function
+if __name__ == '__main__':
+
+    
+    bridge = CvBridge()
+
+    rospy.init_node('test_node')
+    
+    # read from simulation
+    # sub = rospy.Subscriber("/costar_husky_sensor_config_1/left/image_raw/compressed", CompressedImage, process_data, queue_size = 10) 
+
+    # read from bag
+    # sub = rospy.Subscriber("/zed_lateral/zed_lateral/left/image_rect_color/compressed", CompressedImage, process_data, queue_size = 10) 
+
+    rospy.loginfo('test node has been started...')
+
+    # when the node is killed, run the tracker and the tracker evaluator
+    rospy.on_shutdown(exit_handler)
+    
+    rospy.spin() #blocks until node is shutdown, Yields activity on other threads
+    
     
