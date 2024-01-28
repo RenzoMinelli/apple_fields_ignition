@@ -165,13 +165,14 @@ def exit_handler():
     # get the bounding boxes from the file
     bounding_boxes = read_bounding_boxes()
     print(bounding_boxes)
-    # get the depths of the bounding boxes
-    #depths = []
-    #for seq in bounding_boxes:
-    #    depths.append(*get_depths(seq, bounding_boxes))
-    #print(depths)
 
-    # filter the results using depth data
+    # get the depths of the bounding boxes
+    depths = []
+    for timestamp in bounding_boxes:
+       depths.append(*get_depths(timestamp, bounding_boxes))
+    print(depths)
+
+    # TODO: filter the results using depth data
 
 
 # saves an image and returns its name
@@ -186,11 +187,10 @@ def process_data(data):
         pdb.set_trace()
         global_frame = bridge.compressed_imgmsg_to_cv2(data)
         timestamp = data.header.stamp
-        # save image with no annotations first
-        # guardamos la imagen con el timestamp como nombre para matchear con el de profundidad luego
+
+        # save image named as timestamp in order to match with the depth data
         save_image("detected_images_YOLOv8", str(timestamp) + ".jpg", global_frame)
 
-        # pdb.set_trace()
     except CvBridgeError as e:
         raise(e)
 
