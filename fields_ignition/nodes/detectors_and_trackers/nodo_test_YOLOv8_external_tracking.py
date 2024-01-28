@@ -160,7 +160,7 @@ def filter_depths(depths, threshold):
     return filtered_depths
 
 # when the node is killed, run the tracker and filter the results
-def run_tracker_and_filter():
+def track_filter_and_count():
     print('Running tracker and tracker evaluator...')
     
     SOURCE = "detected_images_YOLOv8"
@@ -179,6 +179,14 @@ def run_tracker_and_filter():
     # Filter the results using depth data
     threshold = 30 # we must preserve those depths that are within [0, 30]. The rest must be filtered out
     filtered_depths = filter_depths(depths, threshold)
+
+    # Count the distinct ids that remained after filtering
+    ids = []
+    for depth in filtered_depths:
+        ids.append(depth[0])
+    ids = list(set(ids))
+    # Print the number of apples
+    print('Number of apples: ' + str(len(ids)))
 
 # saves an image and returns its name
 def save_image(save_path, saved_image_name, global_frame):
@@ -208,5 +216,5 @@ if __name__ == '__main__':
     rospy.loginfo('tracking and filtering node started')
    
     # TODO: WAIT FOR DEPTH NODE TO FINISH AND PROCESS GENERATED DATA
-    run_tracker_and_filter()
+    track_filter_and_count()
     
