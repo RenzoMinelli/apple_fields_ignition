@@ -152,6 +152,13 @@ def get_depths(timestamp, bounding_boxes):
         depths.append([bb_id, depth])
     return depths
 
+def filter_depths(depths, threshold):
+    filtered_depths = []
+    for depth in depths:
+        if depth[1] <= threshold:
+            filtered_depths.append(depth)
+    return filtered_depths
+
 # when the node is killed, run the tracker and filter the results
 def run_tracker_and_filter():
     print('Running tracker and tracker evaluator...')
@@ -169,8 +176,9 @@ def run_tracker_and_filter():
     for timestamp in bounding_boxes:
         depths.extend(get_depths(timestamp, bounding_boxes))
 
-    # TODO: filter the results using depth data
-
+    # Filter the results using depth data
+    threshold = 30 # we must preserve those depths that are within [0, 30]. The rest must be filtered out
+    filtered_depths = filter_depths(depths, threshold)
 
 # saves an image and returns its name
 def save_image(save_path, saved_image_name, global_frame):
