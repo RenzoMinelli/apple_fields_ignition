@@ -9,7 +9,9 @@ from stereo_msgs.msg import DisparityImage
 import message_filters
 
 def read_cameras():
-    #si es la simulacion cambiar /stereo por /costar husky o algo asi, lo que diga el topic de salida de hacer stereo_image_proc
+    print('Running stereo_image_proc')
+
+    # Si es la simulacion cambiar /stereo por /costar husky o algo asi, lo que diga el topic de salida de hacer stereo_image_proc
     imageR = message_filters.Subscriber("/stereo/right/image_rect_color", Image)
     disparity = message_filters.Subscriber("stereo/disparity", DisparityImage)
     
@@ -29,9 +31,14 @@ def image_callback(imageR, disparity):
 
     seq = imageR.header.seq
 
+    breakpoint()
+    # get the timestamps that will be the name of the images, this is so the tracker can match the detected images with the depth data
+    cv_disparity_timestamp = disparity.header.stamp
+    cv_image_right_timestamp = imageR.header.stamp
+
     print("saving images")
-    cv.imwrite('detected_images_depth_data/image_{}.png'.format(seq), cv_disparity)
-    cv.imwrite('detected_images_YOLOv8/image_{}.png'.format(seq), cv_image_right)
+    cv.imwrite('detected_images_depth_data/{}.png'.format(cv_disparity_timestamp), cv_disparity)
+    cv.imwrite('detected_images_YOLOv8/{}.png'.format(cv_image_right_timestamp), cv_image_right)
 
 
 
