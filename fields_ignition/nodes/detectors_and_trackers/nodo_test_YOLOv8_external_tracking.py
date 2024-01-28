@@ -87,8 +87,8 @@ def read_bounding_boxes():
 
     # Iterate over file names
     for file_name in file_names:
-        # Obtain the timestamp out of the file name (it is suppose to be te string before the first dot)
-        timestamp = file_name.split(".")[0]
+        # Obtain the timestamp out of the file name (example name: image_40.png)
+        timestamp = file_name.split("_")[1].split(".")[0]
 
         # Obtain bounding boxes from the file
         with open(os.path.join(dir_path, file_name), 'r') as bb_file:
@@ -137,7 +137,7 @@ def read_bounding_boxes():
 def get_depths(timestamp, bounding_boxes):
     # read the depth image
     print("warning: reading depth image from file using grayscale parameter. For other kinds of images, change the code.")
-    depth_image = cv2.imread("detected_images_depth_data/" + str(timestamp) + ".png", cv2.IMREAD_GRAYSCALE)
+    depth_image = cv2.imread("detected_images_depth_data/" + "image_" +str(timestamp) + ".png", cv2.IMREAD_GRAYSCALE)
 
     if type(depth_image) != numpy.ndarray:
         print('timestamp ' + str(timestamp) + ' not found in detected_images_depth_data folder')
@@ -153,24 +153,21 @@ def get_depths(timestamp, bounding_boxes):
     return depths
 
 # when the node is killed, run the tracker and filter the results
-def exit_handler():
+def run_tracker_and_filter():
     print('Running tracker and tracker evaluator...')
     
     SOURCE = "detected_images_YOLOv8"
 
     # subprocess.run(["python3", "yolo_tracking/examples/track.py", "--yolo-model", YOLO_WEIGHTS, "--tracking-method", TRACKING_METHOD, "--source", SOURCE, "--save", "--save-txt"]) 
 
-    # TODO: WAIT FOR DEPTH NODE TO FINISH 
-
     # get the bounding boxes from the file
     bounding_boxes = read_bounding_boxes()
-    print(bounding_boxes)
 
     # get the depths of the bounding boxes
     depths = []
+    
     for timestamp in bounding_boxes:
-       depths.append(*get_depths(timestamp, bounding_boxes))
-    print(depths)
+        depths.extend(get_depths(timestamp, bounding_boxes))
 
     # TODO: filter the results using depth data
 
@@ -198,22 +195,10 @@ def process_data(data):
 # main function
 if __name__ == '__main__':
 
-    
-    bridge = CvBridge()
+    rospy.init_node('tracking_and_filtering_node')
 
-    rospy.init_node('test_node')
-    
-    # read from simulation
-    # sub = rospy.Subscriber("/costar_husky_sensor_config_1/left/image_raw/compressed", CompressedImage, process_data, queue_size = 10) 
-
-    # read from bag
-    # sub = rospy.Subscriber("/zed_lateral/zed_lateral/left/image_rect_color/compressed", CompressedImage, process_data, queue_size = 10) 
-
-    rospy.loginfo('test node has been started...')
-
-    # when the node is killed, run the tracker and the tracker evaluator
-    rospy.on_shutdown(exit_handler)
-    
-    rospy.spin() #blocks until node is shutdown, Yields activity on other threads
-    
+    rospy.loginfo('tracking and filtering node started')
+   
+    # TODO: WAIT FOR DEPTH NODE TO FINISH AND PROCESS GENERATED DATA
+    run_tracker_and_filter()
     
