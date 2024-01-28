@@ -81,7 +81,6 @@ def read_bounding_boxes():
     
     file_names = os.listdir(dir_path)
     file_names.remove(ignored_file)
-    breakpoint()
 
     # Define bounding_boxes as an empty dictionary 
     bounding_boxes = {}
