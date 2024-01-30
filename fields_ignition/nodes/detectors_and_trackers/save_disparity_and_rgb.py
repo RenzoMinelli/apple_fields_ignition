@@ -9,8 +9,8 @@ import message_filters
 
 def read_cameras():
     #si es la simulacion cambiar /stereo por /costar_husky_sensor_config_1, lo que diga el topic de salida de hacer stereo_image_proc
-    imageR = message_filters.Subscriber("/stereo/right/image_rect_color", Image)
-    disparity = message_filters.Subscriber("/stereo/disparity", DisparityImage)
+    imageR = message_filters.Subscriber("/costar_husky_sensor_config_1/right/image_rect_color", Image)
+    disparity = message_filters.Subscriber("/costar_husky_sensor_config_1/disparity", DisparityImage)
 
     # Synchronize images
     ts = message_filters.TimeSynchronizer([imageR, disparity], queue_size=20)
@@ -22,13 +22,19 @@ def image_callback(imageR, disparity):
     rospy.loginfo("receiving Image")
 
     # convert the images to cv2 format and save them
-    cv_image_right = br.imgmsg_to_cv2(imageR)
+    cv_image_right = br.imgmsg_to_cv2(imageR, 'bgr8')
     cv_disparity = br.imgmsg_to_cv2(disparity.image)
+
+    # Normalize the disparity map
+    disparity_map_normalized = cv.normalize(cv_disparity, None, 0, 255, cv.NORM_MINMAX)
+
+    # Apply a colormap (you can choose a different colormap if desired)
+    colored_disparity_map = cv.applyColorMap(disparity_map_normalized.astype(np.uint8), cv.COLORMAP_JET)
 
     timestamp = str(imageR.header.stamp)
 
     print("saving images")
-    cv.imwrite('detected_images_depth_data/{}.png'.format(timestamp), cv_disparity)
+    cv.imwrite('detected_images_depth_data/{}.png'.format(timestamp), colored_disparity_map)
     cv.imwrite('detected_images_YOLOv8/{}.png'.format(timestamp), cv_image_right)
 
 if __name__ == '__main__':
