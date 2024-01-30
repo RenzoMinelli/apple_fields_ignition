@@ -27,6 +27,7 @@ TRACKING_METHOD = "bytetrack"
 YOLO_WEIGHTS = "weights/yolov8.pt"
 bridge = CvBridge()
 YOLOv8_model = None
+FIXED_THRESHOLD = True
 
 def encontrar_punto_de_corte(lista):
     """
@@ -177,7 +178,8 @@ def track_filter_and_count():
         depths.extend(get_depths(timestamp, bounding_boxes))
 
     # Filter the results using depth data
-    threshold = 30 # we must preserve those depths that are within [0, 30]. The rest must be filtered out
+    # we must preserve those depths that are within [0, 30]. The rest must be filtered out
+    threshold = 30 if FIXED_THRESHOLD else encontrar_punto_de_corte([pair[1] for pair in depths]) 
     filtered_depths = filter_depths(depths, threshold)
 
     # Count the distinct ids that remained after filtering
