@@ -1,0 +1,29 @@
+<launch>
+  <!-- Play the rosbag -->
+  <node pkg="rosbag" type="play" name="rosbag_play" args="/home/paolo/catkin_ws/s1_230228.bag /zed_lateral/zed_lateral/left/camera_info:=/stereo/left/camera_info /zed_lateral/zed_lateral/right/camera_info:=/stereo/right/camera_info" output="screen"/>
+
+  <!-- Remap left camera image topic -->
+  <node pkg="image_transport" type="republish" name="remap_left_image" output="screen" args="compressed in:=/zed_lateral/zed_lateral/left/image_rect_color raw out:=/stereo/left/image_raw" />
+
+  <!-- Remap right camera image topic -->
+  <node pkg="image_transport" type="republish" name="remap_right_image" output="screen" args="compressed in:=/zed_lateral/zed_lateral/right/image_rect_color raw out:=/stereo/right/image_raw" />
+
+  <!-- Remap left camera info topic -->
+  <!-- <node pkg="topic_tools" type="relay" name="remap_left_camera_info">
+    <remap from="/zed_lateral/zed_lateral/left/camera_info" to="/stereo/left/camera_info"/>
+  </node> -->
+
+  <!-- Remap right camera info topic -->
+  <!-- <node pkg="topic_tools" type="relay" name="remap_right_camera_info">
+    <remap from="/zed_lateral/zed_lateral/right/camera_info" to="/stereo/right/camera_info"/>
+  </node> -->
+
+  <!-- Run stereo_image_proc -->
+  <!-- <node pkg="stereo_image_proc" type="stereo_image_proc" name="stereo_image_proc" output="screen">
+    <param name="approximate_sync" value="true"/>
+  </node> -->
+</launch>
+
+<!-- roslaunch fields_ignition stereo.launch -->
+<!-- ROS_NAMESPACE=stereo rosrun stereo_image_proc stereo_image_proc -->
+<!-- rosrun image_view stereo_view stereo:=/stereo image:=image_rect_color -->
