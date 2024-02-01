@@ -29,7 +29,7 @@ bridge = CvBridge()
 YOLOv8_model = None
 FIXED_THRESHOLD = True
 
-def encontrar_punto_de_corte(lista):
+def find_midpoint(lista):
     """
     Encuentra el punto que divide una lista ordenada de enteros en dos clusters,
     minimizando la suma de las varianzas internas de los clusters.
@@ -48,8 +48,8 @@ def encontrar_punto_de_corte(lista):
         cluster_2 = lista_ordenada[i:]
 
         # Calcular la varianza de cada cluster
-        varianza_1 = varianza(cluster_1) if cluster_1 else 0
-        varianza_2 = varianza(cluster_2) if cluster_2 else 0
+        varianza_1 = variance(cluster_1) if cluster_1 else 0
+        varianza_2 = variance(cluster_2) if cluster_2 else 0
 
         # Sumar las varianzas
         varianza_suma = varianza_1 + varianza_2
@@ -61,7 +61,7 @@ def encontrar_punto_de_corte(lista):
 
     return mejor_punto
 
-def varianza(lista):
+def variance(lista):
     """
     Calcula la varianza de una lista de números.
     """
@@ -182,7 +182,7 @@ def track_filter_and_count():
 
     # Filter the results using depth data
     # we must preserve those depths that are within [0, 30]. The rest must be filtered out
-    threshold = 30 if FIXED_THRESHOLD else encontrar_punto_de_corte([pair[1] for pair in depths]) 
+    threshold = 30 if FIXED_THRESHOLD else find_midpoint([pair[1] for pair in depths]) 
     filtered_depths = filter_depths(depths, threshold)
 
     # Count the distinct ids that remained after filtering
@@ -192,34 +192,4 @@ def track_filter_and_count():
     ids = list(set(ids))
     # Print the number of apples
     print('Number of apples: ' + str(len(ids)))
-
-# saves an image and returns its name
-def save_image(save_path, saved_image_name, global_frame):
-    current_time = datetime.datetime.now().strftime("%Y%m%d%H%M%S%f") + "_"
-    cv2.imwrite(save_path + '/' + current_time + saved_image_name, global_frame)
-    return current_time + saved_image_name
-
-# callback function
-def process_data(data):
-    try:
-        pdb.set_trace()
-        global_frame = bridge.compressed_imgmsg_to_cv2(data)
-        timestamp = data.header.stamp
-
-        # save image named as timestamp in order to match with the depth data
-        save_image("detected_images_YOLOv8", str(timestamp) + ".jpg", global_frame)
-
-    except CvBridgeError as e:
-        raise(e)
-
-
-# main function
-if __name__ == '__main__':
-
-    rospy.init_node('tracking_and_filtering_node')
-
-    rospy.loginfo('tracking and filtering node started')
-   
-    # TODO: WAIT FOR DEPTH NODE TO FINISH AND PROCESS GENERATED DATA
-    track_filter_and_count()
     
