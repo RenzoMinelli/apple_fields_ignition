@@ -189,7 +189,7 @@ def track_filter_and_count():
     ids = []
     for depth in filtered_depths:
         ids.append(depth[0])
-    ids = list(set(ids))
+    ids = set(ids)
     # Print the number of apples
     print('Number of apples: ' + str(len(ids)))
     
