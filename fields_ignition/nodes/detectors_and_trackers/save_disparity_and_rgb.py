@@ -52,10 +52,9 @@ if __name__ == '__main__':
 # rosrun fields_ignition save_disparity_and_rgb.py
 
 # Simulacion:
-# cambiar en este py lo que inica el comentario en la linea 12
+# cambiar en este py lo que indica el comentario en la linea 12
 # roslaunch fields_ignition fields_ignition.launch
 # ROS_NAMESPACE=costar_husky_sensor_config_1 rosrun stereo_image_proc stereo_image_proc
-# rosrun image_view stereo_view stereo:=/stereo image:=image_rect_color
 # Si queres mejor calidad: rosrun rqt_reconfigure rqt_reconfigure y cargar el yaml en /home/paolo/catkin_ws/src/apple_fields_ignition/fields_ignition/config/stereoConfigSim.yaml
-# rosrun image_view stereo_view stereo:=/stereo image:=image_rect_color (para verificacion visual de que se ve bien)
+# rosrun image_view stereo_view stereo:=/costar_husky_sensor_config_1 image:=image_rect_color (para verificacion visual de que se ve bien)
 # rosrun fields_ignition save_disparity_and_rgb.py

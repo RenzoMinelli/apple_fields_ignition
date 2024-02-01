@@ -89,7 +89,7 @@ def read_bounding_boxes():
     # Iterate over file names
     for file_name in file_names:
         # Obtain the timestamp out of the file name (example name: image_40.png)
-        timestamp = file_name.split("_")[1].split(".")[0]
+        timestamp = file_name.split(".")[0]
 
         # Obtain bounding boxes from the file
         with open(os.path.join(dir_path, file_name), 'r') as bb_file:
@@ -141,7 +141,7 @@ def read_bounding_boxes():
 def get_depths(timestamp, bounding_boxes):
     # read the depth image
     print("warning: reading depth image from file using grayscale parameter. For other kinds of images, change the code.")
-    depth_image = cv2.imread("detected_images_depth_data/" + "image_" +str(timestamp) + ".png", cv2.IMREAD_GRAYSCALE)
+    depth_image = cv2.imread("detected_images_depth_data/" + str(timestamp) + ".png", cv2.IMREAD_GRAYSCALE)
 
     if type(depth_image) != numpy.ndarray:
         print('timestamp ' + str(timestamp) + ' not found in detected_images_depth_data folder')
@@ -169,7 +169,7 @@ def track_filter_and_count():
     
     SOURCE = "detected_images_YOLOv8"
 
-    # subprocess.run(["python3", "yolo_tracking/examples/track.py", "--yolo-model", YOLO_WEIGHTS, "--tracking-method", TRACKING_METHOD, "--source", SOURCE, "--save", "--save-txt"]) 
+    subprocess.run(["python3", "yolo_tracking/examples/track.py", "--yolo-model", YOLO_WEIGHTS, "--tracking-method", TRACKING_METHOD, "--source", SOURCE, "--save", "--save-txt"]) 
 
     # get the bounding boxes from the file
     bounding_boxes = read_bounding_boxes()
