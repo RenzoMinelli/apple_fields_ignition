@@ -121,8 +121,11 @@ def read_bounding_boxes():
                 h = int(h)
                 w = int(w)
 
+                if (x + w/2 < 30 or x + w/2 > 1280 - 30): #ESTE IF ES PARA CONSIDERAR LA FRANJA NEGRA QUE SALE EN LAS IMAGENES DEPROFUNDIDAD
+                    continue
+
                 # Create a list with the bounding box center and the bounding box id which is what will be saved in the dictionary
-                bb_center = [int(x + w/2), int(y + h/2), bb_id]
+                bb_center = [int(x + w/2) + 30, int(y + h/2), bb_id] #EL + 30 PARA CONSIDERAR LA FRANJA NEGRA QUE SALE EN LAS IMAGENES DEPROFUNDIDAD
 
                 if (timestamp in bounding_boxes):
                     bounding_boxes[timestamp].append(bb_center)
