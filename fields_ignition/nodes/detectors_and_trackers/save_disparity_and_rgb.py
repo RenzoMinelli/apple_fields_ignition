@@ -6,6 +6,7 @@ from cv_bridge import CvBridge, CvBridgeError
 from sensor_msgs.msg import Image, CompressedImage
 from stereo_msgs.msg import DisparityImage
 import message_filters
+from rgb_and_depth_processing import track_filter_and_count
 
 def read_cameras():
     #si es la simulacion cambiar /stereo por /costar_husky_sensor_config_1, lo que diga el topic de salida de hacer stereo_image_proc
@@ -35,7 +36,9 @@ if __name__ == '__main__':
     rospy.init_node('my_node')
     try:
         read_cameras()
-        
+
+        # Process generated images
+        rospy.on_shutdown(track_filter_and_count)
     except rospy.ROSInterruptException:
         pass
 

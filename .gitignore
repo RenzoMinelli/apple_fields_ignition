@@ -1,1 +1,2 @@
 *.bag
+fields_ignition/nodes/detectors_and_trackers/__pycache__/rgb_and_depth_processing.cpython-38.pyc
