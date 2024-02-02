@@ -99,7 +99,12 @@ def read_bounding_boxes():
                 line_split = line.split(" ")
 
                 # If the line has 6 elements, the bounding box has an id, otherwise it is 0
-                bb_id = int(line_split[5][:-1]) if len(line_split) == 6 else 0
+                print("line: ", line)
+
+                if len(line_split) < 6: # this is to skip IDs = 0 which correspond to unconfirmed tracks 
+                    continue
+
+                bb_id = int(line_split[5][:-1])
                 x,y = line_split[1:3]
                 h,w = line_split[3:5]
 
