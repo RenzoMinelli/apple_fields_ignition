@@ -7,11 +7,14 @@ from sensor_msgs.msg import Image, CompressedImage
 from stereo_msgs.msg import DisparityImage
 import message_filters
 from rgb_and_depth_processing import track_filter_and_count
+import os
+ros_namespace = ''
 
 def read_cameras():
     #si es la simulacion cambiar /stereo por /costar_husky_sensor_config_1, lo que diga el topic de salida de hacer stereo_image_proc
-    imageR = message_filters.Subscriber("/costar_husky_sensor_config_1/right/image_rect_color", Image)
-    disparity = message_filters.Subscriber("/costar_husky_sensor_config_1/disparity", DisparityImage)
+    ros_namespace = os.getenv('ROS_NAMESPACE')
+    imageR = message_filters.Subscriber("/" + ros_namespace + "/right/image_rect_color", Image)
+    disparity = message_filters.Subscriber("/" + ros_namespace + "/disparity", DisparityImage)
 
     # Synchronize images
     ts = message_filters.TimeSynchronizer([imageR, disparity], queue_size=20)
