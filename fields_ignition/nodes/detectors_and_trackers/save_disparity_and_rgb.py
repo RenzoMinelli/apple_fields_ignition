@@ -8,6 +8,7 @@ from stereo_msgs.msg import DisparityImage
 import message_filters
 from rgb_and_depth_processing import track_filter_and_count
 import os
+import subprocess
 ros_namespace = ''
 
 def read_cameras():
@@ -35,9 +36,27 @@ def image_callback(imageR, disparity):
     cv.imwrite('detected_images_depth_data/{}.png'.format(timestamp), cv_disparity)
     cv.imwrite('detected_images_YOLOv8/{}.png'.format(timestamp), cv_image_right)
 
+def empty_folder(folder_path):
+    # Get all the file names in the folder
+    file_names = os.listdir(folder_path)
+
+    # Iterate over the file names and delete each file
+    for file_name in file_names:
+        file_path = os.path.join(folder_path, file_name)
+        os.remove(file_path)
+
+def delete_folder(folder_path):
+    subprocess.run(['rm', '-rf', folder_path])
+
 if __name__ == '__main__':
     rospy.init_node('my_node')
     try:
+        # Empty the folders
+        #TODO if folders do not exist, create them
+        empty_folder('detected_images_depth_data')
+        empty_folder('detected_images_YOLOv8')
+        delete_folder('yolo_tracking/runs/track/exp')
+
         read_cameras()
 
         # Process generated images
