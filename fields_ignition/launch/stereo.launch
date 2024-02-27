@@ -1,6 +1,6 @@
 <launch>
   <!-- Play the rosbag -->
-  <node pkg="rosbag" type="play" name="rosbag_play" args="/home/paolo/catkin_ws/s1_230228.bag /zed_lateral/zed_lateral/left/camera_info:=/stereo/left/camera_info /zed_lateral/zed_lateral/right/camera_info:=/stereo/right/camera_info" output="screen"/>
+  <node pkg="rosbag" type="play" name="rosbag_play" args="-s 200 /home/pincho/Documents/bagMercedes/s1_230228.bag /zed_lateral/zed_lateral/left/camera_info:=/stereo/left/camera_info /zed_lateral/zed_lateral/right/camera_info:=/stereo/right/camera_info" output="screen"/>
 
   <!-- Remap left camera image topic -->
   <node pkg="image_transport" type="republish" name="remap_left_image" output="screen" args="compressed in:=/zed_lateral/zed_lateral/left/image_rect_color raw out:=/stereo/left/image_raw" />

@@ -14,6 +14,13 @@ import pdb
 import subprocess
 import os
 import numpy
+ros_namespace = os.getenv('ROS_NAMESPACE')
+
+# image_height = 720 if ros_namespace == 'costar_husky_sensor_config_1' else 1080
+# image_width = 1280 if ros_namespace == 'costar_husky_sensor_config_1' else 1920
+image_height = 1024
+image_width = 1024
+offset_horizontal = 53
 
 # clone repository with tracker and tracker evaluator - after running the node for the first time, run `pip install --upgrade sentry-sdk`
 subprocess.run(["git", "clone", "--recurse-submodules", "https://github.com/Geromendez135/yolo_tracking.git"])
@@ -115,10 +122,10 @@ def read_bounding_boxes():
                 w = float(w)
 
                 # As the values are normalized we need to multiply them by the image size
-                x = x * 1280 # ESTO HARDCODEADO NO ME PARECE MUCHO PORQUE SI ALGUIEN EN EL FUTURO QUIERE CAMBIAR EL SENSOR SE COMPLICA REVISAR EL CODIGO, ME PARECE QUE DEBERIA SER UN PARAMETRO O UNA VARIABLE GLOABL MINIMO
-                y = y * 720
-                h = h * 1280
-                w = w * 720
+                x = x * image_width # ESTO HARDCODEADO NO ME PARECE MUCHO PORQUE SI ALGUIEN EN EL FUTURO QUIERE CAMBIAR EL SENSOR SE COMPLICA REVISAR EL CODIGO, ME PARECE QUE DEBERIA SER UN PARAMETRO O UNA VARIABLE GLOABL MINIMO
+                y = y * image_height
+                h = h * image_height
+                w = w * image_width
 
                 # Convert everything to int
                 x = int(x)
@@ -126,11 +133,14 @@ def read_bounding_boxes():
                 h = int(h)
                 w = int(w)
 
-                if (x + w/2 < 30 or x + w/2 > 1280 - 30): #ESTE IF ES PARA CONSIDERAR LA FRANJA NEGRA QUE SALE EN LAS IMAGENES DEPROFUNDIDAD
+                # if (x + w/2 < 70 or x + w/2 > image_width - 7 or y + h/2 < 7 or y + h/2 > image_height - 7): #ESTE IF ES PARA CONSIDERAR LA FRANJA NEGRA QUE SALE EN LAS IMAGENES DE PROFUNDIDAD
+                #     continue
+
+                if(int(x + w/2) + offset_horizontal >= image_width):
                     continue
 
                 # Create a list with the bounding box center and the bounding box id which is what will be saved in the dictionary
-                bb_center = [int(x + w/2) + 30, int(y + h/2), bb_id] #EL + 30 PARA CONSIDERAR LA FRANJA NEGRA QUE SALE EN LAS IMAGENES DEPROFUNDIDAD
+                bb_center = [int(x + w/2) + offset_horizontal, int(y + h/2), bb_id] #EL + 30 PARA CONSIDERAR LA FRANJA NEGRA QUE SALE EN LAS IMAGENES DEPROFUNDIDAD
 
                 if (timestamp in bounding_boxes):
                     bounding_boxes[timestamp].append(bb_center)
@@ -164,7 +174,7 @@ def get_depths(timestamp, bounding_boxes):
 def filter_depths(depths, threshold):
     filtered_depths = []
     for depth in depths:
-        if depth[1] <= threshold:
+        if depth[1] >= threshold:
             filtered_depths.append(depth)
     return filtered_depths
 
@@ -197,4 +207,3 @@ def track_filter_and_count():
     ids = set(ids)
     # Print the number of apples
     print('Number of apples: ' + str(len(ids)))
-    
