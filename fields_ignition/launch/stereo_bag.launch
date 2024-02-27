@@ -18,4 +18,11 @@
   <node pkg="image_transport" type="republish" name="remap_left_image" output="screen" args="compressed in:=$(arg left_camera_image_topic) raw out:=/stereo/left/image_raw" />
   <!-- Remap right camera image topic -->
   <node pkg="image_transport" type="republish" name="remap_right_image" output="screen" args="compressed in:=$(arg right_camera_image_topic) raw out:=/stereo/right/image_raw" />
+
+  <!-- Run stereo_image_proc -->
+  <group ns="stereo">
+    <node pkg="stereo_image_proc" type="stereo_image_proc" name="stereo_image_proc" output="screen">
+      <rosparam command="load" file="/home/paolo/catkin_ws/src/apple_fields_ignition/fields_ignition/config/stereoParamsMercedez.yaml"/>
+    </node>
+  </group>
 </launch>
