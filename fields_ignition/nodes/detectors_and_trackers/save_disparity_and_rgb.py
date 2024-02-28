@@ -49,20 +49,21 @@ def delete_folder(folder_path):
     subprocess.run(['rm', '-rf', folder_path])
 
 if __name__ == '__main__':
-    rospy.init_node('my_node')
-    try:
-        # Empty the folders
-        #TODO if folders do not exist, create them
-        empty_folder('detected_images_depth_data')
-        empty_folder('detected_images_YOLOv8')
-        delete_folder('yolo_tracking/runs/track/exp')
+    # rospy.init_node('my_node')
+    # try:
+    #     # Empty the folders
+    #     #TODO if folders do not exist, create them
+    #     empty_folder('detected_images_depth_data')
+    #     empty_folder('detected_images_YOLOv8')
+    #     delete_folder('yolo_tracking/runs/track/exp')
 
-        read_cameras()
+    #     read_cameras()
 
-        # Process generated images
-        rospy.on_shutdown(track_filter_and_count)
-    except rospy.ROSInterruptException:
-        pass
+    #     # Process generated images
+    #     rospy.on_shutdown(track_filter_and_count)
+    # except rospy.ROSInterruptException:
+    #     pass
+    track_filter_and_count()
 
 
 # Bag de mercedes:
