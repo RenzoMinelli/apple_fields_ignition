@@ -12,7 +12,7 @@
   <arg name="right_camera_info_topic" default="/zed_lateral/zed_lateral/right/camera_info"/>
 
   <!-- Play the rosbag and remap camera info topics -->
-  <node pkg="rosbag" type="play" name="rosbag_play" args="$(arg bag_file_path) $(arg left_camera_info_topic):=/stereo/left/camera_info $(arg right_camera_info_topic):=/stereo/right/camera_info" output="screen"/>
+  <node pkg="rosbag" type="play" name="rosbag_play" args="$(arg bag_file_path) $(arg left_camera_info_topic):=/stereo/left/camera_info $(arg right_camera_info_topic):=/stereo/right/camera_info" output="log"/>
 
   <!-- Remap left camera image topic -->
   <node pkg="image_transport" type="republish" name="remap_left_image" output="screen" args="compressed in:=$(arg left_camera_image_topic) raw out:=/stereo/left/image_raw" />
@@ -26,10 +26,13 @@
     </node>
   </group>
 
-  <!-- rosrun fields_ignition save_disparity_and_rgb.py -->
   <!-- Run script to save the images -->
   <!-- use remap instead of the namespace -->
-  <env name="ROS_NAMESPACE" value="stereo">
-    <node pkg="fields_ignition" type="save_disparity_and_rgb.py" name="save_disparity_and_rgb" output="screen"/>
-  </env>
+  <arg name="folder_path" default="/home/paolo/catkin_ws"/>
+  <env name="ROS_NAMESPACE" value="stereo" />
+  <node pkg="fields_ignition" type="save_disparity_and_rgb.py" name="save_disparity_and_rgb" args="$(arg folder_path)" output="screen"/>
 </launch>
+
+<!-- Ejemplo de ejecucion -->
+<!-- Parado en la carpeta de catkin_ws -->
+<!-- roslaunch fields_ignition stereo_bag.launch bag_file_path:=/home/paolo/catkin_ws/s1_230228.bag folder_path:=/home/paolo/catkin_ws -->
