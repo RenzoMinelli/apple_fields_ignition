@@ -113,34 +113,27 @@ def read_bounding_boxes():
 
                 bb_id = int(line_split[5][:-1])
                 x,y = line_split[1:3]
-                h,w = line_split[3:5]
 
                 # Convert everything to float first
                 x = float(x)
                 y = float(y)
-                h = float(h)
-                w = float(w)
 
                 # As the values are normalized we need to multiply them by the image size
                 x = x * image_width # ESTO HARDCODEADO NO ME PARECE MUCHO PORQUE SI ALGUIEN EN EL FUTURO QUIERE CAMBIAR EL SENSOR SE COMPLICA REVISAR EL CODIGO, ME PARECE QUE DEBERIA SER UN PARAMETRO O UNA VARIABLE GLOABL MINIMO
                 y = y * image_height
-                h = h * image_height
-                w = w * image_width
 
                 # Convert everything to int
                 x = int(x)
                 y = int(y)
-                h = int(h)
-                w = int(w)
 
                 # if (x + w/2 < 70 or x + w/2 > image_width - 7 or y + h/2 < 7 or y + h/2 > image_height - 7): #ESTE IF ES PARA CONSIDERAR LA FRANJA NEGRA QUE SALE EN LAS IMAGENES DE PROFUNDIDAD
                 #     continue
 
-                if(int(x + w/2) + offset_horizontal >= image_width):
+                if(int(x) + offset_horizontal >= image_width):
                     continue
 
                 # Create a list with the bounding box center and the bounding box id which is what will be saved in the dictionary
-                bb_center = [int(x + w/2) + offset_horizontal, int(y + h/2), bb_id] #EL + 30 PARA CONSIDERAR LA FRANJA NEGRA QUE SALE EN LAS IMAGENES DEPROFUNDIDAD
+                bb_center = [x + offset_horizontal, y, bb_id] #EL + 30 PARA CONSIDERAR LA FRANJA NEGRA QUE SALE EN LAS IMAGENES DEPROFUNDIDAD
 
                 if (timestamp in bounding_boxes):
                     bounding_boxes[timestamp].append(bb_center)
