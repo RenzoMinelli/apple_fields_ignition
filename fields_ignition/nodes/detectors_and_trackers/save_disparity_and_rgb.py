@@ -11,7 +11,7 @@ import os
 import subprocess
 
 def read_cameras():
-    ros_namespace = os.getenv('ROS_NAMESPACE')
+    ros_namespace = os.getenv('ROS_NAMESPACE') == None and 'stereo' or os.getenv('ROS_NAMESPACE')
     imageL = message_filters.Subscriber("/" + ros_namespace + "/left/image_rect_color", Image)
     imageR = message_filters.Subscriber("/" + ros_namespace + "/right/image_rect_color", Image)
     disparity = message_filters.Subscriber("/" + ros_namespace + "/disparity", DisparityImage)
