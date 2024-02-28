@@ -2,41 +2,47 @@
 import rospy
 import cv2 as cv
 import numpy as np
-from cv_bridge import CvBridge, CvBridgeError
-from sensor_msgs.msg import Image, CompressedImage
+from cv_bridge import CvBridge
+from sensor_msgs.msg import Image
 from stereo_msgs.msg import DisparityImage
 import message_filters
-from rgb_and_depth_processing import track_filter_and_count
+# from rgb_and_depth_processing import track_filter_and_count
 import os
 import subprocess
-ros_namespace = ''
+import sys
 
 def read_cameras():
-    #si es la simulacion cambiar /stereo por /costar_husky_sensor_config_1, lo que diga el topic de salida de hacer stereo_image_proc
-    ros_namespace = os.getenv('ROS_NAMESPACE')
+    ros_namespace = os.getenv('ROS_NAMESPACE') == None and 'stereo' or os.getenv('ROS_NAMESPACE')
+    imageL = message_filters.Subscriber("/" + ros_namespace + "/left/image_rect_color", Image)
     imageR = message_filters.Subscriber("/" + ros_namespace + "/right/image_rect_color", Image)
     disparity = message_filters.Subscriber("/" + ros_namespace + "/disparity", DisparityImage)
 
     # Synchronize images
-    ts = message_filters.TimeSynchronizer([imageR, disparity], queue_size=20)
+    ts = message_filters.TimeSynchronizer([imageL, imageR, disparity], queue_size=20)
     ts.registerCallback(image_callback)
     rospy.spin()
 
-def image_callback(imageR, disparity):
+def image_callback(imageL, imageR, disparity):
     br = CvBridge()
     rospy.loginfo("receiving Image")
 
     # convert the images to cv2 format and save them
+    cv_image_left = br.imgmsg_to_cv2(imageL, 'bgr8')
     cv_image_right = br.imgmsg_to_cv2(imageR, 'bgr8')
     cv_disparity = br.imgmsg_to_cv2(disparity.image)
 
     timestamp = str(imageR.header.stamp)
 
-    print("saving images")
-    cv.imwrite('detected_images_depth_data/{}.png'.format(timestamp), cv_disparity)
-    cv.imwrite('detected_images_YOLOv8/{}.png'.format(timestamp), cv_image_right)
+    cv.imwrite('left_rgb_images/{}.png'.format(timestamp), cv_image_left)
+    cv.imwrite('right_rgb_images/{}.png'.format(timestamp), cv_image_right)
+    cv.imwrite('disparity_images/{}.png'.format(timestamp), cv_disparity)
 
 def empty_folder(folder_path):
+    # If the folder does not exist, create it
+    if not os.path.exists(folder_path):
+        os.makedirs(folder_path)
+        return
+    
     # Get all the file names in the folder
     file_names = os.listdir(folder_path)
 
@@ -49,21 +55,22 @@ def delete_folder(folder_path):
     subprocess.run(['rm', '-rf', folder_path])
 
 if __name__ == '__main__':
-    # rospy.init_node('my_node')
-    # try:
-    #     # Empty the folders
-    #     #TODO if folders do not exist, create them
-    #     empty_folder('detected_images_depth_data')
-    #     empty_folder('detected_images_YOLOv8')
-    #     delete_folder('yolo_tracking/runs/track/exp')
+    rospy.init_node('save_disparity_and_rgb')
+    try:
+        # Change the current directory to the one sent as argument
+        os.chdir(sys.argv[1])
+        # Empty the folders
+        empty_folder('left_rgb_images')
+        empty_folder('right_rgb_images')
+        empty_folder('disparity_images')
+        delete_folder('yolo_tracking/runs/track/exp')
 
-    #     read_cameras()
+        read_cameras()
 
-    #     # Process generated images
-    #     rospy.on_shutdown(track_filter_and_count)
-    # except rospy.ROSInterruptException:
-    #     pass
-    track_filter_and_count()
+        # Process generated images
+        # rospy.on_shutdown(track_filter_and_count)
+    except rospy.ROSInterruptException:
+        pass
 
 
 # Bag de mercedes:
