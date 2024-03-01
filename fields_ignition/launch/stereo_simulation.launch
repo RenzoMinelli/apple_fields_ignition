@@ -1,0 +1,18 @@
+<launch>
+  <!-- Run stereo_image_proc -->
+  <group ns="/costar_husky_sensor_config_1">
+    <node pkg="stereo_image_proc" type="stereo_image_proc" name="stereo_image_proc" output="screen">
+      <rosparam command="load" file="/home/paolo/catkin_ws/src/apple_fields_ignition/fields_ignition/config/stereoParamsSim.yaml"/>
+    </node>
+  </group>
+
+  <!-- Run script to save the images -->
+  <!-- use remap instead of the namespace -->
+  <arg name="folder_path" default="/home/paolo/catkin_ws"/>
+  <env name="ROS_NAMESPACE" value="costar_husky_sensor_config_1" />
+  <node pkg="fields_ignition" type="save_disparity_and_rgb.py" name="save_disparity_and_rgb" args="$(arg folder_path)" output="screen"/>
+</launch>
+
+<!-- Ejemplo de ejecucion -->
+<!-- Parado en la carpeta de catkin_ws y con la simulacion corriendo (roslaunch fields_ignition fields_ignition.launch) -->
+<!-- roslaunch fields_ignition stereo_simulation.launch folder_path:=/home/paolo/catkin_ws -->

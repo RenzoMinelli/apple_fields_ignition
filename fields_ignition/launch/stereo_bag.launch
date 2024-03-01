@@ -22,7 +22,7 @@
   <!-- Run stereo_image_proc -->
   <group ns="stereo">
     <node pkg="stereo_image_proc" type="stereo_image_proc" name="stereo_image_proc" output="screen">
-      <rosparam command="load" file="/home/paolo/catkin_ws/src/apple_fields_ignition/fields_ignition/config/stereoParamsMercedes.yaml"/>
+      <rosparam command="load" file="/home/paolo/catkin_ws/src/apple_fields_ignition/fields_ignition/config/stereoParamsBag.yaml"/>
     </node>
   </group>
 
