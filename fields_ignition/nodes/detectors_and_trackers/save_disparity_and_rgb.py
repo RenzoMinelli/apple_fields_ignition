@@ -6,7 +6,7 @@ from cv_bridge import CvBridge
 from sensor_msgs.msg import Image
 from stereo_msgs.msg import DisparityImage
 import message_filters
-# from rgb_and_depth_processing import track_filter_and_count
+from rgb_and_depth_processing import track_filter_and_count
 import os
 import subprocess
 import sys
@@ -56,9 +56,13 @@ def delete_folder(folder_path):
 
 if __name__ == '__main__':
     rospy.init_node('save_disparity_and_rgb')
+
+    working_directory = sys.argv[1]
+    print("working inside directory ", working_directory)
+
     try:
         # Change the current directory to the one sent as argument
-        os.chdir(sys.argv[1])
+        os.chdir(working_directory)
         # Empty the folders
         empty_folder('left_rgb_images')
         empty_folder('right_rgb_images')
@@ -68,7 +72,7 @@ if __name__ == '__main__':
         read_cameras()
 
         # Process generated images
-        # rospy.on_shutdown(track_filter_and_count)
+        rospy.on_shutdown(track_filter_and_count(working_directory))
     except rospy.ROSInterruptException:
         pass
 

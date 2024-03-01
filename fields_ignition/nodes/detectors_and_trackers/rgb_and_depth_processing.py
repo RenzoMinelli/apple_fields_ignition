@@ -14,19 +14,19 @@ import pdb
 import subprocess
 import os
 import numpy
+
 ros_namespace = os.getenv('ROS_NAMESPACE')
 
-# image_height = 720 if ros_namespace == 'costar_husky_sensor_config_1' else 1080
-# image_width = 1280 if ros_namespace == 'costar_husky_sensor_config_1' else 1920
 image_height = 1024
 image_width = 1024
 offset_horizontal = 53
 
 # clone repository with tracker and tracker evaluator - after running the node for the first time, run `pip install --upgrade sentry-sdk`
-subprocess.run(["git", "clone", "--recurse-submodules", "https://github.com/Geromendez135/yolo_tracking.git"])
-subprocess.run(["pip", "install", "-r", "yolo_tracking/requirements.txt"])
-subprocess.run(["git", "clone", "https://github.com/JonathonLuiten/TrackEval.git", "yolo_tracking/val_utils"])
-subprocess.run(["cp", "-r", "yolo_tracking/boxmot", "yolo_tracking/examples"])
+def clone_tracker_repo():
+    subprocess.run(["git", "clone", "--recurse-submodules", "https://github.com/Geromendez135/yolo_tracking.git"])
+    subprocess.run(["pip", "install", "-r", "yolo_tracking/requirements.txt"])
+    subprocess.run(["git", "clone", "https://github.com/JonathonLuiten/TrackEval.git", "yolo_tracking/val_utils"])
+    subprocess.run(["cp", "-r", "yolo_tracking/boxmot", "yolo_tracking/examples"])
 
 
 # global variables
@@ -34,7 +34,7 @@ TRACKING_METHOD = "bytetrack"
 YOLO_WEIGHTS = "weights/yolov8.pt"
 bridge = CvBridge()
 YOLOv8_model = None
-FIXED_THRESHOLD = True
+FIXED_THRESHOLD = False
 
 def find_midpoint(lista):
     """
@@ -172,9 +172,13 @@ def filter_depths(depths, threshold):
     return filtered_depths
 
 # when the node is killed, run the tracker and filter the results
-def track_filter_and_count():
-    print('Running tracker and tracker evaluator...')
+def track_filter_and_count(working_directory):
+    os.chdir(working_directory)
+    print('working inside directory ', os.getcwd())
     
+    clone_tracker_repo()
+
+    print('Running tracker and tracker evaluator...')
     SOURCE = "detected_images_YOLOv8"
 
     subprocess.run(["python3", "yolo_tracking/examples/track.py", "--yolo-model", YOLO_WEIGHTS, "--tracking-method", TRACKING_METHOD, "--source", SOURCE, "--save", "--save-txt"]) 
@@ -191,6 +195,7 @@ def track_filter_and_count():
     # Filter the results using depth data
     # we must preserve those depths that are within [0, 30]. The rest must be filtered out
     threshold = 30 if FIXED_THRESHOLD else find_midpoint([pair[1] for pair in depths]) 
+    print('with calculated threshold: ', threshold)
     filtered_depths = filter_depths(depths, threshold)
 
     # Count the distinct ids that remained after filtering
