@@ -42,6 +42,8 @@ def find_clusters(lista):
     Encuentra el punto que divide una lista ordenada de enteros en dos clusters,
     minimizando la suma de las varianzas internas de los clusters.
     """
+    lista.sort()
+    print('lista', lista)
     lista = numpy.array(lista)
     
     data = lista.reshape(-1, 1)
@@ -54,7 +56,7 @@ def find_clusters(lista):
 
     # Get the cluster centers
     cluster_centers = kmeans.cluster_centers_
-    print('cluster centers: ', cluster_centers)
+    print('cluster centers: ', '0:', cluster_centers[0][0], '1: ',cluster_centers[1][0])
     return cluster_centers[0][0] if cluster_centers[0][0] > cluster_centers[1][0] else cluster_centers[1][0]
 
 
