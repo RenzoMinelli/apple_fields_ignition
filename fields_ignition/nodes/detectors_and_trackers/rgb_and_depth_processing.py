@@ -54,7 +54,7 @@ def find_clusters(lista):
 
     # Get the cluster centers
     cluster_centers = kmeans.cluster_centers_
-
+    print('cluster centers: ', cluster_centers)
     return cluster_centers[0][0] if cluster_centers[0][0] > cluster_centers[1][0] else cluster_centers[1][0]
 
 
@@ -163,7 +163,7 @@ def track_filter_and_count(working_directory):
     print('Running tracker and tracker evaluator...')
     SOURCE = "detected_images_YOLOv8"
 
-    subprocess.run(["python3", "yolo_tracking/examples/track.py", "--yolo-model", YOLO_WEIGHTS, "--tracking-method", TRACKING_METHOD, "--source", SOURCE, "--save", "--save-txt"]) 
+    # subprocess.run(["python3", "yolo_tracking/examples/track.py", "--yolo-model", YOLO_WEIGHTS, "--tracking-method", TRACKING_METHOD, "--source", SOURCE, "--save", "--save-txt"]) 
 
     # get the bounding boxes from the file
     bounding_boxes = read_bounding_boxes()
