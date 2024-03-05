@@ -36,37 +36,13 @@ bridge = CvBridge()
 YOLOv8_model = None
 FIXED_THRESHOLD = False
 
-def find_midpoint(lista):
+def find_clusters(lista):
+    breakpoint()
     """
     Encuentra el punto que divide una lista ordenada de enteros en dos clusters,
     minimizando la suma de las varianzas internas de los clusters.
     """
-    # Ordenar la lista
-    lista_ordenada = sorted(lista)
-
-    # Inicializar el mejor punto de corte y la menor suma de varianzas encontrada
-    mejor_punto = None
-    menor_varianza_suma = float('inf')
-
-    # Iterar sobre todos los puntos posibles (excepto los extremos)
-    for i in range(1, len(lista_ordenada)):
-        # Dividir la lista en dos clusters basándonos en el punto actual
-        cluster_1 = lista_ordenada[:i]
-        cluster_2 = lista_ordenada[i:]
-
-        # Calcular la varianza de cada cluster
-        varianza_1 = variance(cluster_1) if cluster_1 else 0
-        varianza_2 = variance(cluster_2) if cluster_2 else 0
-
-        # Sumar las varianzas
-        varianza_suma = varianza_1 + varianza_2
-
-        # Actualizar el mejor punto y la menor varianza suma si es necesario
-        if varianza_suma < menor_varianza_suma:
-            menor_varianza_suma = varianza_suma
-            mejor_punto = lista_ordenada[i - 1]
-
-    return mejor_punto
+    
 
 def variance(lista):
     """
@@ -181,7 +157,7 @@ def track_filter_and_count(working_directory):
     print('Running tracker and tracker evaluator...')
     SOURCE = "detected_images_YOLOv8"
 
-    subprocess.run(["python3", "yolo_tracking/examples/track.py", "--yolo-model", YOLO_WEIGHTS, "--tracking-method", TRACKING_METHOD, "--source", SOURCE, "--save", "--save-txt"]) 
+    # subprocess.run(["python3", "yolo_tracking/examples/track.py", "--yolo-model", YOLO_WEIGHTS, "--tracking-method", TRACKING_METHOD, "--source", SOURCE, "--save", "--save-txt"]) 
 
     # get the bounding boxes from the file
     bounding_boxes = read_bounding_boxes()
@@ -194,7 +170,7 @@ def track_filter_and_count(working_directory):
 
     # Filter the results using depth data
     # we must preserve those depths that are within [0, 30]. The rest must be filtered out
-    threshold = 30 if FIXED_THRESHOLD else find_midpoint([pair[1] for pair in depths]) 
+    threshold = 30 if FIXED_THRESHOLD else find_clusters([pair[1] for pair in depths]) 
     print('with calculated threshold: ', threshold)
     filtered_depths = filter_depths(depths, threshold)
 
