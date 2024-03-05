@@ -61,20 +61,22 @@ if __name__ == '__main__':
     print("working inside directory ", working_directory)
 
     try:
-        # # Change the current directory to the one sent as argument
-        # os.chdir(working_directory)
-        # # Empty the folders
-        # empty_folder('left_rgb_images')
-        # empty_folder('right_rgb_images')
-        # empty_folder('disparity_images')
-        # delete_folder('yolo_tracking/runs/track/exp')
+        # Change the current directory to the one sent as argument
+        os.chdir(working_directory)
+        # Empty the folders
+        empty_folder('left_rgb_images')
+        empty_folder('right_rgb_images')
+        empty_folder('disparity_images')
+        delete_folder('yolo_tracking/runs/track/exp')
 
-        # read_cameras()
+        read_cameras()
 
-        # # Process generated images
+        # Process generated images
+        
         # rospy.on_shutdown(track_filter_and_count(working_directory))
+        rospy.on_shutdown(os.system(f'python rgb_and_depth_processing.py {working_directory}'))
 
-        track_filter_and_count(working_directory)
+        # track_filter_and_count(working_directory)
     except rospy.ROSInterruptException:
         pass
 

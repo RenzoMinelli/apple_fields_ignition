@@ -63,11 +63,11 @@ def find_clusters(lista):
 # read bounding boxes from the bounding box file
 def read_bounding_boxes():
 
-    # Get all detections except the file detected_images_YOLOv8.txt
+    # Get all detections except the file right_rgb_images.txt
 
     # Specify dir path
     dir_path = 'yolo_tracking/runs/track/exp/labels/'
-    ignored_file = 'detected_images_YOLOv8.txt'
+    ignored_file = 'right_rgb_images.txt'
 
     # Use os.listdir to obtain the file names skipping ignored_file
     
@@ -133,7 +133,7 @@ def read_bounding_boxes():
 def get_depths(timestamp, bounding_boxes):
     # read the depth image
     print("warning: reading depth image from file using grayscale parameter. For other kinds of images, change the code.")
-    depth_image = cv2.imread("detected_images_depth_data/" + str(timestamp) + ".png", cv2.IMREAD_GRAYSCALE)
+    depth_image = cv2.imread("disparity_images/" + str(timestamp) + ".png", cv2.IMREAD_GRAYSCALE)
 
     if type(depth_image) != numpy.ndarray:
         print('timestamp ' + str(timestamp) + ' not found in detected_images_depth_data folder')
@@ -163,9 +163,9 @@ def track_filter_and_count(working_directory):
     clone_tracker_repo()
 
     print('Running tracker and tracker evaluator...')
-    SOURCE = "detected_images_YOLOv8"
+    SOURCE = "right_rgb_images"
 
-    # subprocess.run(["python3", "yolo_tracking/examples/track.py", "--yolo-model", YOLO_WEIGHTS, "--tracking-method", TRACKING_METHOD, "--source", SOURCE, "--save", "--save-txt"]) 
+    subprocess.run(["python3", "yolo_tracking/examples/track.py", "--yolo-model", YOLO_WEIGHTS, "--tracking-method", TRACKING_METHOD, "--source", SOURCE, "--save", "--save-txt"]) 
 
     # get the bounding boxes from the file
     bounding_boxes = read_bounding_boxes()
