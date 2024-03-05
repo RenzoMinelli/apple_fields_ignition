@@ -14,6 +14,7 @@ import pdb
 import subprocess
 import os
 import numpy
+from sklearn.cluster import KMeans
 
 ros_namespace = os.getenv('ROS_NAMESPACE')
 
@@ -37,20 +38,25 @@ YOLOv8_model = None
 FIXED_THRESHOLD = False
 
 def find_clusters(lista):
-    breakpoint()
     """
     Encuentra el punto que divide una lista ordenada de enteros en dos clusters,
     minimizando la suma de las varianzas internas de los clusters.
     """
+    lista = numpy.array(lista)
     
+    data = lista.reshape(-1, 1)
 
-def variance(lista):
-    """
-    Calcula la varianza de una lista de números.
-    """
-    media = sum(lista) / len(lista)
-    varianza = sum((x - media) ** 2 for x in lista) / len(lista)
-    return varianza
+    # Initialize KMeans model
+    kmeans = KMeans(n_clusters=2)
+
+    # Fit the model to the data
+    kmeans.fit(data)
+
+    # Get the cluster centers
+    cluster_centers = kmeans.cluster_centers_
+
+    return cluster_centers[0][0] if cluster_centers[0][0] > cluster_centers[1][0] else cluster_centers[1][0]
+
 
 # read bounding boxes from the bounding box file
 def read_bounding_boxes():
@@ -157,7 +163,7 @@ def track_filter_and_count(working_directory):
     print('Running tracker and tracker evaluator...')
     SOURCE = "detected_images_YOLOv8"
 
-    # subprocess.run(["python3", "yolo_tracking/examples/track.py", "--yolo-model", YOLO_WEIGHTS, "--tracking-method", TRACKING_METHOD, "--source", SOURCE, "--save", "--save-txt"]) 
+    subprocess.run(["python3", "yolo_tracking/examples/track.py", "--yolo-model", YOLO_WEIGHTS, "--tracking-method", TRACKING_METHOD, "--source", SOURCE, "--save", "--save-txt"]) 
 
     # get the bounding boxes from the file
     bounding_boxes = read_bounding_boxes()
