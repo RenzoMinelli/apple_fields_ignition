@@ -88,7 +88,7 @@
         </geometry>
       </visual>
       <visual name="base_link_fixed_joint_lump__camera/camera_link_visual_1">
-        <pose frame="">0.0012 0 1 0 -0.2618 1.57079632679</pose>
+        <pose frame="">0.0012 0 0.716 0 -0.3 1.57079632679</pose>
         <geometry>
           <mesh>
             <uri>meshes/realsense.dae</uri>
@@ -140,22 +140,20 @@
           </mesh>
         </geometry>
       </visual>
-      <!-- <visual name="base_link_fixed_joint_lump__arch_visual_7">
-        <pose frame="">0.0012 0
-      0.251 0 -0 0</pose>
+      <visual name="base_link_fixed_joint_lump__arch_visual_7">
+        <pose frame="">0.0012 0 0.251 0 -0 0</pose>
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-      <uri>meshes/jpl04_arch_nosensor.stl</uri>
+            <uri>meshes/jpl04_arch_nosensor.stl</uri>
           </mesh>
         </geometry>
         <material>
-      <ambient>0.8 0.8 0.8 1</ambient>
+          <ambient>0.8 0.8 0.8 1</ambient>
           <diffuse>0.45 0.45 0.45 1</diffuse>
-          <specular>0.8
-      0.8 0.8 1.0</specular>
+          <specular>0.8 0.8 0.8 1.0</specular>
         </material>
-      </visual> -->
+      </visual>
       <visual name="base_link_fixed_joint_lump__user_rail_link_visual_13">
         <pose frame="">0.272 0 0.245 0 -0 0</pose>
         <geometry>
@@ -169,56 +167,67 @@
       <self_collide>0</self_collide>
       <enable_wind>0</enable_wind>
       <kinematic>0</kinematic>
-      <sensor name="camera_front" type="camera">
-        <camera name="camera_front">
-          <horizontal_fov>1.81514</horizontal_fov> <!-- based on Zed2 720 vertical fov -->
-          <lens>
-            <intrinsics>
-              <!-- fx = fy = width / ( 2 * tan (hfov / 2 ) ) -->
-              <fx>1920</fx><!-- <fx>3000</fx> 277.1 -->
-              <fy>1920</fy><!-- <fy>3000</fy> 277.1 -->
-              <!-- cx = ( width + 1 ) / 2 -->
-              <cx>960.5</cx> <!-- 160.5-->
-              <!-- cy = ( height + 1 ) / 2 -->
-              <cy>540.5</cy> <!-- 120.5-->
-              <s>0</s>
-            </intrinsics>
-          </lens>
+      <sensor name="camera_left" type="camera">
+        <camera name="camera_left">
+          <horizontal_fov>1.3962634</horizontal_fov>
+          <image>
+            <width>1024</width>
+            <height>1024</height>
+            <format>R8G8B8</format>
+          </image>
+          <clip>
+            <near>0.02</near>
+            <far>300</far>
+          </clip>
+          <noise>
+            <type>gaussian</type>
+            <mean>0.0</mean>
+            <stddev>0.0</stddev>
+          </noise>
           <distortion>
-            <k1>0.1</k1>
-            <k2>0.05</k2>
+            <k1>0.0</k1>
+            <k2>0.0</k2>
             <k3>0.0</k3>
             <p1>0.0</p1>
             <p2>0.0</p2>
             <center>0.5 0.5</center>
           </distortion>
-          <image>
-            <width>1920</width> <!-- initial 320 x 240 -->
-            <height>1080</height>
-            <format>R8G8B8</format>
-          </image>
-          <clip>
-            <near>0.1</near>
-            <far>100</far>
-          </clip>
-          <depth_camera>
-            <clip>
-              <near>0.1</near>
-              <far>100</far>
-            </clip>
-          </depth_camera>
-          <noise>
-            <type>gaussian</type>
-            <mean>0</mean>
-            <stddev>0.007</stddev>
-          </noise>
         </camera>
         <always_on>1</always_on>
         <update_rate>30</update_rate>
         <visualize>1</visualize>
-        <pose frame="">0.0012 0 1 0 -0.2618 1.57079632679</pose> <!--<pose frame="">0.438 0 0.272 0
-        -0
-        0</pose>-->
+        <pose frame="">0.0012 0 0.716 0 -0.3 1.57079632679</pose>
+      </sensor>
+      <sensor name="camera_right" type="camera">
+        <camera name="camera_right">
+          <horizontal_fov>1.3962634</horizontal_fov>
+          <image>
+            <width>1024</width>
+            <height>1024</height>
+            <format>R8G8B8</format>
+          </image>
+          <clip>
+            <near>0.02</near>
+            <far>300</far>
+          </clip>
+          <noise>
+            <type>gaussian</type>
+            <mean>0.0</mean>
+            <stddev>0.0</stddev>
+          </noise>
+          <distortion>
+            <k1>0.0</k1>
+            <k2>0.0</k2>
+            <k3>0.0</k3>
+            <p1>0.0</p1>
+            <p2>0.0</p2>
+            <center>0.5 0.5</center>
+          </distortion>
+        </camera>
+        <always_on>1</always_on>
+        <update_rate>30</update_rate>
+        <visualize>1</visualize>
+        <pose frame="">0.1212 0 0.716 0 -0.3 1.57079632679</pose>
       </sensor>
       <gravity>1</gravity>
       <velocity_decay />
