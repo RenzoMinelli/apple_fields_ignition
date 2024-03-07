@@ -189,9 +189,3 @@ def track_filter_and_count(working_directory):
     ids = set(ids)
     # Print the number of apples
     print('Number of apples: ' + str(len(ids)))
-
-# main function that calls track_filter_and_count
-
-if __name__ == '__main__':
-    working_directory = sys.argv[1]
-    track_filter_and_count(working_directory)

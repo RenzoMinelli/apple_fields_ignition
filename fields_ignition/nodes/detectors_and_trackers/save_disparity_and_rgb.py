@@ -70,9 +70,6 @@ if __name__ == '__main__':
 
         read_cameras()
 
-        # Process generated images
-        rospy.on_shutdown(handle_shutdown)
-
     except rospy.ROSInterruptException:
         pass
 
