@@ -24,14 +24,12 @@ offset_horizontal = 53
 
 # clone repository with tracker and tracker evaluator - after running the node for the first time, run `pip install --upgrade sentry-sdk`
 def clone_tracker_repo():
-    subprocess.run(["git", "clone", "--recurse-submodules", "https://github.com/Geromendez135/yolo_tracking.git"])
-    subprocess.run(["pip", "install", "-r", "yolo_tracking/requirements.txt"])
-    subprocess.run(["git", "clone", "https://github.com/JonathonLuiten/TrackEval.git", "yolo_tracking/val_utils"])
-    subprocess.run(["cp", "-r", "yolo_tracking/boxmot", "yolo_tracking/examples"])
+    subprocess.run(["git", "clone", "--recurse-submodules", "https://github.com/PaoloCappelli/yolo_tracking.git"])
+    subprocess.run(["pip", "install", "boxmot"])
 
 
 # global variables
-TRACKING_METHOD = "bytetrack"
+TRACKING_METHOD = "deepocsort"
 YOLO_WEIGHTS = "weights/yolov8.pt"
 bridge = CvBridge()
 YOLOv8_model = None
