@@ -16,6 +16,7 @@ import os
 import numpy
 from sklearn.cluster import KMeans
 import sys
+import json 
 
 ros_namespace = os.getenv('ROS_NAMESPACE')
 
@@ -151,6 +152,19 @@ def filter_depths(depths, threshold):
             filtered_depths.append(depth)
     return filtered_depths
 
+def total_amount_apples():
+    dir_path = "/home/renzo/catkin_ws/src/apple_fields_ignition/fields_ignition/generated/stereo_close_rows/apple_field/"
+    apple_amount = 0
+    for root, dirs, files in os.walk(dir_path):
+        for dir_name in dirs:
+            if dir_name.startswith('apple_'):
+                data_file = os.path.join(root, dir_name, 'markers.json')
+                if os.path.exists(data_file):
+                    with open(data_file, 'r') as f:
+                        data = json.load(f)
+                        apple_amount += data["count_apples"]
+    return apple_amount
+
 # when the node is killed, run the tracker and filter the results
 def track_filter_and_count(working_directory):
     os.chdir(working_directory)
@@ -184,7 +198,12 @@ def track_filter_and_count(working_directory):
         ids.append(depth[0])
     ids = set(ids)
     # Print the number of apples
-    print('Number of apples: ' + str(len(ids)))
+    print('Number of apples counted: ' + str(len(ids)))
+    trees_counted = 5
+    total_amount_trees = 15
+    tot_apples = total_amount_apples()
+    print(f"total_amount_apples: {tot_apples}, for_{trees_counted}_trees: {round(tot_apples/total_amount_trees)*trees_counted}")
+
 
 
 if __name__ == "__main__":
