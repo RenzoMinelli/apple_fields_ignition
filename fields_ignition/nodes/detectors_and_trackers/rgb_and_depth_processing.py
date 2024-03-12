@@ -15,6 +15,7 @@ import subprocess
 import os
 import numpy
 from sklearn.cluster import KMeans
+import sys
 
 ros_namespace = os.getenv('ROS_NAMESPACE')
 
@@ -30,7 +31,7 @@ def clone_tracker_repo():
 
 # global variables
 TRACKING_METHOD = "deepocsort"
-YOLO_WEIGHTS = "weights/yolov8.pt"
+YOLO_WEIGHTS = "weights/yolov8_100.pt"
 bridge = CvBridge()
 YOLOv8_model = None
 FIXED_THRESHOLD = False
@@ -65,12 +66,9 @@ def read_bounding_boxes():
 
     # Specify dir path
     dir_path = 'yolo_tracking/runs/track/exp/labels/'
-    ignored_file = 'right_rgb_images.txt'
 
     # Use os.listdir to obtain the file names skipping ignored_file
-    
     file_names = os.listdir(dir_path)
-    file_names.remove(ignored_file)
 
     # Define bounding_boxes as an empty dictionary 
     bounding_boxes = {}
@@ -187,3 +185,8 @@ def track_filter_and_count(working_directory):
     ids = set(ids)
     # Print the number of apples
     print('Number of apples: ' + str(len(ids)))
+
+
+if __name__ == "__main__":
+    working_directory=sys.argv[1]
+    track_filter_and_count(working_directory)
