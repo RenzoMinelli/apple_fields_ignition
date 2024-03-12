@@ -36,6 +36,7 @@ YOLO_WEIGHTS = "weights/yolov8_100.pt"
 bridge = CvBridge()
 YOLOv8_model = None
 FIXED_THRESHOLD = False
+WORLD_NAME = "one_row_trees"
 
 def find_clusters(lista):
     """
@@ -152,8 +153,8 @@ def filter_depths(depths, threshold):
             filtered_depths.append(depth)
     return filtered_depths
 
-def total_amount_apples():
-    dir_path = "/home/renzo/catkin_ws/src/apple_fields_ignition/fields_ignition/generated/stereo_close_rows/apple_field/"
+def total_amount_apples(working_directory):
+    dir_path = f"{working_directory}/src/apple_fields_ignition/fields_ignition/generated/{WORLD_NAME}/apple_field/"
     apple_amount = 0
     for root, dirs, files in os.walk(dir_path):
         for dir_name in dirs:
@@ -164,6 +165,15 @@ def total_amount_apples():
                         data = json.load(f)
                         apple_amount += data["count_apples"]
     return apple_amount
+
+def total_amount_trees(working_directory):
+    dir_path = f"{working_directory}/src/apple_fields_ignition/fields_ignition/generated/{WORLD_NAME}/apple_field/"
+    tree_amount = 0
+    for root, dirs, files in os.walk(dir_path):
+        for dir_name in dirs:
+            if dir_name.startswith('apple_'):
+                tree_amount += 1
+    return tree_amount
 
 # when the node is killed, run the tracker and filter the results
 def track_filter_and_count(working_directory):
@@ -199,12 +209,11 @@ def track_filter_and_count(working_directory):
     ids = set(ids)
     # Print the number of apples
     print('Number of apples counted: ' + str(len(ids)))
+
     trees_counted = 5
-    total_amount_trees = 15
-    tot_apples = total_amount_apples()
-    print(f"total_amount_apples: {tot_apples}, for_{trees_counted}_trees: {round(tot_apples/total_amount_trees)*trees_counted}")
-
-
+    tot_trees = total_amount_trees(working_directory)
+    tot_apples = total_amount_apples(working_directory)
+    print(f"total_amount_apples: {tot_apples}, for_{trees_counted}_trees: {round((tot_apples*trees_counted)/tot_trees)}")
 
 if __name__ == "__main__":
     working_directory=sys.argv[1]
