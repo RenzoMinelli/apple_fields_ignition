@@ -17,4 +17,3 @@ def launch_ros_node():
 
 if __name__ == "__main__":
     launch_ros_node()
-    
