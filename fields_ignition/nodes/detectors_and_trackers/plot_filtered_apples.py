@@ -1,16 +1,13 @@
 #!/usr/bin/env python3
 
 # imports
-import rospy
-from sensor_msgs.msg import CompressedImage
-from sensor_msgs.msg import Imu
 import time as Time
-from ultralytics import YOLO
+# from ultralytics import YOLO
 import cv2
-from cv_bridge import CvBridge, CvBridgeError
-import torch
+# from cv_bridge import CvBridge, CvBridgeError
+# import torch
 import datetime
-import pdb
+# import pdb
 import subprocess
 import os
 import numpy
@@ -76,8 +73,6 @@ def read_bounding_boxes():
             for line in lines:
                 line_split = line.split(" ")
                 
-                breakpoint() # fijarse aca como llega el tama;o de la bounding box
-
                 # If the line has 6 elements, the bounding box has an id, otherwise it is 0
                 print("line: ", line)
 
@@ -85,7 +80,7 @@ def read_bounding_boxes():
                     continue
 
                 bb_id = int(line_split[5][:-1])
-                x,y = line_split[1:3]
+                x,y,w,h = line_split[1:5]
 
                 # Convert everything to float first
                 x = float(x)
@@ -106,7 +101,7 @@ def read_bounding_boxes():
                     continue
 
                 # Create a list with the bounding box center and the bounding box id which is what will be saved in the dictionary
-                bb_center = [x + offset_horizontal, y, bb_id] #EL + 30 PARA CONSIDERAR LA FRANJA NEGRA QUE SALE EN LAS IMAGENES DEPROFUNDIDAD
+                bb_center = [x + offset_horizontal, y, bb_id, w, h] #EL + 30 PARA CONSIDERAR LA FRANJA NEGRA QUE SALE EN LAS IMAGENES DEPROFUNDIDAD
 
                 if (timestamp in bounding_boxes):
                     bounding_boxes[timestamp].append(bb_center)
@@ -116,7 +111,7 @@ def read_bounding_boxes():
         
 
     # The return value is a dictionary with the timestamp as the key and an array with the bounding boxes centers of the corresponding frame as the value, and as a third value, the bounding box id.
-    # bounding_boxes = {<timestamp>: [[<x>, <y>, <id>], ...], ...}
+    # bounding_boxes = {<timestamp>: [[<x>, <y>, <id>, <w>, <h>], ...], ...}
     return bounding_boxes
 
 # when the nodes ends track the apples and evaluate the tracking
@@ -137,18 +132,22 @@ def get_depths(timestamp, bounding_boxes):
         bb_id = bb_center[2]
         depth = depth_image[int(bb_center[1]), int(bb_center[0])]
 
-        depths.append([bb_id, depth])
+        depths.append([bb_id, depth, bb_center[0], bb_center[1], bb_center[3], bb_center[4]]) # OJO ESTO PUEDE ESTAR MAL
 
     # returns an array with the depths of the bounding boxes
-    # depths = [[<id>, <depth>], ...]
+    # depths = [[<id>, <depth>, <x>, <y>, <w>, <h>], ...]
     return depths
 
 def filter_depths(depths, threshold):
-    filtered_depths = []
+    green_depths = []
+    red_depths = []
     for depth in depths:
         if depth[1] >= threshold:
-            filtered_depths.append(depth)
-    return filtered_depths
+            green_depths.append(depth)
+        else:
+            red_depths.append(depth)
+
+    return [red_depths, green_depths]
 
 
 # Define a function to draw bounding boxes on an image and save the modified image
@@ -175,7 +174,7 @@ def track_filter_and_count(working_directory):
     
     # get the bounding boxes from the file
     # dictionary with the timestamp as the key and an array with the bounding boxes centers of the corresponding frame as the value, and as a third value, the bounding box id.
-    # bounding_boxes = {<timestamp>: [[<x>, <y>, <id>], ...], ...}
+    # bounding_boxes = {<timestamp>: [[<x>, <y>, <id>, <w>, <h>], ...], ...}
     bounding_boxes = read_bounding_boxes()
 
     # get the depths of the bounding boxes
@@ -188,20 +187,17 @@ def track_filter_and_count(working_directory):
     # we must preserve those depths that are within [0, 30]. The rest must be filtered out
     threshold = 30 if FIXED_THRESHOLD else find_clusters([pair[1] for pair in depths]) 
     
-    print('with calculated threshold: ', threshold)
-    filtered_depths = filter_depths(depths, threshold)
-
-    
     for timestamp in bounding_boxes:
-        green_depths = []
-        breakpoint()
-        # depths = [[<id>, <depth>], ...]
-        green_depths.extend(get_depths(timestamp, bounding_boxes))
+        depths = []
 
-        filtered_depths = filter_depths(green_depths, threshold)
+        # depths = [[<id>, <depth>, <x>, <y>, <w>, <h>], ...]
+        depths.extend(get_depths(timestamp, bounding_boxes))
+
+
+        red_depths, green_depths = filter_depths(depths, threshold)
         # print <timestamp>.png with the bounding boxes of the filtered apples colored in green and the rest in red
         image_path = 'right_rgb_images/' + timestamp + '.png'
-        bbox_list = []
+        bbox_list = green_depths
         output_folder = 'test_filtered_images'
         draw_boxes_and_save(image_path, bbox_list, output_folder)
 
