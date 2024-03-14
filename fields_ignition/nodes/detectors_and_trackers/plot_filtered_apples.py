@@ -151,12 +151,12 @@ def filter_depths(depths, threshold):
 
 
 # Define a function to draw bounding boxes on an image and save the modified image
-def draw_boxes_and_save(image_path, bbox_list, output_folder):
+def draw_boxes_and_save(image_path, green_bboxs, red_bboxs, output_folder):
     # Read the image
     img = cv2.imread(image_path)
 
-    # Iterate over each bounding box in the list
-    for i, bbox in enumerate(bbox_list):
+    # Iterate over each GREEN bounding box in the list
+    for i, bbox in enumerate(green_bboxs):
 
         _, _, x, y, width, height = bbox
 
@@ -169,15 +169,29 @@ def draw_boxes_and_save(image_path, bbox_list, output_folder):
         # Draw the bounding box
         cv2.rectangle(img, (int(x), int(y)), (int(x + w), int(y + h)), (0, 255, 0), 2)
 
-        # Save the modified image with bounding boxes
-        filename = os.path.basename(image_path)
-        output_path = os.path.join(output_folder, filename)
+    # Iterate over each RED bounding box in the list
+    for i, bbox in enumerate(red_bboxs):
 
-        # debug log
-        print('image: ', image_path)
-        print('saving image with bounding boxes in ', output_path)
+        _, _, x, y, width, height = bbox
 
-        cv2.imwrite(output_path, img)
+        w = float(width)*image_width
+        h = float(height)*image_height
+
+        x = x - offset_horizontal - w/2
+        y -= h/2
+
+        # Draw the bounding box
+        cv2.rectangle(img, (int(x), int(y)), (int(x + w), int(y + h)), (0, 0, 255), 2)
+
+    # Save the modified image with bounding boxes
+    filename = os.path.basename(image_path)
+    output_path = os.path.join(output_folder, filename)
+
+    # debug log
+    print('image: ', image_path)
+    print('saving image with bounding boxes in ', output_path)
+
+    cv2.imwrite(output_path, img)
 
 
 # when the node is killed, run the tracker and filter the results
@@ -210,9 +224,8 @@ def track_filter_and_count(working_directory):
         red_depths, green_depths = filter_depths(depths, threshold)
         # print <timestamp>.png with the bounding boxes of the filtered apples colored in green and the rest in red
         image_path = 'right_rgb_images/' + timestamp + '.png'
-        bbox_list = green_depths
         output_folder = working_directory + '/test_filtered_images'
-        draw_boxes_and_save(image_path, bbox_list, output_folder)
+        draw_boxes_and_save(image_path, green_depths, red_depths, output_folder)
 
 
 
