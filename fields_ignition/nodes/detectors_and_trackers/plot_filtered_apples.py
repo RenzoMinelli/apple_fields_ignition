@@ -29,8 +29,8 @@ def find_clusters(lista):
     Encuentra el punto que divide una lista ordenada de enteros en dos clusters,
     minimizando la suma de las varianzas internas de los clusters.
     """
-    lista.sort()
-    print('lista', lista)
+    # lista.sort()
+    # print('lista', lista)
     lista = numpy.array(lista)
     
     data = lista.reshape(-1, 1)
@@ -121,6 +121,7 @@ def get_depths(timestamp, bounding_boxes):
     # read the depth image
     # print("warning: reading depth image from file using grayscale parameter. For other kinds of images, change the code.")
     depth_image = cv2.imread("disparity_images/" + str(timestamp) + ".png", cv2.IMREAD_GRAYSCALE)
+    img = cv2.imread("disparity_images/" + str(timestamp) + ".png")
 
     if type(depth_image) != numpy.ndarray:
         print('timestamp ' + str(timestamp) + ' not found in detected_images_depth_data folder')
@@ -131,8 +132,10 @@ def get_depths(timestamp, bounding_boxes):
     for bb_center in bounding_boxes[timestamp]:
         bb_id = bb_center[2]
         depth = depth_image[int(bb_center[1]), int(bb_center[0])]
+        cv2.circle(img, (int(bb_center[0]), int(bb_center[1])), 5, (0, 0, 255), -1)
 
         depths.append([bb_id, depth, bb_center[0], bb_center[1], bb_center[3], bb_center[4]]) # OJO ESTO PUEDE ESTAR MAL
+    cv2.imwrite('test_depth_i10/' + timestamp + '.png', img)
 
     # returns an array with the depths of the bounding boxes
     # depths = [[<id>, <depth>, <x>, <y>, <w>, <h>], ...]
@@ -205,20 +208,27 @@ def track_filter_and_count(working_directory):
     bounding_boxes = read_bounding_boxes()
 
     # get the depths of the bounding boxes
-    depths = []
+    # depths = []
     
-    for timestamp in bounding_boxes:
-        depths.extend(get_depths(timestamp, bounding_boxes))
+    # for timestamp in bounding_boxes:
+    #     depths.extend(get_depths(timestamp, bounding_boxes))
 
-    # Filter the results using depth data
-    # we must preserve those depths that are within [0, 30]. The rest must be filtered out
-    threshold = 30 if FIXED_THRESHOLD else find_clusters([pair[1] for pair in depths]) 
+    # # Filter the results using depth data
+    # # we must preserve those depths that are within [0, 30]. The rest must be filtered out
+    # threshold = 30 if FIXED_THRESHOLD else find_clusters([pair[1] for pair in depths]) 
     
+    i = 0
     for timestamp in bounding_boxes:
         depths = []
 
         # depths = [[<id>, <depth>, <x>, <y>, <w>, <h>], ...]
         depths.extend(get_depths(timestamp, bounding_boxes))
+
+        if i%10 == 0:
+            # Filter the results using depth data
+            # we must preserve those depths that are within [0, 30]. The rest must be filtered out
+            threshold = 30 if FIXED_THRESHOLD else find_clusters([pair[1] for pair in depths]) 
+        i += 1
 
         # red_depths, green_depths = [[<id>, <depth>, <x>, <y>, <w>, <h>], ...], [[<id>, <depth>, <x>, <y>, <w>, <h>], ...]
         red_depths, green_depths = filter_depths(depths, threshold)
