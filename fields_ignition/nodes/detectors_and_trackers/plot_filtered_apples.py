@@ -119,7 +119,7 @@ def read_bounding_boxes():
 # given a sequence number (seq and a dictionary with the bounding boxes (bounding_boxes), return an array with the depths of the bounding boxes
 def get_depths(timestamp, bounding_boxes):
     # read the depth image
-    print("warning: reading depth image from file using grayscale parameter. For other kinds of images, change the code.")
+    # print("warning: reading depth image from file using grayscale parameter. For other kinds of images, change the code.")
     depth_image = cv2.imread("disparity_images/" + str(timestamp) + ".png", cv2.IMREAD_GRAYSCALE)
 
     if type(depth_image) != numpy.ndarray:
@@ -157,7 +157,12 @@ def draw_boxes_and_save(image_path, bbox_list, output_folder):
     
     # Iterate over each bounding box in the list
     for i, bbox in enumerate(bbox_list):
-        x, y, w, h = bbox
+
+        _, _, x, y, width, height = bbox
+
+        w = float(width)*image_width
+        h = float(height)*image_height
+
         # Draw the bounding box
         cv2.rectangle(img, (int(x), int(y)), (int(x + w), int(y + h)), (0, 255, 0), 2)
     
@@ -193,12 +198,12 @@ def track_filter_and_count(working_directory):
         # depths = [[<id>, <depth>, <x>, <y>, <w>, <h>], ...]
         depths.extend(get_depths(timestamp, bounding_boxes))
 
-
+        # red_depths, green_depths = [[<id>, <depth>, <x>, <y>, <w>, <h>], ...], [[<id>, <depth>, <x>, <y>, <w>, <h>], ...]
         red_depths, green_depths = filter_depths(depths, threshold)
         # print <timestamp>.png with the bounding boxes of the filtered apples colored in green and the rest in red
         image_path = 'right_rgb_images/' + timestamp + '.png'
         bbox_list = green_depths
-        output_folder = 'test_filtered_images'
+        output_folder = working_directory + '/filtered_images'
         draw_boxes_and_save(image_path, bbox_list, output_folder)
 
 
