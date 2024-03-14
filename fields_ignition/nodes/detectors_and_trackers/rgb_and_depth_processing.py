@@ -36,7 +36,7 @@ YOLO_WEIGHTS = "weights/yolov8_100.pt"
 bridge = CvBridge()
 YOLOv8_model = None
 FIXED_THRESHOLD = False
-WORLD_NAME = "one_row_trees"
+WORLD_NAME = "stereo_close_rows"
 
 def find_clusters(lista):
     """
@@ -111,7 +111,7 @@ def read_bounding_boxes():
                 # if (x + w/2 < 70 or x + w/2 > image_width - 7 or y + h/2 < 7 or y + h/2 > image_height - 7): #ESTE IF ES PARA CONSIDERAR LA FRANJA NEGRA QUE SALE EN LAS IMAGENES DE PROFUNDIDAD
                 #     continue
 
-                if(int(x) + offset_horizontal >= image_width):
+                if(x + offset_horizontal >= image_width):
                     continue
 
                 # Create a list with the bounding box center and the bounding box id which is what will be saved in the dictionary
@@ -175,6 +175,19 @@ def total_amount_trees(working_directory):
                 tree_amount += 1
     return tree_amount
 
+def total_amount_apples_for_trees_ids(ids):
+    dir_path = f"{working_directory}/src/apple_fields_ignition/fields_ignition/generated/{WORLD_NAME}/apple_field/"
+    apple_amount = 0
+    dir_names_wanted = [f"apple_{x}" for x in ids]
+    for root, dirs, files in os.walk(dir_path):
+        for dir_name in dir_names_wanted:
+            data_file = os.path.join(root, dir_name, 'markers.json')
+            if os.path.exists(data_file):
+                with open(data_file, 'r') as f:
+                    data = json.load(f)
+                    apple_amount += data["count_apples"]
+    return apple_amount
+
 # when the node is killed, run the tracker and filter the results
 def track_filter_and_count(working_directory):
     os.chdir(working_directory)
@@ -214,6 +227,7 @@ def track_filter_and_count(working_directory):
     tot_trees = total_amount_trees(working_directory)
     tot_apples = total_amount_apples(working_directory)
     print(f"total_amount_apples: {tot_apples}, for_{trees_counted}_trees: {round((tot_apples*trees_counted)/tot_trees)}")
+    print(f"amount of apples exactly for trees id (5,6,7,8,9): {total_amount_apples_for_trees_ids([5,6,7,8,9])}")
 
 if __name__ == "__main__":
     working_directory=sys.argv[1]
