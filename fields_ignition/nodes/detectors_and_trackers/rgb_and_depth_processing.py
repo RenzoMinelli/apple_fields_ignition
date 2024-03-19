@@ -221,7 +221,7 @@ def track_filter_and_count(working_directory):
 
         # Filter the results using depth data
         # we must preserve those depths that are within [0, 30]. The rest must be filtered out
-        threshold = 30 if FIXED_THRESHOLD else find_clusters([pair[1] for pair in image_depth_data]) 
+        threshold = 57 if FIXED_THRESHOLD else find_clusters([pair[1] for pair in image_depth_data]) 
         print('with calculated threshold: ', threshold)
         filtered_depths = filter_depths(image_depth_data, threshold)
 
