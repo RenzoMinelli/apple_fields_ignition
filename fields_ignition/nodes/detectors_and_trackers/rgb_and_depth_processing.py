@@ -44,21 +44,31 @@ def find_clusters(lista):
     minimizando la suma de las varianzas internas de los clusters.
     """
     lista.sort()
-    print('lista', lista)
     lista = numpy.array(lista)
     
     data = lista.reshape(-1, 1)
 
-    # Initialize KMeans model
-    kmeans = KMeans(n_clusters=2)
+    # Initialize KMeans model for 1 cluster
+    kmeans_1 = KMeans(n_clusters=1, n_init=10)
+    kmeans_1.fit(data)
+    inertia_1 = kmeans_1.inertia_
 
-    # Fit the model to the data
-    kmeans.fit(data)
+    # Initialize KMeans model for 2 clusters
+    kmeans_2 = KMeans(n_clusters=2, n_init=10)
+    kmeans_2.fit(data)
+    inertia_2 = kmeans_2.inertia_
 
-    # Get the cluster centers
-    cluster_centers = kmeans.cluster_centers_
-    print('cluster centers: ', '0:', cluster_centers[0][0], '1: ',cluster_centers[1][0])
-    return cluster_centers[0][0] if cluster_centers[0][0] > cluster_centers[1][0] else cluster_centers[1][0]
+    if inertia_1 < inertia_2:
+        # print("Mejor con 1 cluster.")
+        cluster_centers = kmeans_1.cluster_centers_
+        print(f"cluster center: {cluster_centers[0][0]}")
+        return cluster_centers[0][0]
+    else:
+        # print("Mejor con 2 clusters.")
+        # Get the cluster centers for 2 clusters
+        cluster_centers = kmeans_2.cluster_centers_
+        print('cluster centers: ', '0:', cluster_centers[0][0], '1: ', cluster_centers[1][0])
+        return cluster_centers[0][0] if cluster_centers[0][0] > cluster_centers[1][0] else cluster_centers[1][0]
 
 
 # read bounding boxes from the bounding box file
@@ -207,17 +217,20 @@ def track_filter_and_count(working_directory):
     depths = []
     
     for timestamp in bounding_boxes:
-        depths.extend(get_depths(timestamp, bounding_boxes))
+        image_depth_data = get_depths(timestamp, bounding_boxes)
 
-    # Filter the results using depth data
-    # we must preserve those depths that are within [0, 30]. The rest must be filtered out
-    threshold = 30 if FIXED_THRESHOLD else find_clusters([pair[1] for pair in depths]) 
-    print('with calculated threshold: ', threshold)
-    filtered_depths = filter_depths(depths, threshold)
+        # Filter the results using depth data
+        # we must preserve those depths that are within [0, 30]. The rest must be filtered out
+        threshold = 30 if FIXED_THRESHOLD else find_clusters([pair[1] for pair in image_depth_data]) 
+        print('with calculated threshold: ', threshold)
+        filtered_depths = filter_depths(image_depth_data, threshold)
+
+        print(f"Amount of apples in image: {len(image_depth_data)}, filtered apples: {len(filtered_depths)}")
+        depths.extend(filtered_depths)
 
     # Count the distinct ids that remained after filtering
     ids = []
-    for depth in filtered_depths:
+    for depth in depths:
         ids.append(depth[0])
     ids = set(ids)
     # Print the number of apples
