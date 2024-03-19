@@ -29,22 +29,32 @@ def find_clusters(lista):
     Encuentra el punto que divide una lista ordenada de enteros en dos clusters,
     minimizando la suma de las varianzas internas de los clusters.
     """
-    # lista.sort()
-    # print('lista', lista)
+    lista.sort()
     lista = numpy.array(lista)
     
     data = lista.reshape(-1, 1)
 
-    # Initialize KMeans model
-    kmeans = KMeans(n_clusters=2)
+    # Initialize KMeans model for 1 cluster
+    kmeans_1 = KMeans(n_clusters=1, n_init=10)
+    kmeans_1.fit(data)
+    inertia_1 = kmeans_1.inertia_
 
-    # Fit the model to the data
-    kmeans.fit(data)
+    # Initialize KMeans model for 2 clusters
+    kmeans_2 = KMeans(n_clusters=2, n_init=10)
+    kmeans_2.fit(data)
+    inertia_2 = kmeans_2.inertia_
 
-    # Get the cluster centers
-    cluster_centers = kmeans.cluster_centers_
-    print('cluster centers: ', '0:', cluster_centers[0][0], '1: ',cluster_centers[1][0])
-    return cluster_centers[0][0] if cluster_centers[0][0] > cluster_centers[1][0] else cluster_centers[1][0]
+    if inertia_1 < inertia_2:
+        # print("Mejor con 1 cluster.")
+        cluster_centers = kmeans_1.cluster_centers_
+        print(f"cluster center: {cluster_centers[0][0]}")
+        return cluster_centers[0][0]
+    else:
+        # print("Mejor con 2 clusters.")
+        # Get the cluster centers for 2 clusters
+        cluster_centers = kmeans_2.cluster_centers_
+        print('cluster centers: ', '0:', cluster_centers[0][0], '1: ', cluster_centers[1][0])
+        return cluster_centers[0][0] if cluster_centers[0][0] > cluster_centers[1][0] else cluster_centers[1][0]
 
 
 # read bounding boxes from the bounding box file
@@ -217,29 +227,40 @@ def track_filter_and_count(working_directory):
     # # we must preserve those depths that are within [0, 30]. The rest must be filtered out
     # threshold = 30 if FIXED_THRESHOLD else find_clusters([pair[1] for pair in depths]) 
     
-    i = 0
     for timestamp in bounding_boxes:
-        depths = []
 
         # depths = [[<id>, <depth>, <x>, <y>, <w>, <h>], ...]
-        depths.extend(get_depths(timestamp, bounding_boxes))
+        image_depth_data = get_depths(timestamp, bounding_boxes)
+        
+        # Filter the results using depth data
+        # we must preserve those depths that are within [0, 30]. The rest must be filtered out
+        
+        threshold = 30 if FIXED_THRESHOLD else find_clusters([pair[1] for pair in image_depth_data]) 
 
-        if i%10 == 0:
-            # Filter the results using depth data
-            # we must preserve those depths that are within [0, 30]. The rest must be filtered out
-            threshold = 30 if FIXED_THRESHOLD else find_clusters([pair[1] for pair in depths]) 
-        i += 1
-
+        print(f"--- threshold found: {threshold}")
+        
         # red_depths, green_depths = [[<id>, <depth>, <x>, <y>, <w>, <h>], ...], [[<id>, <depth>, <x>, <y>, <w>, <h>], ...]
-        red_depths, green_depths = filter_depths(depths, threshold)
         # print <timestamp>.png with the bounding boxes of the filtered apples colored in green and the rest in red
+        red_depths, green_depths = filter_depths(image_depth_data, threshold)
+        
+
         image_path = 'right_rgb_images/' + timestamp + '.png'
         output_folder = working_directory + '/test_filtered_images'
         draw_boxes_and_save(image_path, green_depths, red_depths, output_folder)
 
 
-
-
 if __name__ == "__main__":
     working_directory=sys.argv[1]
+
+    folder_names = ["test_depth_i10", "test_filtered_images"]
+    for folder_name in folder_names:
+        folder_path = f"{working_directory}/{folder_name}"
+        if not os.path.exists(folder_path):
+            os.makedirs(folder_path)
+        else:
+            files = os.listdir(folder_path)
+            for file_name in files:
+                file_path = os.path.join(folder_path, file_name)
+                os.remove(file_path)
+
     track_filter_and_count(working_directory)
