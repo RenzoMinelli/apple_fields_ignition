@@ -44,6 +44,7 @@ def find_clusters(lista):
     minimizando la suma de las varianzas internas de los clusters.
     """
     lista.sort()
+    # print(lista)
     lista = numpy.array(lista)
     
     data = lista.reshape(-1, 1)
@@ -61,13 +62,13 @@ def find_clusters(lista):
     if inertia_1 < inertia_2:
         # print("Mejor con 1 cluster.")
         cluster_centers = kmeans_1.cluster_centers_
-        print(f"cluster center: {cluster_centers[0][0]}")
+        # print(f"cluster center: {cluster_centers[0][0]}")
         return cluster_centers[0][0]
     else:
         # print("Mejor con 2 clusters.")
         # Get the cluster centers for 2 clusters
         cluster_centers = kmeans_2.cluster_centers_
-        print('cluster centers: ', '0:', cluster_centers[0][0], '1: ', cluster_centers[1][0])
+        # print('cluster centers: ', '0:', cluster_centers[0][0], '1: ', cluster_centers[1][0])
         return cluster_centers[0][0] if cluster_centers[0][0] > cluster_centers[1][0] else cluster_centers[1][0]
 
 
@@ -98,8 +99,6 @@ def read_bounding_boxes():
                 line_split = line.split(" ")
 
                 # If the line has 6 elements, the bounding box has an id, otherwise it is 0
-                print("line: ", line)
-
                 if len(line_split) < 6: # this is to skip IDs = 0 which correspond to unconfirmed tracks 
                     continue
 
@@ -140,7 +139,7 @@ def read_bounding_boxes():
 # given a sequence number (seq and a dictionary with the bounding boxes (bounding_boxes), return an array with the depths of the bounding boxes
 def get_depths(timestamp, bounding_boxes):
     # read the depth image
-    print("warning: reading depth image from file using grayscale parameter. For other kinds of images, change the code.")
+    # print("warning: reading depth image from file using grayscale parameter. For other kinds of images, change the code.")
     depth_image = cv2.imread("disparity_images/" + str(timestamp) + ".png", cv2.IMREAD_GRAYSCALE)
 
     if type(depth_image) != numpy.ndarray:
@@ -225,7 +224,7 @@ def track_filter_and_count(working_directory):
         print('with calculated threshold: ', threshold)
         filtered_depths = filter_depths(image_depth_data, threshold)
 
-        print(f"Amount of apples in image: {len(image_depth_data)}, filtered apples: {len(filtered_depths)}")
+        # print(f"Amount of apples in image: {len(image_depth_data)}, filtered apples: {len(filtered_depths)}")
         depths.extend(filtered_depths)
 
     # Count the distinct ids that remained after filtering
