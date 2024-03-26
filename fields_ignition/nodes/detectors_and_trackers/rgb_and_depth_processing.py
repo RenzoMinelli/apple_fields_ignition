@@ -37,6 +37,7 @@ bridge = CvBridge()
 YOLOv8_model = None
 FIXED_THRESHOLD = False
 WORLD_NAME = "stereo_close_rows"
+THRESHOLD_MARGIN = 2
 
 def find_clusters(lista):
     """
@@ -221,7 +222,8 @@ def track_filter_and_count(working_directory):
         # Filter the results using depth data
         # we must preserve those depths that are within [0, 30]. The rest must be filtered out
         threshold = 57 if FIXED_THRESHOLD else find_clusters([pair[1] for pair in image_depth_data]) 
-        print('with calculated threshold: ', threshold)
+        threshold += THRESHOLD_MARGIN
+        print(f"with threshold adjusted: {threshold}")
         filtered_depths = filter_depths(image_depth_data, threshold)
 
         # print(f"Amount of apples in image: {len(image_depth_data)}, filtered apples: {len(filtered_depths)}")
@@ -235,10 +237,10 @@ def track_filter_and_count(working_directory):
     # Print the number of apples
     print('Number of apples counted: ' + str(len(ids)))
 
-    trees_counted = 5
-    tot_trees = total_amount_trees(working_directory)
-    tot_apples = total_amount_apples(working_directory)
-    print(f"total_amount_apples: {tot_apples}, for_{trees_counted}_trees: {round((tot_apples*trees_counted)/tot_trees)}")
+    # trees_counted = 5
+    # tot_trees = total_amount_trees(working_directory)
+    # tot_apples = total_amount_apples(working_directory)
+    # print(f"total_amount_apples: {tot_apples}, for_{trees_counted}_trees: {round((tot_apples*trees_counted)/tot_trees)}")
     print(f"amount of apples exactly for trees id (5,6,7,8,9): {total_amount_apples_for_trees_ids([5,6,7,8,9])}")
 
 if __name__ == "__main__":
