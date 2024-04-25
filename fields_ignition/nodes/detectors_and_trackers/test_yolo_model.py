@@ -39,7 +39,7 @@ for i, res in enumerate(results):
             for point in mask:
                 if point[1] < y_center and point[1] > above[1]:
                     above = point
-                if point[1] > y_center and point[1] < below[1]:
+                if point[1] > y_centerSand and point[1] < below[1]:
                     below = point
 
             # calculate distance between the center and the furthest points
