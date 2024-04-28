@@ -151,6 +151,7 @@ def obtener_puntos_con_profunidad(puntos, mapa_profunidad):
     return puntos_con_profundidad
 
 def obtener_plano(puntos):
+    print(f"Puntos del plano: {puntos}")
     puntos_np = np.array(puntos)
     A = np.hstack((puntos_np[:, :2], np.ones((puntos_np.shape[0], 1))))
     b = puntos_np[:, 2]
