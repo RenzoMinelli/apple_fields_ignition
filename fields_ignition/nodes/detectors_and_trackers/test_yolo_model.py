@@ -4,9 +4,43 @@ import cv2
 from PIL import Image
 from math import sqrt
 import numpy as np
+from sklearn.cluster import KMeans
 
 #OFFSET_HORIZONTAL = 53
 OFFSET_HORIZONTAL = 70
+
+def find_clusters(lista):
+    print(f"lista: {lista}")
+    """
+    Encuentra el punto que divide una lista ordenada de enteros en dos clusters,
+    minimizando la suma de las varianzas internas de los clusters.
+    """
+
+    lista = np.array(lista)
+    data = lista.reshape(-1, 1)
+
+    # Initialize KMeans model for 1 cluster
+    kmeans_1 = KMeans(n_clusters=1, n_init=10)
+    kmeans_1.fit(data)
+    inertia_1 = kmeans_1.inertia_
+
+    # Initialize KMeans model for 2 clusters
+    kmeans_2 = KMeans(n_clusters=2, n_init=10)
+    kmeans_2.fit(data)
+    inertia_2 = kmeans_2.inertia_
+
+    if inertia_1 < inertia_2:
+        # print("Mejor con 1 cluster.")
+        cluster_centers = kmeans_1.cluster_centers_
+        # print(f"cluster center: {cluster_centers[0][0]}")
+        return cluster_centers[0][0]
+    else:
+        # print("Mejor con 2 clusters.")
+        # Get the cluster centers for 2 clusters
+        cluster_centers = kmeans_2.cluster_centers_
+        # print('cluster centers: ', '0:', cluster_centers[0][0], '1: ', cluster_centers[1][0])
+        return cluster_centers[0][0] if cluster_centers[0][0] > cluster_centers[1][0] else cluster_centers[1][0]
+
 
 def obtener_puntos_arboles(img, model):
     puntos_arboles = []
@@ -140,13 +174,15 @@ def obtener_puntos_con_profunidad(puntos, mapa_profunidad):
 
         z = escalar_profundidad(mapa_profunidad[y, x])
 
-        # hay que filtrar los puntos de troncos de la otra fila
-        if z < 50:
-            continue
-
         puntos_con_profundidad.append([x,y,z])
 
-    return puntos_con_profundidad
+    threshold = int(find_clusters([p[2] for p in puntos_con_profundidad]))
+    print(f"threshold hayado: {threshold}")
+    # hay que filtrar los puntos de troncos de la otra fila
+    #if z < 50:
+    #    continue
+
+    return [p for p in puntos_con_profundidad if p[2] >= threshold]
 
 def obtener_plano(puntos):
     if len(puntos) < 3:
