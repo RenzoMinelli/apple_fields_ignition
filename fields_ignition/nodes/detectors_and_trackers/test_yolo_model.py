@@ -5,7 +5,8 @@ from PIL import Image
 from math import sqrt
 import numpy as np
 
-OFFSET_HORIZONTAL = 53
+#OFFSET_HORIZONTAL = 53
+OFFSET_HORIZONTAL = 70
 
 def obtener_puntos_arboles(img, model):
     puntos_arboles = []
@@ -134,10 +135,15 @@ def obtener_puntos_con_profunidad(puntos, mapa_profunidad):
     for p in puntos:
         x,y = p[0], p[1]
 
-        if(x + OFFSET_HORIZONTAL >= mapa_profunidad.shape[1]):
+        if x <= OFFSET_HORIZONTAL:
             continue
 
-        z = escalar_profundidad(mapa_profunidad[y, x + OFFSET_HORIZONTAL])
+        z = escalar_profundidad(mapa_profunidad[y, x])
+
+        # hay que filtrar los puntos de troncos de la otra fila
+        if z < 50:
+            continue
+
         puntos_con_profundidad.append([x,y,z])
 
     return puntos_con_profundidad
@@ -163,7 +169,7 @@ def obtener_plano(puntos):
     return a, b, c, d
 
 def delante_de_plano(x, y, z, a, b, c, d):
-    return a * x + b * y + c * z + d < 0
+    return a * x + b * y + c * z + d > 0
 
 def point_distance_to_plane(x, y, z,a, b, c, d):
     num = abs(a*x + b*y + c*z + d)
@@ -189,20 +195,18 @@ def visualizar_plano_en_imagen(img, depth_map, a, b, c, d):
     for y in range(img.shape[0]):
         for x in range(img.shape[1]):
             # Asegúrate de que el índice no salga del rango de la imagen
-            if x + OFFSET_HORIZONTAL >= depth_map.shape[1]:
-                continue
 
             # Obtener la profundidad desde el mapa de profundidad
-            z = depth_map[y, x + OFFSET_HORIZONTAL]
+            z = depth_map[y, x]
             # Escala la profundidad al rango correcto
             z_scaled = escalar_profundidad(z)
 
             # Comprobar si el punto está delante del plano
-            #esta_delante = delante_de_plano(x, y, z_scaled, a, b, c, d)
-            distancia_plano = point_distance_to_plane(x, y, z_scaled, a, b, c, d)
+            esta_delante = delante_de_plano(x, y, z_scaled, a, b, c, d)
+            #distancia_plano = point_distance_to_plane(x, y, z_scaled, a, b, c, d)
             # Pintar el pixel de blanco si está delante del plano, de lo contrario negro
-            img_with_plane[y, x] = (distancia_plano, distancia_plano, distancia_plano)
-            #img_with_plane[y, x] = (255, 255, 255) if esta_delante else (0, 0, 0)
+            #img_with_plane[y, x] = (distancia_plano, distancia_plano, distancia_plano)
+            img_with_plane[y, x] = (255, 255, 255) if esta_delante else (0, 0, 0)
 
     return img_with_plane
 
@@ -216,11 +220,11 @@ def filtrar_puntos(puntos, img_original, mapa_profundidad, model_tronco):
     puntos_rechazados = []
 
     for [x,y] in puntos:
-        if x + OFFSET_HORIZONTAL >= mapa_profundidad.shape[1]:
+        if x <= OFFSET_HORIZONTAL:
             continue
 
         # Obtener la profundidad desde el mapa de profundidad
-        z = mapa_profundidad[y, x + OFFSET_HORIZONTAL]
+        z = mapa_profundidad[y, x]
         # Escala la profundidad al rango correcto
         z_scaled = escalar_profundidad(z)
 
@@ -237,11 +241,11 @@ def filtrar_puntos(puntos, img_original, mapa_profundidad, model_tronco):
 if __name__ == "__main__":
     model_tronco = YOLO('/home/renzo/Downloads/OneDrive_1_4-24-2024/simulado_lateral.pt') 
     
-    #img_test = cv2.imread("/home/renzo/Desktop/recorrida_ambos_lados/left_rgb_images/42835000000.png")
-    #mapa_profundidad = cv2.imread("/home/renzo/Desktop/recorrida_ambos_lados/disparity_images/42835000000.png", cv2.IMREAD_GRAYSCALE)
+    img_test = cv2.imread("/home/renzo/Desktop/recorrida_ambos_lados/left_rgb_images/41086000000.png")
+    mapa_profundidad = cv2.imread("/home/renzo/Desktop/recorrida_ambos_lados/disparity_images/41086000000.png", cv2.IMREAD_GRAYSCALE)
 
-    img_test = cv2.imread("/home/renzo/catkin_ws/left_rgb_images/54979000000.png")
-    mapa_profundidad = cv2.imread("/home/renzo/catkin_ws/disparity_images/54979000000.png", cv2.IMREAD_GRAYSCALE)
+    #img_test = cv2.imread("/home/renzo/catkin_ws/left_rgb_images/54979000000.png")
+    #mapa_profundidad = cv2.imread("/home/renzo/catkin_ws/disparity_images/54979000000.png", cv2.IMREAD_GRAYSCALE)
 
     puntos_arboles = obtener_puntos_arboles(img_test, model_tronco)
     puntos_con_profundidad = obtener_puntos_con_profunidad(puntos_arboles, mapa_profundidad)
