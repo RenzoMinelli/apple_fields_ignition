@@ -200,13 +200,14 @@ def filtrar_puntos(puntos, img_original, mapa_profundidad, model_tronco):
     a, b, c, d = obtener_plano(puntos_con_profundidad)
 
     puntos_filtrados = []
+    puntos_rechazados = []
 
     for [x,y] in puntos:
         if x + OFFSET_HORIZONTAL >= mapa_profundidad.shape[1]:
             continue
 
         # Obtener la profundidad desde el mapa de profundidad
-        z = depth_map[y, x + OFFSET_HORIZONTAL]
+        z = mapa_profundidad[y, x + OFFSET_HORIZONTAL]
         # Escala la profundidad al rango correcto
         z_scaled = escalar_profundidad(z)
 
@@ -215,15 +216,17 @@ def filtrar_puntos(puntos, img_original, mapa_profundidad, model_tronco):
 
         if esta_delante:
             puntos_filtrados.append([x,y])
+        else:
+            puntos_rechazados.append([x,y])
 
-    return puntos_filtrados
+    return puntos_filtrados,puntos_rechazados
 
 if __name__ == "__main__":
     model_tronco = YOLO('/home/renzo/Downloads/OneDrive_1_4-24-2024/simulado_lateral.pt') 
     img_test = cv2.imread("/home/renzo/catkin_ws/right_rgb_images/54979000000.png")
     mapa_profundidad = cv2.imread("/home/renzo/catkin_ws/disparity_images/54979000000.png", cv2.IMREAD_GRAYSCALE)
 
-
+    """
     puntos_arboles = obtener_puntos_arboles(img_test, model_tronco)
     puntos_con_profundidad = obtener_puntos_con_profunidad(puntos_arboles, mapa_profundidad)
     a, b, c, d = obtener_plano(puntos_con_profundidad)
@@ -233,3 +236,13 @@ if __name__ == "__main__":
     # Crear la imagen con el plano visualizado
     img_with_plane = visualizar_plano_en_imagen(img_test, mapa_profundidad, a, b, c, d)
     cv2.imwrite(f"/home/renzo/catkin_ws/deteccion/pixeles_filtrados.png", img_with_plane)
+    """
+
+    puntos_manzanas_test = [[487,695], [558,682], [427,464], [100,658], [286,706]]
+
+    print(f"Puntos manzanas: {puntos_manzanas_test}")
+
+    filt,rech = filtrar_puntos(puntos_manzanas_test, img_test, mapa_profundidad, model_tronco)
+    
+    print(f"filtrados: {filt}, rechazados: {rech}")
+
