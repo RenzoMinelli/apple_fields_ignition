@@ -5,15 +5,7 @@ from PIL import Image
 from math import sqrt
 import numpy as np
 
-model_tronco = YOLO('/home/renzo/Downloads/OneDrive_1_4-24-2024/simulado_lateral.pt')
-offset_horizontal = 53
-image_width = 1024
-img_test = cv2.imread("/home/renzo/catkin_ws/right_rgb_images/54979000000.png")
-mapa_profundidad = cv2.imread("/home/renzo/catkin_ws/disparity_images/54979000000.png", cv2.IMREAD_GRAYSCALE)
-
-# Asumiendo que -1000 es lo más lejos y 0 es la cámara
-MIN_DEPTH = -1000
-MAX_DEPTH = 0
+OFFSET_HORIZONTAL = 53
 
 def obtener_puntos_arboles(img, model):
     puntos_arboles = []
@@ -142,15 +134,18 @@ def obtener_puntos_con_profunidad(puntos, mapa_profunidad):
     for p in puntos:
         x,y = p[0], p[1]
 
-        if(x + offset_horizontal >= image_width):
+        if(x + OFFSET_HORIZONTAL >= mapa_profunidad.shape[1]):
             continue
 
-        z = escalar_profundidad(mapa_profunidad[y, x + offset_horizontal])
+        z = escalar_profundidad(mapa_profunidad[y, x + OFFSET_HORIZONTAL])
         puntos_con_profundidad.append([x,y,z])
 
     return puntos_con_profundidad
 
 def obtener_plano(puntos):
+    if len(puntos) < 3:
+        raise ValueError("At least three points are required to define a plane.")
+    
     print(f"Puntos del plano: {puntos}")
     A = np.array(puntos)
     b = np.ones(len(puntos))
@@ -168,7 +163,7 @@ def obtener_plano(puntos):
     return a, b, c, d
 
 def delante_de_plano(x, y, z, a, b, c, d):
-    return a * x + b * y + c * z + d >= 0
+    return a * x + b * y + c * z + d < 0
 
 def escalar_profundidad(valor_z):
     # Invierte el valor z ya que en el mapa de profundidad, un valor más alto significa más cerca
@@ -182,11 +177,11 @@ def visualizar_plano_en_imagen(img, depth_map, a, b, c, d):
     for y in range(img.shape[0]):
         for x in range(img.shape[1]):
             # Asegúrate de que el índice no salga del rango de la imagen
-            if x + offset_horizontal >= img.shape[1]:
+            if x + OFFSET_HORIZONTAL >= depth_map.shape[1]:
                 continue
 
             # Obtener la profundidad desde el mapa de profundidad
-            z = depth_map[y, x + offset_horizontal]
+            z = depth_map[y, x + OFFSET_HORIZONTAL]
             # Escala la profundidad al rango correcto
             z_scaled = escalar_profundidad(z)
 
@@ -199,13 +194,42 @@ def visualizar_plano_en_imagen(img, depth_map, a, b, c, d):
     return img_with_plane
 
 
-puntos_arboles = obtener_puntos_arboles(img_test, model_tronco)
-puntos_con_profundidad = obtener_puntos_con_profunidad(puntos_arboles, mapa_profundidad)
-a, b, c, d = obtener_plano(puntos_con_profundidad)
+def filtrar_puntos(puntos, img_original, mapa_profundidad, model_tronco):
+    puntos_arboles = obtener_puntos_arboles(img_original, model_tronco)
+    puntos_con_profundidad = obtener_puntos_con_profunidad(puntos_arboles, mapa_profundidad)
+    a, b, c, d = obtener_plano(puntos_con_profundidad)
 
-print(f"coeficientes plano: {a}, {b}, {c}, {d}")
+    puntos_filtrados = []
 
-# Crear la imagen con el plano visualizado
-img_with_plane = visualizar_plano_en_imagen(img_test, mapa_profundidad, a, b, c, d)
+    for [x,y] in puntos:
+        if x + OFFSET_HORIZONTAL >= mapa_profundidad.shape[1]:
+            continue
 
-cv2.imwrite(f"/home/renzo/catkin_ws/deteccion/pixeles_filtrados.png", img_with_plane)
+        # Obtener la profundidad desde el mapa de profundidad
+        z = depth_map[y, x + OFFSET_HORIZONTAL]
+        # Escala la profundidad al rango correcto
+        z_scaled = escalar_profundidad(z)
+
+        # Comprobar si el punto está delante del plano
+        esta_delante = delante_de_plano(x, y, z_scaled, a, b, c, d)
+
+        if esta_delante:
+            puntos_filtrados.append([x,y])
+
+    return puntos_filtrados
+
+if __name__ == "__main__":
+    model_tronco = YOLO('/home/renzo/Downloads/OneDrive_1_4-24-2024/simulado_lateral.pt') 
+    img_test = cv2.imread("/home/renzo/catkin_ws/right_rgb_images/54979000000.png")
+    mapa_profundidad = cv2.imread("/home/renzo/catkin_ws/disparity_images/54979000000.png", cv2.IMREAD_GRAYSCALE)
+
+
+    puntos_arboles = obtener_puntos_arboles(img_test, model_tronco)
+    puntos_con_profundidad = obtener_puntos_con_profunidad(puntos_arboles, mapa_profundidad)
+    a, b, c, d = obtener_plano(puntos_con_profundidad)
+
+    print(f"coeficientes plano: {a}, {b}, {c}, {d}")
+
+    # Crear la imagen con el plano visualizado
+    img_with_plane = visualizar_plano_en_imagen(img_test, mapa_profundidad, a, b, c, d)
+    cv2.imwrite(f"/home/renzo/catkin_ws/deteccion/pixeles_filtrados.png", img_with_plane)
