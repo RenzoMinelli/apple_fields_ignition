@@ -152,20 +152,28 @@ def obtener_puntos_con_profunidad(puntos, mapa_profunidad):
 
 def obtener_plano(puntos):
     print(f"Puntos del plano: {puntos}")
-    puntos_np = np.array(puntos)
-    A = np.hstack((puntos_np[:, :2], np.ones((puntos_np.shape[0], 1))))
-    b = puntos_np[:, 2]
-    coeficientes, residuals, rank, s = np.linalg.lstsq(A, b, rcond=None)
-    a, b, d = coeficientes
-    c = -1
+    A = np.array(puntos)
+    b = np.ones(len(puntos))
+    
+    # Solve for the coefficients using least squares
+    # The normal equation is (A.T * A) * x = A.T * b
+    # We use np.linalg.lstsq to solve this equation which minimizes ||Ax - b||
+    # Where x corresponds to the coefficients [a, b, c]
+    coeffs, _, _, _ = np.linalg.lstsq(A, b, rcond=None)
+    
+    # The result is the coefficients a, b, c, where we have assumed d = 1
+    a, b, c = coeffs
+    d = -1  # We assume d = -1 to solve for a, b, c
+    
     return a, b, c, d
 
 def delante_de_plano(x, y, z, a, b, c, d):
-    return a * x + b * y + c * z - d >= 0
+    return a * x + b * y + c * z + d >= 0
 
 def escalar_profundidad(valor_z):
     # Invierte el valor z ya que en el mapa de profundidad, un valor más alto significa más cerca
-    return ((255 - valor_z) / 255) * (MAX_DEPTH - MIN_DEPTH) + MIN_DEPTH
+    #return ((255 - valor_z) / 255) * (MAX_DEPTH - MIN_DEPTH) + MIN_DEPTH
+    return valor_z
 
 def visualizar_plano_en_imagen(img, depth_map, a, b, c, d):
     # Crear una copia de la imagen para dibujar el plano
