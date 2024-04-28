@@ -3,6 +3,7 @@ from ultralytics import YOLO
 import cv2
 from PIL import Image
 from math import sqrt
+import numpy as np
 
 model = YOLO('/home/renzo/Downloads/OneDrive_1_4-24-2024/simulado_lateral.pt')
 img = cv2.imread("/home/renzo/catkin_ws/right_rgb_images/54979000000.png")
@@ -34,9 +35,25 @@ for res_id, res in enumerate(results):
 
             cv2.circle(img, (int(x_center), int(y_center)), 3, (255, 255, 255), -1)
 
+            # Inicializa una máscara binaria
+            mask_binaria = np.zeros(img.shape[:2], dtype=np.uint8)
+
+            # tuplas de los bordes de la mascara
+            data_points = [tuple(elem) for elem in mask]
+            data_points = np.array([data_points], dtype=np.int32)  # Convertir a matriz numpy de tipo int32
+
+            # Pinta la máscara binaria
+            cv2.fillPoly(mask_binaria, data_points, 1)
+
+            # Encuentra las coordenadas de los píxeles dentro de la máscara
+            y, x = np.where(mask_binaria == 1)
+            pixeles_tronco_coords = list(zip(x, y))  # Convertir el zip en una lista
+
+            print(f"pixeles_tronco_coords: {pixeles_tronco_coords}")
+
             # find the closest point in the mask array to the calculated center
-            closest_point = mask[0]
-            for point in mask:
+            closest_point = pixeles_tronco_coords[0]
+            for point in pixeles_tronco_coords:
                 point_x, point_y = point[0], point[1]
                 closest_x, closest_y = closest_point[0], closest_point[1]
 
@@ -48,7 +65,7 @@ for res_id, res in enumerate(results):
             below_point = closest_point
             closest_x, closest_y = closest_point[0], closest_point[1]
 
-            for point in mask:
+            for point in pixeles_tronco_coords:
                 if point[1] <= closest_y and point[1] <= above_point[1]:
                     above_point = point
                 if point[1] >= closest_y and point[1] >= below_point[1]:
@@ -81,8 +98,8 @@ for res_id, res in enumerate(results):
             cv2.circle(img, (int(above_center_x), int(above_center_y)), 3, (0, 55, 0), -1)
             cv2.circle(img, (int(below_center_x), int(below_center_y)), 3, (55, 0, 0), -1)
 
-            # search for points in mask
-            for point in mask:
+            # search for points in pixeles_tronco_coords
+            for point in pixeles_tronco_coords:
                 point_x, point_y = point[0], point[1]
                 above_x, above_y = above_point[0], above_point[1]
                 below_x, below_y = below_point[0], below_point[1]
