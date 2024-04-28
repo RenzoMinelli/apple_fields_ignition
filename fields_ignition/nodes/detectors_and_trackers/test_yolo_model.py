@@ -165,6 +165,18 @@ def obtener_plano(puntos):
 def delante_de_plano(x, y, z, a, b, c, d):
     return a * x + b * y + c * z + d < 0
 
+def point_distance_to_plane(x, y, z,a, b, c, d):
+    num = abs(a*x + b*y + c*z + d)
+    denom = np.sqrt(a**2 + b**2 + c**2)
+    distance = num / denom
+
+    # Determine the scale based on the geometry of the space
+    # The largest possible distance given the geometry of the points
+    max_distance = np.sqrt(1024**2 + 1024**2 + 255**2)
+    scaled_distance = (distance / max_distance) * 255
+
+    return 255-scaled_distance
+
 def escalar_profundidad(valor_z):
     # Invierte el valor z ya que en el mapa de profundidad, un valor más alto significa más cerca
     #return ((255 - valor_z) / 255) * (MAX_DEPTH - MIN_DEPTH) + MIN_DEPTH
@@ -186,10 +198,11 @@ def visualizar_plano_en_imagen(img, depth_map, a, b, c, d):
             z_scaled = escalar_profundidad(z)
 
             # Comprobar si el punto está delante del plano
-            esta_delante = delante_de_plano(x, y, z_scaled, a, b, c, d)
-
+            #esta_delante = delante_de_plano(x, y, z_scaled, a, b, c, d)
+            distancia_plano = point_distance_to_plane(x, y, z_scaled, a, b, c, d)
             # Pintar el pixel de blanco si está delante del plano, de lo contrario negro
-            img_with_plane[y, x] = (255, 255, 255) if esta_delante else (0, 0, 0)
+            img_with_plane[y, x] = (distancia_plano, distancia_plano, distancia_plano)
+            #img_with_plane[y, x] = (255, 255, 255) if esta_delante else (0, 0, 0)
 
     return img_with_plane
 
@@ -223,10 +236,13 @@ def filtrar_puntos(puntos, img_original, mapa_profundidad, model_tronco):
 
 if __name__ == "__main__":
     model_tronco = YOLO('/home/renzo/Downloads/OneDrive_1_4-24-2024/simulado_lateral.pt') 
-    img_test = cv2.imread("/home/renzo/catkin_ws/right_rgb_images/54979000000.png")
+    
+    #img_test = cv2.imread("/home/renzo/Desktop/recorrida_ambos_lados/left_rgb_images/42835000000.png")
+    #mapa_profundidad = cv2.imread("/home/renzo/Desktop/recorrida_ambos_lados/disparity_images/42835000000.png", cv2.IMREAD_GRAYSCALE)
+
+    img_test = cv2.imread("/home/renzo/catkin_ws/left_rgb_images/54979000000.png")
     mapa_profundidad = cv2.imread("/home/renzo/catkin_ws/disparity_images/54979000000.png", cv2.IMREAD_GRAYSCALE)
 
-    """
     puntos_arboles = obtener_puntos_arboles(img_test, model_tronco)
     puntos_con_profundidad = obtener_puntos_con_profunidad(puntos_arboles, mapa_profundidad)
     a, b, c, d = obtener_plano(puntos_con_profundidad)
@@ -236,13 +252,13 @@ if __name__ == "__main__":
     # Crear la imagen con el plano visualizado
     img_with_plane = visualizar_plano_en_imagen(img_test, mapa_profundidad, a, b, c, d)
     cv2.imwrite(f"/home/renzo/catkin_ws/deteccion/pixeles_filtrados.png", img_with_plane)
+    
     """
-
     puntos_manzanas_test = [[487,695], [558,682], [427,464], [100,658], [286,706]]
 
     print(f"Puntos manzanas: {puntos_manzanas_test}")
 
     filt,rech = filtrar_puntos(puntos_manzanas_test, img_test, mapa_profundidad, model_tronco)
-    
-    print(f"filtrados: {filt}, rechazados: {rech}")
 
+    print(f"filtrados: {filt}, rechazados: {rech}")
+    """
