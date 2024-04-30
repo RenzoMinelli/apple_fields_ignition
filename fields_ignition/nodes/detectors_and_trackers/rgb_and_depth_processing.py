@@ -209,7 +209,7 @@ def track_filter_and_count(working_directory):
     print('Running tracker and tracker evaluator...')
     SOURCE = "right_rgb_images"
 
-    subprocess.run(["python3", "yolo_tracking/tracking/track.py", "--yolo-model", YOLO_WEIGHTS, "--tracking-method", TRACKING_METHOD, "--source", SOURCE, "--save", "--save-txt"]) 
+#    subprocess.run(["python3", "yolo_tracking/tracking/track.py", "--yolo-model", YOLO_WEIGHTS, "--tracking-method", TRACKING_METHOD, "--source", SOURCE, "--save", "--save-txt"]) 
 
     # get the bounding boxes from the file
     bounding_boxes = read_bounding_boxes()
@@ -218,6 +218,7 @@ def track_filter_and_count(working_directory):
     points = []
     
     for timestamp in bounding_boxes:
+        print(f"TIMESTAMP: {timestamp}")
         # read original image to img_original
         img_original = cv2.imread("left_rgb_images/" + str(timestamp) + ".png")
 
@@ -225,8 +226,16 @@ def track_filter_and_count(working_directory):
         mapa_profundidad = cv2.imread("disparity_images/" + str(timestamp) + ".png", cv2.IMREAD_GRAYSCALE)
 
         # filter points using generated plane based on trunk detection and depth data
-        filtered_points = filtrar_puntos(bounding_boxes[timestamp], img_original, mapa_profundidad, trunk_model)
+        filtered_points = []
+        skipped_points = []
 
+        try:
+            filtered_points, skipped_points = filtrar_puntos(timestamp,bounding_boxes[timestamp], img_original, mapa_profundidad, trunk_model)
+        except Exception as e:
+            print(f"frame skipped, error: {e}")
+
+        print(f"puntos filtrados: {filtered_points}")
+        print(f"puntos rechazados: {skipped_points}")
         points.extend(filtered_points)
 
     # Count the distinct ids that remained after filtering
