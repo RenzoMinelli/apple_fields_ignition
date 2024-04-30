@@ -17,6 +17,7 @@ import numpy
 from sklearn.cluster import KMeans
 import sys
 import json 
+from test_yolo_model import filtrar_puntos
 
 ros_namespace = os.getenv('ROS_NAMESPACE')
 
@@ -37,7 +38,7 @@ bridge = CvBridge()
 YOLOv8_model = None
 FIXED_THRESHOLD = False
 WORLD_NAME = "stereo_close_rows"
-THRESHOLD_MARGIN = 2
+trunk_model = YOLO('weights/simulado_lateral.pt')
 
 def find_clusters(lista):
     """
@@ -213,26 +214,25 @@ def track_filter_and_count(working_directory):
     # get the bounding boxes from the file
     bounding_boxes = read_bounding_boxes()
 
-    # get the depths of the bounding boxes
-    depths = []
+    # get the points of the bounding boxes
+    points = []
     
     for timestamp in bounding_boxes:
-        image_depth_data = get_depths(timestamp, bounding_boxes)
+        # read original image to img_original
+        img_original = cv2.imread("left_rgb_images/" + str(timestamp) + ".png")
 
-        # Filter the results using depth data
-        # we must preserve those depths that are within [0, 30]. The rest must be filtered out
-        threshold = 57 if FIXED_THRESHOLD else find_clusters([pair[1] for pair in image_depth_data]) 
-        threshold += THRESHOLD_MARGIN
-        print(f"with threshold adjusted: {threshold}")
-        filtered_depths = filter_depths(image_depth_data, threshold)
+        # read the depth image to mapa_profundidad
+        mapa_profundidad = cv2.imread("disparity_images/" + str(timestamp) + ".png", cv2.IMREAD_GRAYSCALE)
 
-        # print(f"Amount of apples in image: {len(image_depth_data)}, filtered apples: {len(filtered_depths)}")
-        depths.extend(filtered_depths)
+        # filter points using generated plane based on trunk detection and depth data
+        filtered_points = filtrar_puntos(bounding_boxes[timestamp], img_original, mapa_profundidad, trunk_model)
+
+        points.extend(filtered_points)
 
     # Count the distinct ids that remained after filtering
     ids = []
-    for depth in depths:
-        ids.append(depth[0])
+    for point in points:
+        ids.append(point[2])
     ids = set(ids)
     # Print the number of apples
     print('Number of apples counted: ' + str(len(ids)))

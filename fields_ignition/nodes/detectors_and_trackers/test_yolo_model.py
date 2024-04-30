@@ -248,7 +248,7 @@ def filtrar_puntos(puntos, img_original, mapa_profundidad, model_tronco):
     puntos_filtrados = []
     puntos_rechazados = []
 
-    for [x,y] in puntos:
+    for [x, y, apple_id] in puntos:
         if x <= OFFSET_HORIZONTAL:
             continue
 
@@ -261,9 +261,9 @@ def filtrar_puntos(puntos, img_original, mapa_profundidad, model_tronco):
         esta_delante = delante_de_plano(x, y, z_scaled, a, b, c, d)
 
         if esta_delante:
-            puntos_filtrados.append([x,y])
+            puntos_filtrados.append([x, y, apple_id])
         else:
-            puntos_rechazados.append([x,y])
+            puntos_rechazados.append([x, y, apple_id])
 
     return puntos_filtrados,puntos_rechazados
 
