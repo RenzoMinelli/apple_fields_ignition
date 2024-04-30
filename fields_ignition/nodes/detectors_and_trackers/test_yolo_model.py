@@ -9,38 +9,31 @@ from sklearn.cluster import KMeans
 #OFFSET_HORIZONTAL = 53
 OFFSET_HORIZONTAL = 70
 
-def find_clusters(lista):
-    print(f"lista: {lista}")
-    """
-    Encuentra el punto que divide una lista ordenada de enteros en dos clusters,
-    minimizando la suma de las varianzas internas de los clusters.
-    """
+def find_clusters(nums, threshold=10):
+    if not nums:
+        return []
 
-    lista = np.array(lista)
-    data = lista.reshape(-1, 1)
+    # Sort the list of numbers
+    sorted_nums = sorted(nums)
 
-    # Initialize KMeans model for 1 cluster
-    kmeans_1 = KMeans(n_clusters=1, n_init=10)
-    kmeans_1.fit(data)
-    inertia_1 = kmeans_1.inertia_
+    # Initialize the first group
+    groups = []
+    current_group = [sorted_nums[0]]
 
-    # Initialize KMeans model for 2 clusters
-    kmeans_2 = KMeans(n_clusters=2, n_init=10)
-    kmeans_2.fit(data)
-    inertia_2 = kmeans_2.inertia_
+    # Iterate through sorted numbers and form groups
+    for i in range(1, len(sorted_nums)):
+        if sorted_nums[i] - sorted_nums[i - 1] > threshold:
+            # If the gap is larger than the threshold, start a new group
+            groups.append(min(current_group))
+            current_group = [sorted_nums[i]]
+        else:
+            # Otherwise, add the number to the current group
+            current_group.append(sorted_nums[i])
 
-    if inertia_1 < inertia_2:
-        # print("Mejor con 1 cluster.")
-        cluster_centers = kmeans_1.cluster_centers_
-        # print(f"cluster center: {cluster_centers[0][0]}")
-        return cluster_centers[0][0]
-    else:
-        # print("Mejor con 2 clusters.")
-        # Get the cluster centers for 2 clusters
-        cluster_centers = kmeans_2.cluster_centers_
-        # print('cluster centers: ', '0:', cluster_centers[0][0], '1: ', cluster_centers[1][0])
-        return cluster_centers[0][0] if cluster_centers[0][0] > cluster_centers[1][0] else cluster_centers[1][0]
-
+    # Add the last group
+    groups.append(min(current_group))
+    
+    return max(groups)
 
 def obtener_puntos_arboles(img, model):
     puntos_arboles = []
@@ -177,7 +170,7 @@ def obtener_puntos_con_profunidad(puntos, mapa_profunidad):
         puntos_con_profundidad.append([x,y,z])
 
     threshold = int(find_clusters([p[2] for p in puntos_con_profundidad]))
-    print(f"threshold hayado: {threshold}")
+    print(f"threshold hallado: {threshold}")
     # hay que filtrar los puntos de troncos de la otra fila
     #if z < 50:
     #    continue
@@ -277,11 +270,11 @@ def filtrar_puntos(puntos, img_original, mapa_profundidad, model_tronco):
 if __name__ == "__main__":
     model_tronco = YOLO('/home/renzo/Downloads/OneDrive_1_4-24-2024/simulado_lateral.pt') 
     
-    img_test = cv2.imread("/home/renzo/Desktop/recorrida_ambos_lados/left_rgb_images/41086000000.png")
-    mapa_profundidad = cv2.imread("/home/renzo/Desktop/recorrida_ambos_lados/disparity_images/41086000000.png", cv2.IMREAD_GRAYSCALE)
+    #img_test = cv2.imread("/home/renzo/Desktop/recorrida_ambos_lados/left_rgb_images/41086000000.png")
+    #mapa_profundidad = cv2.imread("/home/renzo/Desktop/recorrida_ambos_lados/disparity_images/41086000000.png", cv2.IMREAD_GRAYSCALE)
 
-    #img_test = cv2.imread("/home/renzo/catkin_ws/left_rgb_images/54979000000.png")
-    #mapa_profundidad = cv2.imread("/home/renzo/catkin_ws/disparity_images/54979000000.png", cv2.IMREAD_GRAYSCALE)
+    img_test = cv2.imread("/home/renzo/catkin_ws/left_rgb_images/70818000000.png")
+    mapa_profundidad = cv2.imread("/home/renzo/catkin_ws/disparity_images/70818000000.png", cv2.IMREAD_GRAYSCALE)
 
     puntos_arboles = obtener_puntos_arboles(img_test, model_tronco)
     puntos_con_profundidad = obtener_puntos_con_profunidad(puntos_arboles, mapa_profundidad)
