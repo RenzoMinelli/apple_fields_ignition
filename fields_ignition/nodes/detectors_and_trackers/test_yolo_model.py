@@ -11,7 +11,7 @@ OFFSET_HORIZONTAL = 70
 
 def find_clusters(nums, threshold=10):
     if not nums:
-        return []
+        return 0
 
     # Sort the list of numbers
     sorted_nums = sorted(nums)
