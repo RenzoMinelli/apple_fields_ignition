@@ -10,6 +10,12 @@ from datetime import datetime
 #OFFSET_HORIZONTAL = 53
 OFFSET_HORIZONTAL = 70
 
+class CantidadPuntosInsuficiente(Exception):
+    def __init__(self, m):
+        self.message = m
+    def __str__(self):
+        return self.message
+
 def find_clusters(nums, threshold=10):
     if not nums:
         return 0
@@ -48,7 +54,7 @@ def obtener_puntos_arboles(timestamp,img, model):
         im_rgb = Image.fromarray(im_bgr[..., ::-1])  # RGB-order PIL image
 
         if len(res.masks.xy) < 2:
-            raise("Hay menos de 2 troncos")
+            raise CantidadPuntosInsuficiente("Hay menos de 2 troncos en la imagen")
 
         # Show results to screen (in supported environments)
         # im_rgb.show()
@@ -167,9 +173,8 @@ def obtener_puntos_con_profunidad(puntos_arboles, mapa_profunidad):
 
             if x <= OFFSET_HORIZONTAL:
                 continue
-
-            if mask_id not in puntos_con_profundidad:
-                puntos_con_profundidad[mask_id] = []
+            
+            if mask_id not in puntos_con_profundidad: puntos_con_profundidad[mask_id] = [] 
 
             z = escalar_profundidad(mapa_profunidad[y, x])
             puntos_con_profundidad[mask_id].append([x,y,z])
@@ -189,15 +194,14 @@ def filtrar_puntos_threshold(puntos_arboles):
     for mask_id, puntos_de_arbol in puntos_arboles.items():
         for p in puntos_de_arbol:
             if p[2] >= threshold:
-                if mask_id not in puntos_filtrados:
-                    puntos_filtrados[mask_id] = []
+                if mask_id not in puntos_filtrados: puntos_filtrados[mask_id] = []
                 puntos_filtrados[mask_id].append(p)
 
     return puntos_filtrados
 
 def obtener_plano(puntos):
     if len(puntos) < 3:
-        raise ValueError("At least three points are required to define a plane.")
+        raise CantidadPuntosInsuficiente("Hay menos de 3 puntos, no se puede definir el plano")
     
     print(f"Puntos del plano: {puntos}")
     A = np.array(puntos)
@@ -268,7 +272,7 @@ def filtrar_puntos(timestamp,puntos_manzanas, img_original, mapa_profundidad, mo
     numero_arboles = len(puntos_filtrados.keys())
 
     if numero_arboles < 2:
-        raise("Luego de filtrado los puntos, no quedan 2 arboles")
+        raise CantidadPuntosInsuficiente("Luego de filtrado los puntos, no quedan 2 arboles")
 
     total_puntos = []
     for puntos_tronco in puntos_filtrados.values():
@@ -318,7 +322,7 @@ if __name__ == "__main__":
     numero_arboles = len(puntos_filtrados.keys())
 
     if numero_arboles < 2:
-        raise("Luego de filtrado los puntos, no quedan 2 arboles")
+        raise CantidadPuntosInsuficiente("Luego de filtrado los puntos, no quedan 2 arboles")
 
     total_puntos = []
     for puntos in puntos_filtrados.values():
