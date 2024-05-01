@@ -53,7 +53,7 @@ def obtener_puntos_arboles(timestamp,img, model):
         im_bgr = res.plot()  # BGR-order numpy array
         im_rgb = Image.fromarray(im_bgr[..., ::-1])  # RGB-order PIL image
 
-        if len(res.masks.xy) < 2:
+        if res.masks == None or len(res.masks.xy) < 2:
             raise CantidadPuntosInsuficiente("Hay menos de 2 troncos en la imagen")
 
         # Show results to screen (in supported environments)
