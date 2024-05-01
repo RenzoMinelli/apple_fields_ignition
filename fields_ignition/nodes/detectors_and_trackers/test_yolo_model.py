@@ -249,6 +249,7 @@ def visualizar_plano_en_imagen(img, depth_map, a, b, c, d):
     return img_with_plane
 
 def filtrar_puntos(timestamp,puntos_manzanas, img_original, mapa_profundidad, model_tronco):
+    print(f"puntos manzanas: {puntos_manzanas}")
     puntos_arboles = obtener_puntos_arboles(timestamp,img_original, model_tronco)
     puntos_con_profundidad = obtener_puntos_con_profunidad(puntos_arboles, mapa_profundidad)
     puntos_filtrados = filtrar_puntos_threshold(puntos_con_profundidad)
@@ -264,13 +265,13 @@ def filtrar_puntos(timestamp,puntos_manzanas, img_original, mapa_profundidad, mo
 
     a, b, c, d = obtener_plano(total_puntos)
 
-    img_with_plane = visualizar_plano_en_imagen(img_original, mapa_profundidad, a, b, c, d)
-    cv2.imwrite(f"/home/renzo/catkin_ws/deteccion/pixeles_filtrados_{timestamp}.png", img_with_plane)
+    #img_with_plane = visualizar_plano_en_imagen(img_original, mapa_profundidad, a, b, c, d)
+    #cv2.imwrite(f"/home/renzo/catkin_ws/deteccion/pixeles_filtrados_{timestamp}.png", img_with_plane)
 
     puntos_filtrados = []
     puntos_rechazados = []
 
-    for [x, y, apple_id] in puntos_manzanas:
+    for [x, y, *rest] in puntos_manzanas:
         if x <= OFFSET_HORIZONTAL:
             continue
 
@@ -283,9 +284,9 @@ def filtrar_puntos(timestamp,puntos_manzanas, img_original, mapa_profundidad, mo
         esta_delante = delante_de_plano(x, y, z_scaled, a, b, c, d)
 
         if esta_delante:
-            puntos_filtrados.append([x, y, apple_id])
+            puntos_filtrados.append([x, y, *rest])
         else:
-            puntos_rechazados.append([x, y, apple_id])
+            puntos_rechazados.append([x, y, *rest])
 
     return puntos_filtrados,puntos_rechazados
 
