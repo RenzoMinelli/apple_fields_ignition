@@ -222,18 +222,6 @@ def obtener_plano(puntos):
 def delante_de_plano(x, y, z, a, b, c, d):
     return a * x + b * y + c * z + d > 0
 
-def point_distance_to_plane(x, y, z,a, b, c, d):
-    num = abs(a*x + b*y + c*z + d)
-    denom = np.sqrt(a**2 + b**2 + c**2)
-    distance = num / denom
-
-    # Determine the scale based on the geometry of the space
-    # The largest possible distance given the geometry of the points
-    max_distance = np.sqrt(1024**2 + 1024**2 + 255**2)
-    scaled_distance = (distance / max_distance) * 255
-
-    return 255-scaled_distance
-
 def escalar_profundidad(valor_z):
     # Invierte el valor z ya que en el mapa de profundidad, un valor más alto significa más cerca
     #return ((255 - valor_z) / 255) * (MAX_DEPTH - MIN_DEPTH) + MIN_DEPTH
@@ -254,10 +242,6 @@ def visualizar_plano_en_imagen(img, depth_map, a, b, c, d):
 
             # Comprobar si el punto está delante del plano
             esta_delante = delante_de_plano(x, y, z_scaled, a, b, c, d)
-            #distancia_plano = point_distance_to_plane(x, y, z_scaled, a, b, c, d)
-            # Pintar el pixel de blanco si está delante del plano, de lo contrario negro
-            #img_with_plane[y, x] = (distancia_plano, distancia_plano, distancia_plano)
-            #img_with_plane[y, x] = (255, 255, 255) if esta_delante else (0, 0, 0)
 
             current_color = img_with_plane[y, x]
             img_with_plane[y, x] = current_color if esta_delante else (int(current_color[0]/2), int(current_color[1]/2), int(current_color[2]/2))
