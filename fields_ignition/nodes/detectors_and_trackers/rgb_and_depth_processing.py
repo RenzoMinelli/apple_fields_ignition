@@ -18,6 +18,7 @@ from sklearn.cluster import KMeans
 import sys
 import json 
 from test_yolo_model import filtrar_puntos
+import traceback
 
 ros_namespace = os.getenv('ROS_NAMESPACE')
 
@@ -233,6 +234,7 @@ def track_filter_and_count(working_directory):
             filtered_points, skipped_points = filtrar_puntos(timestamp,bounding_boxes[timestamp], img_original, mapa_profundidad, trunk_model)
         except Exception as e:
             print(f"frame skipped, error: {e}")
+            print(traceback.format_exc())
 
         print(f"puntos filtrados: {filtered_points}")
         print(f"puntos rechazados: {skipped_points}")

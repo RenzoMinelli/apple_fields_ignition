@@ -37,11 +37,9 @@ def find_clusters(nums, threshold=10):
     return max(groups)
 
 def obtener_puntos_arboles(timestamp,img, model):
-    puntos_arboles = []
+    puntos_arboles = {}
 
     results = model([img], iou=0.1, conf=0.35,show_conf=True,show_labels=False,show=False)
-
-    id_imagen = datetime.now()
 
     # Visualize the results
     for res_id, res in enumerate(results):
@@ -56,6 +54,9 @@ def obtener_puntos_arboles(timestamp,img, model):
         # im_rgb.show()
         
         for mask_id, mask in enumerate(res.masks.xy):
+
+            # inicializo con una lista vacia
+            puntos_arboles[mask_id] = []
 
             # get the center of each tree            
             x, y, w, h = res.boxes[mask_id].xywh[0].numpy()
@@ -150,33 +151,49 @@ def obtener_puntos_arboles(timestamp,img, model):
             #print("PUNTOS ENCONTRADOS")
             #print(f"centro: {closest_point}, above: {above_point}, below: {below_point}\n\n")
 
-            puntos_arboles.append(closest_point)
-            puntos_arboles.append(above_point)
-            puntos_arboles.append(below_point)                 
+
+            puntos_arboles[mask_id].append(closest_point)
+            puntos_arboles[mask_id].append(above_point)
+            puntos_arboles[mask_id].append(below_point)               
 
         #res.save(filename=f'/home/renzo/catkin_ws/deteccion/result_{timestamp}_{res_id}_.jpg')
 
     return puntos_arboles
 
-def obtener_puntos_con_profunidad(puntos, mapa_profunidad):
-    puntos_con_profundidad = []
-    for p in puntos:
-        x,y = p[0], p[1]
+def obtener_puntos_con_profunidad(puntos_arboles, mapa_profunidad):
+    puntos_con_profundidad = {}
+    for mask_id, puntos in puntos_arboles.items():
+        for [x,y] in puntos:
 
-        if x <= OFFSET_HORIZONTAL:
-            continue
+            if x <= OFFSET_HORIZONTAL:
+                continue
 
-        z = escalar_profundidad(mapa_profunidad[y, x])
+            if mask_id not in puntos_con_profundidad:
+                puntos_con_profundidad[mask_id] = []
 
-        puntos_con_profundidad.append([x,y,z])
+            z = escalar_profundidad(mapa_profunidad[y, x])
+            puntos_con_profundidad[mask_id].append([x,y,z])
 
-    threshold = int(find_clusters([p[2] for p in puntos_con_profundidad]))
+    return puntos_con_profundidad
+
+def filtrar_puntos_threshold(puntos_arboles):
+    puntos = []
+    for mask_id, puntos_de_arbol in puntos_arboles.items():
+        puntos += puntos_de_arbol
+
+    threshold = int(find_clusters([p[2] for p in puntos]))
+
     print(f"threshold hallado: {threshold}")
-    # hay que filtrar los puntos de troncos de la otra fila
-    #if z < 50:
-    #    continue
 
-    return [p for p in puntos_con_profundidad if p[2] >= threshold]
+    puntos_filtrados = {}
+    for mask_id, puntos_de_arbol in puntos_arboles.items():
+        for p in puntos_de_arbol:
+            if p[2] >= threshold:
+                if mask_id not in puntos_filtrados:
+                    puntos_filtrados[mask_id] = []
+                puntos_filtrados[mask_id].append(p)
+
+    return puntos_filtrados
 
 def obtener_plano(puntos):
     if len(puntos) < 3:
@@ -243,10 +260,21 @@ def visualizar_plano_en_imagen(img, depth_map, a, b, c, d):
 
     return img_with_plane
 
-def filtrar_puntos(timestamp,puntos, img_original, mapa_profundidad, model_tronco):
+def filtrar_puntos(timestamp,puntos_manzanas, img_original, mapa_profundidad, model_tronco):
     puntos_arboles = obtener_puntos_arboles(timestamp,img_original, model_tronco)
     puntos_con_profundidad = obtener_puntos_con_profunidad(puntos_arboles, mapa_profundidad)
-    a, b, c, d = obtener_plano(puntos_con_profundidad)
+    puntos_filtrados = filtrar_puntos_threshold(puntos_con_profundidad)
+
+    numero_arboles = len(puntos_filtrados.keys())
+
+    if numero_arboles < 2:
+        raise("Luego de filtrado los puntos, no quedan 2 arboles")
+
+    total_puntos = []
+    for puntos_tronco in puntos_filtrados.values():
+        total_puntos += puntos_tronco
+
+    a, b, c, d = obtener_plano(total_puntos)
 
     img_with_plane = visualizar_plano_en_imagen(img_original, mapa_profundidad, a, b, c, d)
     cv2.imwrite(f"/home/renzo/catkin_ws/deteccion/pixeles_filtrados_{timestamp}.png", img_with_plane)
@@ -254,7 +282,7 @@ def filtrar_puntos(timestamp,puntos, img_original, mapa_profundidad, model_tronc
     puntos_filtrados = []
     puntos_rechazados = []
 
-    for [x, y, apple_id] in puntos:
+    for [x, y, apple_id] in puntos_manzanas:
         if x <= OFFSET_HORIZONTAL:
             continue
 
@@ -284,7 +312,19 @@ if __name__ == "__main__":
 
     puntos_arboles = obtener_puntos_arboles(img_test, model_tronco)
     puntos_con_profundidad = obtener_puntos_con_profunidad(puntos_arboles, mapa_profundidad)
-    a, b, c, d = obtener_plano(puntos_con_profundidad)
+    puntos_filtrados = filtrar_puntos_threshold(puntos_con_profundidad)
+
+    
+    numero_arboles = len(puntos_filtrados.keys())
+
+    if numero_arboles < 2:
+        raise("Luego de filtrado los puntos, no quedan 2 arboles")
+
+    total_puntos = []
+    for puntos in puntos_filtrados.values():
+        total_puntos += puntos
+
+    a, b, c, d = obtener_plano(total_puntos)
 
     print(f"coeficientes plano: {a}, {b}, {c}, {d}")
 
