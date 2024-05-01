@@ -24,7 +24,6 @@ ros_namespace = os.getenv('ROS_NAMESPACE')
 
 image_height = 1024
 image_width = 1024
-offset_horizontal = 53
 
 # clone repository with tracker and tracker evaluator - after running the node for the first time, run `pip install --upgrade sentry-sdk`
 def clone_tracker_repo():
@@ -38,8 +37,9 @@ YOLO_WEIGHTS = "weights/yolov8_100.pt"
 bridge = CvBridge()
 YOLOv8_model = None
 FIXED_THRESHOLD = False
-WORLD_NAME = "stereo_close_rows"
+WORLD_NAME = "sim_stereo"
 trunk_model = YOLO('weights/simulado_lateral.pt')
+SOURCE = "left_rgb_images"
 
 def find_clusters(lista):
     """
@@ -123,11 +123,8 @@ def read_bounding_boxes():
                 # if (x + w/2 < 70 or x + w/2 > image_width - 7 or y + h/2 < 7 or y + h/2 > image_height - 7): #ESTE IF ES PARA CONSIDERAR LA FRANJA NEGRA QUE SALE EN LAS IMAGENES DE PROFUNDIDAD
                 #     continue
 
-                if(x + offset_horizontal >= image_width):
-                    continue
-
                 # Create a list with the bounding box center and the bounding box id which is what will be saved in the dictionary
-                bb_center = [x + offset_horizontal, y, bb_id] #EL + 30 PARA CONSIDERAR LA FRANJA NEGRA QUE SALE EN LAS IMAGENES DEPROFUNDIDAD
+                bb_center = [x, y, bb_id] #EL + 30 PARA CONSIDERAR LA FRANJA NEGRA QUE SALE EN LAS IMAGENES DEPROFUNDIDAD
 
                 if (timestamp in bounding_boxes):
                     bounding_boxes[timestamp].append(bb_center)
@@ -208,9 +205,8 @@ def track_filter_and_count(working_directory):
     clone_tracker_repo()
 
     print('Running tracker and tracker evaluator...')
-    SOURCE = "right_rgb_images"
 
-#    subprocess.run(["python3", "yolo_tracking/tracking/track.py", "--yolo-model", YOLO_WEIGHTS, "--tracking-method", TRACKING_METHOD, "--source", SOURCE, "--save", "--save-txt"]) 
+    subprocess.run(["python3", "yolo_tracking/tracking/track.py", "--yolo-model", YOLO_WEIGHTS, "--tracking-method", TRACKING_METHOD, "--source", SOURCE, "--save", "--save-txt"]) 
 
     # get the bounding boxes from the file
     bounding_boxes = read_bounding_boxes()
@@ -252,7 +248,7 @@ def track_filter_and_count(working_directory):
     # tot_trees = total_amount_trees(working_directory)
     # tot_apples = total_amount_apples(working_directory)
     # print(f"total_amount_apples: {tot_apples}, for_{trees_counted}_trees: {round((tot_apples*trees_counted)/tot_trees)}")
-    print(f"amount of apples exactly for trees id (5,6,7,8,9): {total_amount_apples_for_trees_ids([5,6,7,8,9])}")
+    print(f"amount of apples exactly for trees id (12,13,14,15,16,17): {total_amount_apples_for_trees_ids([12,13,14,15,16,17])}")
 
 if __name__ == "__main__":
     working_directory=sys.argv[1]
