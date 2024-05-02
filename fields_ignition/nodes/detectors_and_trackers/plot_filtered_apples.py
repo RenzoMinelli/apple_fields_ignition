@@ -208,6 +208,7 @@ def track_filter_and_count(working_directory):
         # read original image to img_original
         image_path = 'left_rgb_images/' + timestamp + '.png'
         img_original = cv2.imread(image_path)
+        output_folder = working_directory + '/test_filtered_images'
 
         # read the depth image to mapa_profundidad
         mapa_profundidad = cv2.imread("disparity_images/" + str(timestamp) + ".png", cv2.IMREAD_GRAYSCALE)
@@ -219,17 +220,14 @@ def track_filter_and_count(working_directory):
 
         try:
             filtered_points, skipped_points = filtrar_puntos(timestamp,bounding_boxes[timestamp], img_original, mapa_profundidad, trunk_model)
+               
+            draw_boxes_and_save(image_path,img_original, filtered_points, skipped_points, output_folder)
         except CantidadPuntosInsuficiente as e:
             print(f"frame skipped, error: {e}")
             print(traceback.format_exc())
 
         print(f"puntos filtrados: {filtered_points}")
         print(f"puntos rechazados: {skipped_points}")
-
-        
-        output_folder = working_directory + '/test_filtered_images'
-        draw_boxes_and_save(image_path,img_original, filtered_points, skipped_points, output_folder)
-
 
 if __name__ == "__main__":
     working_directory=sys.argv[1]
