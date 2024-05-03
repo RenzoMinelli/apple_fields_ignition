@@ -65,7 +65,7 @@ def obtener_puntos_arboles(timestamp,img, model):
             puntos_arboles[mask_id] = []
 
             # get the center of each tree            
-            x, y, w, h = res.boxes[mask_id].xywh[0].numpy()
+            x, y, w, h = res.boxes[mask_id].xywh[0].cpu().numpy()
             
             #print(f"x: {x}, y: {y}, w: {w}, h: {h}")
             x_center = x
@@ -227,7 +227,7 @@ def escalar_profundidad(valor_z):
     #return ((255 - valor_z) / 255) * (MAX_DEPTH - MIN_DEPTH) + MIN_DEPTH
     return valor_z
 
-def visualizar_plano_en_imagen(img, depth_map, a, b, c, d):
+def visualizar_plano_en_imagen(img, puntos_manzanas, depth_map, a, b, c, d):
     # Crear una copia de la imagen para dibujar el plano
     img_with_plane = img.copy()
 
@@ -246,9 +246,22 @@ def visualizar_plano_en_imagen(img, depth_map, a, b, c, d):
             current_color = img_with_plane[y, x]
             img_with_plane[y, x] = current_color if esta_delante else (int(current_color[0]/2), int(current_color[1]/2), int(current_color[2]/2))
 
+    for [x, y] in puntos_manzanas:
+        # calcular profundidad de la manzana
+        z = depth_map[y, x]
+        z_scaled = escalar_profundidad(z)
+
+        # Comprobar si el punto está delante del plano
+        esta_delante = delante_de_plano(x, y, z_scaled, a, b, c, d)
+
+        if esta_delante:
+            cv2.circle(img_with_plane, (x, y), 3, (0, 255, 0), -1)
+        else:
+            cv2.circle(img_with_plane, (x, y), 3, (255, 0, 0), -1)
+
     return img_with_plane
 
-def filtrar_puntos(timestamp,puntos_manzanas, img_original, mapa_profundidad, model_tronco):
+def filtrar_puntos(timestamp, puntos_manzanas, img_original, mapa_profundidad, model_tronco):
     print(f"puntos manzanas: {puntos_manzanas}")
     puntos_arboles = obtener_puntos_arboles(timestamp,img_original, model_tronco)
     puntos_con_profundidad = obtener_puntos_con_profunidad(puntos_arboles, mapa_profundidad)
@@ -291,15 +304,15 @@ def filtrar_puntos(timestamp,puntos_manzanas, img_original, mapa_profundidad, mo
     return puntos_filtrados,puntos_rechazados
 
 if __name__ == "__main__":
-    model_tronco = YOLO('/home/renzo/Downloads/OneDrive_1_4-24-2024/simulado_lateral.pt') 
+    model_tronco = YOLO('/home/pincho/catkin_ws/weights/simulado_lateral.pt') 
     
     #img_test = cv2.imread("/home/renzo/Desktop/recorrida_ambos_lados/left_rgb_images/41086000000.png")
     #mapa_profundidad = cv2.imread("/home/renzo/Desktop/recorrida_ambos_lados/disparity_images/41086000000.png", cv2.IMREAD_GRAYSCALE)
 
-    img_test = cv2.imread("/home/renzo/catkin_ws/left_rgb_images/70818000000.png")
-    mapa_profundidad = cv2.imread("/home/renzo/catkin_ws/disparity_images/70818000000.png", cv2.IMREAD_GRAYSCALE)
+    img_test = cv2.imread("/home/pincho/catkin_ws/right_rgb_images/33396000000.png")
+    mapa_profundidad = cv2.imread("/home/pincho/catkin_ws/disparity_images/33396000000.png", cv2.IMREAD_GRAYSCALE)
 
-    puntos_arboles = obtener_puntos_arboles(img_test, model_tronco)
+    puntos_arboles = obtener_puntos_arboles("33396000000" ,img_test, model_tronco)
     puntos_con_profundidad = obtener_puntos_con_profunidad(puntos_arboles, mapa_profundidad)
     puntos_filtrados = filtrar_puntos_threshold(puntos_con_profundidad)
 
@@ -318,7 +331,7 @@ if __name__ == "__main__":
     print(f"coeficientes plano: {a}, {b}, {c}, {d}")
 
     # Crear la imagen con el plano visualizado
-    img_with_plane = visualizar_plano_en_imagen(img_test, mapa_profundidad, a, b, c, d)
+    img_with_plane = visualizar_plano_en_imagen(img_test, puntos_manzanas, mapa_profundidad, a, b, c, d)
     cv2.imwrite(f"/home/renzo/catkin_ws/deteccion/pixeles_filtrados.png", img_with_plane)
     
     """
