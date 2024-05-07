@@ -246,7 +246,7 @@ def visualizar_plano_en_imagen(img, puntos_manzanas, depth_map, a, b, c, d):
             current_color = img_with_plane[y, x]
             img_with_plane[y, x] = current_color if esta_delante else (int(current_color[0]/2), int(current_color[1]/2), int(current_color[2]/2))
 
-    for [x, y] in puntos_manzanas:
+    for [x, y, *rest] in puntos_manzanas:
         # calcular profundidad de la manzana
         z = depth_map[y, x]
         z_scaled = escalar_profundidad(z)
@@ -278,7 +278,7 @@ def filtrar_puntos(timestamp, puntos_manzanas, img_original, mapa_profundidad, m
 
     a, b, c, d = obtener_plano(total_puntos)
 
-    #img_with_plane = visualizar_plano_en_imagen(img_original, mapa_profundidad, a, b, c, d)
+    #img_with_plane = visualizar_plano_en_imagen(img_original, puntos_manzanas, mapa_profundidad, a, b, c, d)
     #cv2.imwrite(f"/home/renzo/catkin_ws/deteccion/pixeles_filtrados_{timestamp}.png", img_with_plane)
 
     puntos_filtrados = []
