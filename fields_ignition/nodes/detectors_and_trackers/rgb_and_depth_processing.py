@@ -13,7 +13,7 @@ import numpy
 from sklearn.cluster import KMeans
 import sys
 import json 
-from test_yolo_model import filtrar_puntos, CantidadPuntosInsuficiente
+from test_yolo_model import filtrar_puntos, CantidadPuntosInsuficiente, visualizar_plano_en_imagen
 import traceback
 
 ros_namespace = os.getenv('ROS_NAMESPACE')
@@ -201,7 +201,7 @@ def track_filter_and_count(working_directory):
 
     print('Running tracker and tracker evaluator...')
 
-    subprocess.run(["python3", "yolo_tracking/tracking/track.py", "--yolo-model", YOLO_WEIGHTS, "--tracking-method", TRACKING_METHOD, "--source", SOURCE, "--save", "--save-txt"]) 
+    # subprocess.run(["python3", "yolo_tracking/tracking/track.py", "--yolo-model", YOLO_WEIGHTS, "--tracking-method", TRACKING_METHOD, "--source", SOURCE, "--save", "--save-txt"]) 
 
     # get the bounding boxes from the file
     bounding_boxes = read_bounding_boxes()
@@ -215,14 +215,17 @@ def track_filter_and_count(working_directory):
         img_original = cv2.imread("left_rgb_images/" + str(timestamp) + ".png")
 
         # read the depth image to mapa_profundidad
-        mapa_profundidad = cv2.imread("disparity_images/" + str(timestamp) + ".png", cv2.IMREAD_GRAYSCALE)
-
+        mapa_profundidad = cv2.imread("disparity_images/" + str(timestamp) + ".png", cv2.IMREAD_GRAYSCALE)        
+        
         # filter points using generated plane based on trunk detection and depth data
         filtered_points = []
         skipped_points = []
 
         try:
-            filtered_points, skipped_points = filtrar_puntos(timestamp,bounding_boxes[timestamp], img_original, mapa_profundidad, trunk_model)
+            filtered_points, skipped_points, a, b, c, d = filtrar_puntos(timestamp,bounding_boxes[timestamp], img_original, mapa_profundidad, trunk_model)
+            
+            img_with_plane = visualizar_plano_en_imagen(img_original, bounding_boxes[timestamp], mapa_profundidad, a, b, c, d)
+            cv2.imwrite(f"/home/pincho/catkin_ws/planos/{timestamp}_plane.png", img_with_plane)
         except CantidadPuntosInsuficiente as e:
             print(f"frame skipped, error: {e}")
             print(traceback.format_exc())

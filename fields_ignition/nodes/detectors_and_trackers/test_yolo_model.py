@@ -245,7 +245,6 @@ def visualizar_plano_en_imagen(img, puntos_manzanas, depth_map, a, b, c, d):
 
             current_color = img_with_plane[y, x]
             img_with_plane[y, x] = current_color if esta_delante else (int(current_color[0]/2), int(current_color[1]/2), int(current_color[2]/2))
-
     for [x, y, *rest] in puntos_manzanas:
         # calcular profundidad de la manzana
         z = depth_map[y, x]
@@ -257,7 +256,7 @@ def visualizar_plano_en_imagen(img, puntos_manzanas, depth_map, a, b, c, d):
         if esta_delante:
             cv2.circle(img_with_plane, (x, y), 3, (0, 255, 0), -1)
         else:
-            cv2.circle(img_with_plane, (x, y), 3, (255, 0, 0), -1)
+            cv2.circle(img_with_plane, (x, y), 3, (0, 0, 255), -1)
 
     return img_with_plane
 
@@ -277,7 +276,6 @@ def filtrar_puntos(timestamp, puntos_manzanas, img_original, mapa_profundidad, m
         total_puntos += puntos_tronco
 
     a, b, c, d = obtener_plano(total_puntos)
-
     #img_with_plane = visualizar_plano_en_imagen(img_original, puntos_manzanas, mapa_profundidad, a, b, c, d)
     #cv2.imwrite(f"/home/renzo/catkin_ws/deteccion/pixeles_filtrados_{timestamp}.png", img_with_plane)
 
@@ -301,7 +299,7 @@ def filtrar_puntos(timestamp, puntos_manzanas, img_original, mapa_profundidad, m
         else:
             puntos_rechazados.append([x, y, *rest])
 
-    return puntos_filtrados,puntos_rechazados
+    return puntos_filtrados, puntos_rechazados, a, b, c, d
 
 if __name__ == "__main__":
     model_tronco = YOLO('/home/pincho/catkin_ws/weights/simulado_lateral.pt') 
