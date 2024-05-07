@@ -2,7 +2,7 @@
 
 # imports
 import time as Time
-from ultralytics import YOLO
+# from ultralytics import YOLO
 import cv2
 # from cv_bridge import CvBridge, CvBridgeError
 # import torch
@@ -13,18 +13,16 @@ import os
 import numpy
 from sklearn.cluster import KMeans
 import sys
-from test_yolo_model import filtrar_puntos, CantidadPuntosInsuficiente
-import traceback
 
 ros_namespace = os.getenv('ROS_NAMESPACE')
 
 image_height = 1024
 image_width = 1024
+offset_horizontal = 53
 
 # global variables
 YOLOv8_model = None
 FIXED_THRESHOLD = False
-trunk_model = YOLO('weights/simulado_lateral.pt')
 
 def find_clusters(lista):
     """
@@ -86,7 +84,7 @@ def read_bounding_boxes():
                 line_split = line.split(" ")
                 
                 # If the line has 6 elements, the bounding box has an id, otherwise it is 0
-                # print("line: ", line)
+                print("line: ", line)
 
                 if len(line_split) < 6: # this is to skip IDs = 0 which correspond to unconfirmed tracks 
                     continue
@@ -101,8 +99,6 @@ def read_bounding_boxes():
                 # As the values are normalized we need to multiply them by the image size
                 x = x * image_width # ESTO HARDCODEADO NO ME PARECE MUCHO PORQUE SI ALGUIEN EN EL FUTURO QUIERE CAMBIAR EL SENSOR SE COMPLICA REVISAR EL CODIGO, ME PARECE QUE DEBERIA SER UN PARAMETRO O UNA VARIABLE GLOABL MINIMO
                 y = y * image_height
-                w = float(w)*image_width
-                h = float(h)*image_height
 
                 # Convert everything to int
                 x = int(x)
@@ -111,11 +107,11 @@ def read_bounding_boxes():
                 # if (x + w/2 < 70 or x + w/2 > image_width - 7 or y + h/2 < 7 or y + h/2 > image_height - 7): #ESTE IF ES PARA CONSIDERAR LA FRANJA NEGRA QUE SALE EN LAS IMAGENES DE PROFUNDIDAD
                 #     continue
 
-                if(int(x) >= image_width):
+                if(int(x) + offset_horizontal >= image_width):
                     continue
 
                 # Create a list with the bounding box center and the bounding box id which is what will be saved in the dictionary
-                bb_center = [x, y, bb_id, w, h] #EL + 30 PARA CONSIDERAR LA FRANJA NEGRA QUE SALE EN LAS IMAGENES DEPROFUNDIDAD
+                bb_center = [x + offset_horizontal, y, bb_id, w, h] #EL + 30 PARA CONSIDERAR LA FRANJA NEGRA QUE SALE EN LAS IMAGENES DEPROFUNDIDAD
 
                 if (timestamp in bounding_boxes):
                     bounding_boxes[timestamp].append(bb_center)
@@ -130,7 +126,31 @@ def read_bounding_boxes():
 
 # when the nodes ends track the apples and evaluate the tracking
 
-# given a sequence number (seq and a dictionary with the bounding boxes (bounding_boxes), return an array with the depths of the bounding box
+# given a sequence number (seq and a dictionary with the bounding boxes (bounding_boxes), return an array with the depths of the bounding boxes
+def get_depths(timestamp, bounding_boxes):
+    # read the depth image
+    # print("warning: reading depth image from file using grayscale parameter. For other kinds of images, change the code.")
+    depth_image = cv2.imread("disparity_images/" + str(timestamp) + ".png", cv2.IMREAD_GRAYSCALE)
+    img = cv2.imread("disparity_images/" + str(timestamp) + ".png")
+
+    if type(depth_image) != numpy.ndarray:
+        print('timestamp ' + str(timestamp) + ' not found in detected_images_depth_data folder')
+        return []
+
+    # get the depths of the bounding boxes
+    depths = []
+    for bb_center in bounding_boxes[timestamp]:
+        bb_id = bb_center[2]
+        depth = depth_image[int(bb_center[1]), int(bb_center[0])]
+        cv2.circle(img, (int(bb_center[0]), int(bb_center[1])), 5, (0, 0, 255), -1)
+
+        depths.append([bb_id, depth, bb_center[0], bb_center[1], bb_center[3], bb_center[4]]) # OJO ESTO PUEDE ESTAR MAL
+    cv2.imwrite('test_depth_i10/' + timestamp + '.png', img)
+
+    # returns an array with the depths of the bounding boxes
+    # depths = [[<id>, <depth>, <x>, <y>, <w>, <h>], ...]
+    return depths
+
 def filter_depths(depths, threshold):
     green_depths = []
     red_depths = []
@@ -144,30 +164,35 @@ def filter_depths(depths, threshold):
 
 
 # Define a function to draw bounding boxes on an image and save the modified image
-def draw_boxes_and_save(image_path, img, green_bboxs, red_bboxs, output_folder):
+def draw_boxes_and_save(image_path, green_bboxs, red_bboxs, output_folder):
     # Read the image
+    img = cv2.imread(image_path)
 
     # Iterate over each GREEN bounding box in the list
     for i, bbox in enumerate(green_bboxs):
 
-        x, y, bb_id, w, h = bbox
+        _, _, x, y, width, height = bbox
 
-        x = x - w/2
+        w = float(width)*image_width
+        h = float(height)*image_height
+
+        x = x - offset_horizontal - w/2
         y -= h/2
 
-        #breakpoint()
         # Draw the bounding box
         cv2.rectangle(img, (int(x), int(y)), (int(x + w), int(y + h)), (0, 255, 0), 2)
 
     # Iterate over each RED bounding box in the list
     for i, bbox in enumerate(red_bboxs):
 
-        x, y, bb_id, w, h = bbox
+        _, _, x, y, width, height = bbox
 
-        x = x - w/2
+        w = float(width)*image_width
+        h = float(height)*image_height
+
+        x = x - offset_horizontal - w/2
         y -= h/2
 
-        #breakpoint()
         # Draw the bounding box
         cv2.rectangle(img, (int(x), int(y)), (int(x + w), int(y + h)), (0, 0, 255), 2)
 
@@ -204,30 +229,25 @@ def track_filter_and_count(working_directory):
     
     for timestamp in bounding_boxes:
 
-        print(f"TIMESTAMP: {timestamp}")
-        # read original image to img_original
-        image_path = 'left_rgb_images/' + timestamp + '.png'
-        img_original = cv2.imread(image_path)
+        # depths = [[<id>, <depth>, <x>, <y>, <w>, <h>], ...]
+        image_depth_data = get_depths(timestamp, bounding_boxes)
+        
+        # Filter the results using depth data
+        # we must preserve those depths that are within [0, 30]. The rest must be filtered out
+        
+        threshold = 30 if FIXED_THRESHOLD else find_clusters([pair[1] for pair in image_depth_data]) 
+
+        print(f"--- threshold found: {threshold}")
+        
+        # red_depths, green_depths = [[<id>, <depth>, <x>, <y>, <w>, <h>], ...], [[<id>, <depth>, <x>, <y>, <w>, <h>], ...]
+        # print <timestamp>.png with the bounding boxes of the filtered apples colored in green and the rest in red
+        red_depths, green_depths = filter_depths(image_depth_data, threshold)
+        
+
+        image_path = 'right_rgb_images/' + timestamp + '.png'
         output_folder = working_directory + '/test_filtered_images'
+        draw_boxes_and_save(image_path, green_depths, red_depths, output_folder)
 
-        # read the depth image to mapa_profundidad
-        mapa_profundidad = cv2.imread("disparity_images/" + str(timestamp) + ".png", cv2.IMREAD_GRAYSCALE)
-
-        #image_depth_data = get_depths(timestamp, bounding_boxes)
-        # filter points using generated plane based on trunk detection and depth data
-        filtered_points = []
-        skipped_points = []
-
-        try:
-            filtered_points, skipped_points = filtrar_puntos(timestamp,bounding_boxes[timestamp], img_original, mapa_profundidad, trunk_model)
-               
-            draw_boxes_and_save(image_path,img_original, filtered_points, skipped_points, output_folder)
-        except CantidadPuntosInsuficiente as e:
-            print(f"frame skipped, error: {e}")
-            print(traceback.format_exc())
-
-        print(f"puntos filtrados: {filtered_points}")
-        print(f"puntos rechazados: {skipped_points}")
 
 if __name__ == "__main__":
     working_directory=sys.argv[1]

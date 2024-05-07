@@ -13,7 +13,7 @@ import numpy
 from sklearn.cluster import KMeans
 import sys
 import json 
-from test_yolo_model import filtrar_puntos, CantidadPuntosInsuficiente, visualizar_plano_en_imagen
+from plane_processing_utils import filtrar_puntos, CantidadPuntosInsuficiente, visualizar_plano_en_imagen
 import traceback
 
 ros_namespace = os.getenv('ROS_NAMESPACE')

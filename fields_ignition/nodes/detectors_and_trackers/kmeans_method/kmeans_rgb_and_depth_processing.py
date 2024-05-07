@@ -1,9 +1,6 @@
 #!/usr/bin/env python3
 
 # imports
-import rospy
-from sensor_msgs.msg import CompressedImage
-from sensor_msgs.msg import Imu
 import time as Time
 from ultralytics import YOLO
 import cv2

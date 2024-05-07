@@ -13,7 +13,7 @@ import os
 import numpy
 from sklearn.cluster import KMeans
 import sys
-from test_yolo_model import filtrar_puntos, CantidadPuntosInsuficiente
+from plane_processing_utils import filtrar_puntos, CantidadPuntosInsuficiente
 import traceback
 
 ros_namespace = os.getenv('ROS_NAMESPACE')
