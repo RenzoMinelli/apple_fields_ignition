@@ -29,7 +29,7 @@ def record_bag(field, name, record_bag, record_video):
     print("Recording...")
     os.makedirs(target, exist_ok=True)
     if record_bag:
-        rosbag_proc = Popen('nohup bash -c "rosbag record -O {}/record.bag -a -q __name:=record_bag"'.format(target), shell=True)
+        rosbag_proc = Popen('nohup bash -c "rosbag record -O {}/record.bag -a -x \'(.*)/compressedDepth(.*)\' -q __name:=record_bag"'.format(target), shell=True)
     
     if record_video:
         Popen('nohup bash -c "roslaunch fields_ignition record.launch field_name:={} experiment_name:={}"'.format(field, name), shell=True)
