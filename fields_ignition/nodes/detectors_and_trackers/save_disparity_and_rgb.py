@@ -3,8 +3,6 @@ import rospy
 import cv2 as cv
 import numpy as np
 from cv_bridge import CvBridge
-from sensor_msgs.msg import Image
-from stereo_msgs.msg import DisparityImage
 import message_filters
 import os
 import subprocess
