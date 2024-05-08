@@ -32,7 +32,7 @@ TRACKING_METHOD = "deepocsort"
 YOLO_WEIGHTS = "weights/yolov8_100.pt"
 YOLOv8_model = None
 FIXED_THRESHOLD = False
-WORLD_NAME = "sim_stereo"
+WORLD_NAME = "stereo_close_rows"
 trunk_model = YOLO('weights/simulado_lateral.pt')
 SOURCE = "left_rgb_images"
 
@@ -222,10 +222,7 @@ def track_filter_and_count(working_directory):
         skipped_points = []
 
         try:
-            filtered_points, skipped_points, a, b, c, d = filtrar_puntos(timestamp,bounding_boxes[timestamp], img_original, mapa_profundidad, trunk_model)
-            
-            img_with_plane = visualizar_plano_en_imagen(img_original, bounding_boxes[timestamp], mapa_profundidad, a, b, c, d)
-            cv2.imwrite(f"/home/pincho/catkin_ws/planos/{timestamp}_plane.png", img_with_plane)
+            filtered_points, skipped_points = filtrar_puntos(timestamp,bounding_boxes[timestamp], img_original, mapa_profundidad, trunk_model, working_directory, generar_imagen_plano=False)
         except CantidadPuntosInsuficiente as e:
             print(f"frame skipped, error: {e}")
             print(traceback.format_exc())
@@ -246,7 +243,7 @@ def track_filter_and_count(working_directory):
     # tot_trees = total_amount_trees(working_directory)
     # tot_apples = total_amount_apples(working_directory)
     # print(f"total_amount_apples: {tot_apples}, for_{trees_counted}_trees: {round((tot_apples*trees_counted)/tot_trees)}")
-    print(f"amount of apples exactly for trees id (12,13,14,15,16,17): {total_amount_apples_for_trees_ids([12,13,14,15,16,17])}")
+    print(f"amount of apples exactly for trees id (5,6,7,8,9): {total_amount_apples_for_trees_ids([5,6,7,8,9])}")
 
 if __name__ == "__main__":
     working_directory=sys.argv[1]

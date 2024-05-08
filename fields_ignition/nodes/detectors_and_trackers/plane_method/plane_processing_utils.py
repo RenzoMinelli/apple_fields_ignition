@@ -260,7 +260,7 @@ def visualizar_plano_en_imagen(img, puntos_manzanas, depth_map, a, b, c, d):
 
     return img_with_plane
 
-def filtrar_puntos(timestamp, puntos_manzanas, img_original, mapa_profundidad, model_tronco):
+def filtrar_puntos(timestamp, puntos_manzanas, img_original, mapa_profundidad, model_tronco, working_directory, generar_imagen_plano=False):
     print(f"puntos manzanas: {puntos_manzanas}")
     puntos_arboles = obtener_puntos_arboles(timestamp,img_original, model_tronco)
     puntos_con_profundidad = obtener_puntos_con_profunidad(puntos_arboles, mapa_profundidad)
@@ -276,8 +276,10 @@ def filtrar_puntos(timestamp, puntos_manzanas, img_original, mapa_profundidad, m
         total_puntos += puntos_tronco
 
     a, b, c, d = obtener_plano(total_puntos)
-    #img_with_plane = visualizar_plano_en_imagen(img_original, puntos_manzanas, mapa_profundidad, a, b, c, d)
-    #cv2.imwrite(f"/home/renzo/catkin_ws/deteccion/pixeles_filtrados_{timestamp}.png", img_with_plane)
+
+    if generar_imagen_plano:
+        img_with_plane = visualizar_plano_en_imagen(img_original, puntos_manzanas, mapa_profundidad, a, b, c, d)
+        cv2.imwrite(f"{working_directory}/deteccion/pixeles_filtrados_{timestamp}.png", img_with_plane)
 
     puntos_filtrados = []
     puntos_rechazados = []
@@ -299,16 +301,17 @@ def filtrar_puntos(timestamp, puntos_manzanas, img_original, mapa_profundidad, m
         else:
             puntos_rechazados.append([x, y, *rest])
 
-    return puntos_filtrados, puntos_rechazados, a, b, c, d
+    return puntos_filtrados, puntos_rechazados
 
 if __name__ == "__main__":
-    model_tronco = YOLO('/home/pincho/catkin_ws/weights/simulado_lateral.pt') 
+    working_directory=sys.argv[1]
+    model_tronco = YOLO(f"{working_directory}/weights/simulado_lateral.pt") 
     
     #img_test = cv2.imread("/home/renzo/Desktop/recorrida_ambos_lados/left_rgb_images/41086000000.png")
     #mapa_profundidad = cv2.imread("/home/renzo/Desktop/recorrida_ambos_lados/disparity_images/41086000000.png", cv2.IMREAD_GRAYSCALE)
 
-    img_test = cv2.imread("/home/pincho/catkin_ws/right_rgb_images/33396000000.png")
-    mapa_profundidad = cv2.imread("/home/pincho/catkin_ws/disparity_images/33396000000.png", cv2.IMREAD_GRAYSCALE)
+    img_test = cv2.imread(f"{working_directory}/right_rgb_images/33396000000.png")
+    mapa_profundidad = cv2.imread(f"{working_directory}/disparity_images/33396000000.png", cv2.IMREAD_GRAYSCALE)
 
     puntos_arboles = obtener_puntos_arboles("33396000000" ,img_test, model_tronco)
     puntos_con_profundidad = obtener_puntos_con_profunidad(puntos_arboles, mapa_profundidad)
