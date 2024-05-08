@@ -204,7 +204,7 @@ def track_filter_and_count(working_directory):
     
     for timestamp in bounding_boxes:
 
-        print(f"TIMESTAMP: {timestamp}")
+        # print(f"TIMESTAMP: {timestamp}")
         # read original image to img_original
         image_path = 'left_rgb_images/' + timestamp + '.png'
         img_original = cv2.imread(image_path)
@@ -224,10 +224,9 @@ def track_filter_and_count(working_directory):
             draw_boxes_and_save(image_path,img_original, filtered_points, skipped_points, output_folder)
         except CantidadPuntosInsuficiente as e:
             print(f"frame skipped, error: {e}")
-            print(traceback.format_exc())
 
-        print(f"puntos filtrados: {filtered_points}")
-        print(f"puntos rechazados: {skipped_points}")
+        # print(f"puntos filtrados: {filtered_points}")
+        # print(f"puntos rechazados: {skipped_points}")
 
 if __name__ == "__main__":
     working_directory=sys.argv[1]

@@ -9,6 +9,7 @@ from datetime import datetime
 
 #OFFSET_HORIZONTAL = 53
 OFFSET_HORIZONTAL = 70
+MARGEN_PLANO = 2
 
 class CantidadPuntosInsuficiente(Exception):
     def __init__(self, m):
@@ -274,6 +275,9 @@ def filtrar_puntos(timestamp, puntos_manzanas, img_original, mapa_profundidad, m
     total_puntos = []
     for puntos_tronco in puntos_filtrados.values():
         total_puntos += puntos_tronco
+
+    # vamos a correr el plano en z un margen
+    total_puntos = [[x, y, z + MARGEN_PLANO] for x, y, z in total_puntos]
 
     a, b, c, d = obtener_plano(total_puntos)
 
