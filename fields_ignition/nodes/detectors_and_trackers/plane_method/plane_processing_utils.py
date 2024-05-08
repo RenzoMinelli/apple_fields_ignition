@@ -188,7 +188,7 @@ def filtrar_puntos_threshold(puntos_arboles):
 
     threshold = int(find_clusters([p[2] for p in puntos]))
 
-    print(f"threshold hallado: {threshold}")
+    # print(f"threshold hallado: {threshold}")
 
     puntos_filtrados = {}
     for mask_id, puntos_de_arbol in puntos_arboles.items():
@@ -203,7 +203,7 @@ def obtener_plano(puntos):
     if len(puntos) < 3:
         raise CantidadPuntosInsuficiente("Hay menos de 3 puntos, no se puede definir el plano")
     
-    print(f"Puntos del plano: {puntos}")
+    # print(f"Puntos del plano: {puntos}")
     A = np.array(puntos)
     b = np.ones(len(puntos))
     
@@ -261,7 +261,7 @@ def visualizar_plano_en_imagen(img, puntos_manzanas, depth_map, a, b, c, d):
     return img_with_plane
 
 def filtrar_puntos(timestamp, puntos_manzanas, img_original, mapa_profundidad, model_tronco, working_directory, generar_imagen_plano=False):
-    print(f"puntos manzanas: {puntos_manzanas}")
+    # print(f"puntos manzanas: {puntos_manzanas}")
     puntos_arboles = obtener_puntos_arboles(timestamp,img_original, model_tronco)
     puntos_con_profundidad = obtener_puntos_con_profunidad(puntos_arboles, mapa_profundidad)
     puntos_filtrados = filtrar_puntos_threshold(puntos_con_profundidad)
@@ -329,7 +329,7 @@ if __name__ == "__main__":
 
     a, b, c, d = obtener_plano(total_puntos)
 
-    print(f"coeficientes plano: {a}, {b}, {c}, {d}")
+    # print(f"coeficientes plano: {a}, {b}, {c}, {d}")
 
     # Crear la imagen con el plano visualizado
     img_with_plane = visualizar_plano_en_imagen(img_test, puntos_manzanas, mapa_profundidad, a, b, c, d)

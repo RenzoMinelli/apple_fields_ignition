@@ -210,7 +210,7 @@ def track_filter_and_count(working_directory):
     points = []
     
     for timestamp in bounding_boxes:
-        print(f"TIMESTAMP: {timestamp}")
+        # print(f"TIMESTAMP: {timestamp}")
         # read original image to img_original
         img_original = cv2.imread("left_rgb_images/" + str(timestamp) + ".png")
 
@@ -225,10 +225,10 @@ def track_filter_and_count(working_directory):
             filtered_points, skipped_points = filtrar_puntos(timestamp,bounding_boxes[timestamp], img_original, mapa_profundidad, trunk_model, working_directory, generar_imagen_plano=False)
         except CantidadPuntosInsuficiente as e:
             print(f"frame skipped, error: {e}")
-            print(traceback.format_exc())
+            # print(traceback.format_exc())
 
-        print(f"puntos filtrados: {filtered_points}")
-        print(f"puntos rechazados: {skipped_points}")
+        #print(f"puntos filtrados: {filtered_points}")
+        #print(f"puntos rechazados: {skipped_points}")
         points.extend(filtered_points)
 
     # Count the distinct ids that remained after filtering
