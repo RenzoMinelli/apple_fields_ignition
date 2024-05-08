@@ -4,7 +4,6 @@
 import time as Time
 from ultralytics import YOLO
 import cv2
-from cv_bridge import CvBridge, CvBridgeError
 import torch
 import datetime
 import pdb
@@ -30,7 +29,6 @@ def clone_tracker_repo():
 # global variables
 TRACKING_METHOD = "deepocsort"
 YOLO_WEIGHTS = "weights/yolov8_100.pt"
-bridge = CvBridge()
 YOLOv8_model = None
 FIXED_THRESHOLD = False
 WORLD_NAME = "stereo_close_rows"
@@ -205,7 +203,7 @@ def track_filter_and_count(working_directory):
     print('Running tracker and tracker evaluator...')
     SOURCE = "right_rgb_images"
 
-    subprocess.run(["python3", "yolo_tracking/tracking/track.py", "--yolo-model", YOLO_WEIGHTS, "--tracking-method", TRACKING_METHOD, "--source", SOURCE, "--save", "--save-txt"]) 
+    # subprocess.run(["python3", "yolo_tracking/tracking/track.py", "--yolo-model", YOLO_WEIGHTS, "--tracking-method", TRACKING_METHOD, "--source", SOURCE, "--save", "--save-txt"]) 
 
     # get the bounding boxes from the file
     bounding_boxes = read_bounding_boxes()
