@@ -180,7 +180,7 @@ def total_amount_trees(working_directory):
                 tree_amount += 1
     return tree_amount
 
-def total_amount_apples_for_trees_ids(ids):
+def total_amount_apples_for_trees_ids(working_directory, ids):
     dir_path = f"{working_directory}/src/apple_fields_ignition/fields_ignition/generated/{WORLD_NAME}/apple_field/"
     apple_amount = 0
     dir_names_wanted = [f"apple_{x}" for x in ids]
@@ -246,7 +246,7 @@ def track_filter_and_count(working_directory, track):
     # tot_trees = total_amount_trees(working_directory)
     # tot_apples = total_amount_apples(working_directory)
     # print(f"total_amount_apples: {tot_apples}, for_{trees_counted}_trees: {round((tot_apples*trees_counted)/tot_trees)}")
-    print(f"amount of apples exactly for trees id (5,6,7,8,9): {total_amount_apples_for_trees_ids([5,6,7,8,9])}")
+    print(f"amount of apples exactly for trees id (5,6,7,8,9): {total_amount_apples_for_trees_ids(working_directory, [5,6,7,8,9])}")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
