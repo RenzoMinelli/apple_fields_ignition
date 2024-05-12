@@ -15,6 +15,7 @@ import sys
 import json 
 from plane_processing_utils import filtrar_puntos, CantidadPuntosInsuficiente, visualizar_plano_en_imagen
 import traceback
+import argparse
 
 ros_namespace = os.getenv('ROS_NAMESPACE')
 
@@ -193,7 +194,7 @@ def total_amount_apples_for_trees_ids(ids):
     return apple_amount
 
 # when the node is killed, run the tracker and filter the results
-def track_filter_and_count(working_directory):
+def track_filter_and_count(working_directory, track):
     os.chdir(working_directory)
     print('working inside directory ', os.getcwd())
     
@@ -201,7 +202,9 @@ def track_filter_and_count(working_directory):
 
     print('Running tracker and tracker evaluator...')
 
-    #subprocess.run(["python3", "yolo_tracking/tracking/track.py", "--yolo-model", YOLO_WEIGHTS, "--tracking-method", TRACKING_METHOD, "--source", SOURCE, "--save", "--save-txt"]) 
+    if track:
+        # run the tracker
+        subprocess.run(["python3", "yolo_tracking/tracking/track.py", "--yolo-model", YOLO_WEIGHTS, "--tracking-method", TRACKING_METHOD, "--source", SOURCE, "--save", "--save-txt"]) 
 
     # get the bounding boxes from the file
     bounding_boxes = read_bounding_boxes()
@@ -246,5 +249,9 @@ def track_filter_and_count(working_directory):
     print(f"amount of apples exactly for trees id (5,6,7,8,9): {total_amount_apples_for_trees_ids([5,6,7,8,9])}")
 
 if __name__ == "__main__":
-    working_directory=sys.argv[1]
-    track_filter_and_count(working_directory)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--working_directory", required=True)
+    parser.add_argument("--track", default='False', type=lambda x: (str(x).lower() == 'true'))
+    args = parser.parse_args()
+
+    track_filter_and_count(args.working_directory, args.track)
