@@ -1,6 +1,6 @@
 <launch>
   <!-- Launch file to run bag file -->
-  <arg name="bag_file_path" default="/home/paolo/catkin_ws/close_rows.bag"/>
+  <arg name="bag_file_path" default="/home/paolo/catkin_ws/bag_mas_lento.bag"/>
   <arg name="folder_path" default="/home/paolo/catkin_ws"/>
 
   <!-- Camera image left topic -->
@@ -23,7 +23,7 @@
   <!-- Run stereo_image_proc -->
   <group ns="stereo">
     <node pkg="stereo_image_proc" type="stereo_image_proc" name="stereo_image_proc" output="screen">
-      <rosparam command="load" file="$(arg folder_path)/src/apple_fields_ignition/fields_ignition/config/stereoParamsSim2Blocks.yaml"/>
+      <rosparam command="load" file="$(arg folder_path)/src/apple_fields_ignition/fields_ignition/config/stereoParamsSim1Block.yaml"/>
     </node>
   </group>
 
