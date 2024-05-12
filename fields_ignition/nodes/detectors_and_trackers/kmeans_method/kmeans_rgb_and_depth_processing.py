@@ -25,7 +25,7 @@ def clone_tracker_repo():
 TRACKING_METHOD = "deepocsort"
 YOLO_WEIGHTS = "weights/yolov8l_150.pt"
 FIXED_THRESHOLD = False
-WORLD_NAME = "stereo_close_rows"
+WORLD_NAME = "stereo_trees_close"
 THRESHOLD_MARGIN = 2
 
 def find_clusters(lista):
