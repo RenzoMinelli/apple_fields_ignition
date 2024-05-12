@@ -20,26 +20,20 @@ def find_clusters(nums, threshold=10):
         return 0
 
     # Sort the list of numbers
-    sorted_nums = sorted(nums)
+    sorted_nums = sorted(nums, reverse=True)
+    maximo = sorted_nums[0]
 
     # Initialize the first group
-    groups = []
-    current_group = [sorted_nums[0]]
+    puntos_incluidos = [maximo]
 
     # Iterate through sorted numbers and form groups
     for i in range(1, len(sorted_nums)):
-        if sorted_nums[i] - sorted_nums[i - 1] > threshold:
-            # If the gap is larger than the threshold, start a new group
-            groups.append(min(current_group))
-            current_group = [sorted_nums[i]]
-        else:
-            # Otherwise, add the number to the current group
-            current_group.append(sorted_nums[i])
+        if abs(maximo - sorted_nums[i]) > threshold:
+            break
 
-    # Add the last group
-    groups.append(min(current_group))
+        puntos_incluidos.append(sorted_nums[i])
     
-    return max(groups)
+    return min(puntos_incluidos)
 
 def obtener_puntos_arboles(timestamp,img, model):
     puntos_arboles = {}
