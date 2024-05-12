@@ -1,24 +1,16 @@
 #!/usr/bin/env python3
 
 # imports
-import time as Time
-# from ultralytics import YOLO
 import cv2
-# from cv_bridge import CvBridge, CvBridgeError
-# import torch
-import datetime
-# import pdb
-import subprocess
 import os
 import numpy
 from sklearn.cluster import KMeans
-import sys
+import argparse
 
 ros_namespace = os.getenv('ROS_NAMESPACE')
 
 image_height = 1024
 image_width = 1024
-offset_horizontal = 53
 
 # global variables
 YOLOv8_model = None
@@ -104,14 +96,8 @@ def read_bounding_boxes():
                 x = int(x)
                 y = int(y)
 
-                # if (x + w/2 < 70 or x + w/2 > image_width - 7 or y + h/2 < 7 or y + h/2 > image_height - 7): #ESTE IF ES PARA CONSIDERAR LA FRANJA NEGRA QUE SALE EN LAS IMAGENES DE PROFUNDIDAD
-                #     continue
-
-                if(int(x) + offset_horizontal >= image_width):
-                    continue
-
                 # Create a list with the bounding box center and the bounding box id which is what will be saved in the dictionary
-                bb_center = [x + offset_horizontal, y, bb_id, w, h] #EL + 30 PARA CONSIDERAR LA FRANJA NEGRA QUE SALE EN LAS IMAGENES DEPROFUNDIDAD
+                bb_center = [x, y, bb_id, w, h] #EL + 30 PARA CONSIDERAR LA FRANJA NEGRA QUE SALE EN LAS IMAGENES DEPROFUNDIDAD
 
                 if (timestamp in bounding_boxes):
                     bounding_boxes[timestamp].append(bb_center)
@@ -176,7 +162,7 @@ def draw_boxes_and_save(image_path, green_bboxs, red_bboxs, output_folder):
         w = float(width)*image_width
         h = float(height)*image_height
 
-        x = x - offset_horizontal - w/2
+        x = x - w/2
         y -= h/2
 
         # Draw the bounding box
@@ -190,7 +176,7 @@ def draw_boxes_and_save(image_path, green_bboxs, red_bboxs, output_folder):
         w = float(width)*image_width
         h = float(height)*image_height
 
-        x = x - offset_horizontal - w/2
+        x = x - w/2
         y -= h/2
 
         # Draw the bounding box
@@ -244,17 +230,19 @@ def track_filter_and_count(working_directory):
         red_depths, green_depths = filter_depths(image_depth_data, threshold)
         
 
-        image_path = 'right_rgb_images/' + timestamp + '.png'
+        image_path = 'left_rgb_images/' + timestamp + '.png'
         output_folder = working_directory + '/test_filtered_images'
         draw_boxes_and_save(image_path, green_depths, red_depths, output_folder)
 
 
 if __name__ == "__main__":
-    working_directory=sys.argv[1]
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--working_directory", required=True)
+    args = parser.parse_args()
 
     folder_names = ["test_depth_i10", "test_filtered_images"]
     for folder_name in folder_names:
-        folder_path = f"{working_directory}/{folder_name}"
+        folder_path = f"{args.working_directory}/{folder_name}"
         if not os.path.exists(folder_path):
             os.makedirs(folder_path)
         else:
@@ -263,4 +251,4 @@ if __name__ == "__main__":
                 file_path = os.path.join(folder_path, file_name)
                 os.remove(file_path)
 
-    track_filter_and_count(working_directory)
+    track_filter_and_count(args.working_directory)

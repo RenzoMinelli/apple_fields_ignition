@@ -1,17 +1,12 @@
 #!/usr/bin/env python3
 
 # imports
-import time as Time
-from ultralytics import YOLO
 import cv2
-import torch
-import datetime
-import pdb
 import subprocess
 import os
 import numpy
 from sklearn.cluster import KMeans
-import sys
+import argparse
 import json 
 
 ros_namespace = os.getenv('ROS_NAMESPACE')
@@ -28,8 +23,7 @@ def clone_tracker_repo():
 
 # global variables
 TRACKING_METHOD = "deepocsort"
-YOLO_WEIGHTS = "weights/yolov8_100.pt"
-YOLOv8_model = None
+YOLO_WEIGHTS = "weights/yolov8l_150.pt"
 FIXED_THRESHOLD = False
 WORLD_NAME = "stereo_close_rows"
 THRESHOLD_MARGIN = 2
@@ -113,14 +107,8 @@ def read_bounding_boxes():
                 x = int(x)
                 y = int(y)
 
-                # if (x + w/2 < 70 or x + w/2 > image_width - 7 or y + h/2 < 7 or y + h/2 > image_height - 7): #ESTE IF ES PARA CONSIDERAR LA FRANJA NEGRA QUE SALE EN LAS IMAGENES DE PROFUNDIDAD
-                #     continue
-
-                if(x + offset_horizontal >= image_width):
-                    continue
-
                 # Create a list with the bounding box center and the bounding box id which is what will be saved in the dictionary
-                bb_center = [x + offset_horizontal, y, bb_id] #EL + 30 PARA CONSIDERAR LA FRANJA NEGRA QUE SALE EN LAS IMAGENES DEPROFUNDIDAD
+                bb_center = [x, y, bb_id] #EL + 30 PARA CONSIDERAR LA FRANJA NEGRA QUE SALE EN LAS IMAGENES DEPROFUNDIDAD
 
                 if (timestamp in bounding_boxes):
                     bounding_boxes[timestamp].append(bb_center)
@@ -180,7 +168,7 @@ def total_amount_trees(working_directory):
                 tree_amount += 1
     return tree_amount
 
-def total_amount_apples_for_trees_ids(ids):
+def total_amount_apples_for_trees_ids(working_directory, ids):
     dir_path = f"{working_directory}/src/apple_fields_ignition/fields_ignition/generated/{WORLD_NAME}/apple_field/"
     apple_amount = 0
     dir_names_wanted = [f"apple_{x}" for x in ids]
@@ -194,16 +182,17 @@ def total_amount_apples_for_trees_ids(ids):
     return apple_amount
 
 # when the node is killed, run the tracker and filter the results
-def track_filter_and_count(working_directory):
+def track_filter_and_count(working_directory, track):
     os.chdir(working_directory)
     print('working inside directory ', os.getcwd())
     
     clone_tracker_repo()
 
     print('Running tracker and tracker evaluator...')
-    SOURCE = "right_rgb_images"
+    SOURCE = "left_rgb_images"
 
-    # subprocess.run(["python3", "yolo_tracking/tracking/track.py", "--yolo-model", YOLO_WEIGHTS, "--tracking-method", TRACKING_METHOD, "--source", SOURCE, "--save", "--save-txt"]) 
+    if track:
+        subprocess.run(["python3", "yolo_tracking/tracking/track.py", "--yolo-model", YOLO_WEIGHTS, "--tracking-method", TRACKING_METHOD, "--source", SOURCE, "--save", "--save-txt"]) 
 
     # get the bounding boxes from the file
     bounding_boxes = read_bounding_boxes()
@@ -236,8 +225,11 @@ def track_filter_and_count(working_directory):
     # tot_trees = total_amount_trees(working_directory)
     # tot_apples = total_amount_apples(working_directory)
     # print(f"total_amount_apples: {tot_apples}, for_{trees_counted}_trees: {round((tot_apples*trees_counted)/tot_trees)}")
-    print(f"amount of apples exactly for trees id (5,6,7,8,9): {total_amount_apples_for_trees_ids([5,6,7,8,9])}")
+    print(f"amount of apples exactly for trees id (5,6,7,8,9): {total_amount_apples_for_trees_ids(working_directory, [5,6,7,8,9])}")
 
 if __name__ == "__main__":
-    working_directory=sys.argv[1]
-    track_filter_and_count(working_directory)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--working_directory", required=True)
+    parser.add_argument("--track", default='False', type=lambda x: (str(x).lower() == 'true'))
+    args = parser.parse_args()
+    track_filter_and_count(args.working_directory, args.track)

@@ -1,20 +1,14 @@
 #!/usr/bin/env python3
 
 # imports
-import time as Time
 from ultralytics import YOLO
 import cv2
-import torch
-import datetime
-import pdb
 import subprocess
 import os
 import numpy
 from sklearn.cluster import KMeans
-import sys
 import json 
-from plane_processing_utils import filtrar_puntos, CantidadPuntosInsuficiente, visualizar_plano_en_imagen
-import traceback
+from plane_processing_utils import filtrar_puntos, CantidadPuntosInsuficiente
 import argparse
 
 ros_namespace = os.getenv('ROS_NAMESPACE')

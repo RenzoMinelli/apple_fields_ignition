@@ -1,2 +1,5 @@
 *.bag
-fields_ignition/nodes/detectors_and_trackers/__pycache__/rgb_and_depth_processing.cpython-38.pyc
+fields_ignition/nodes/detectors_and_trackers/__pycache__/
+fields_ignition/nodes/detectors_and_trackers/plane_method/__pycache__/
+fields_ignition/nodes/detectors_and_trackers/kmeans_method/__pycache__/
+
