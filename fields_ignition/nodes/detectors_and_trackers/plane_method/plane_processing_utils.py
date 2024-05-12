@@ -2,10 +2,8 @@
 from ultralytics import YOLO
 import cv2
 from PIL import Image
-from math import sqrt
 import numpy as np
-from sklearn.cluster import KMeans
-from datetime import datetime
+import sys 
 
 #OFFSET_HORIZONTAL = 53
 OFFSET_HORIZONTAL = 70
@@ -336,7 +334,7 @@ if __name__ == "__main__":
     # print(f"coeficientes plano: {a}, {b}, {c}, {d}")
 
     # Crear la imagen con el plano visualizado
-    img_with_plane = visualizar_plano_en_imagen(img_test, puntos_manzanas, mapa_profundidad, a, b, c, d)
+    img_with_plane = visualizar_plano_en_imagen(img_test, [], mapa_profundidad, a, b, c, d)
     cv2.imwrite(f"/home/renzo/catkin_ws/deteccion/pixeles_filtrados.png", img_with_plane)
     
     """
