@@ -28,11 +28,11 @@ def clone_tracker_repo():
 
 
 # global variables
-TRACKING_METHOD = "hybridsort"
+TRACKING_METHOD = "deepocsort"
 YOLO_WEIGHTS = "weights/yolov8l_150.pt"
 YOLOv8_model = None
 FIXED_THRESHOLD = False
-WORLD_NAME = "stereo_close_rows"
+WORLD_NAME = "stereo_trees_close"
 trunk_model = YOLO('weights/simulado_lateral.pt')
 SOURCE = "left_rgb_images"
 
