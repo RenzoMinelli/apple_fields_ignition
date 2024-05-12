@@ -23,13 +23,13 @@ image_width = 1024
 
 # clone repository with tracker and tracker evaluator - after running the node for the first time, run `pip install --upgrade sentry-sdk`
 def clone_tracker_repo():
-    subprocess.run(["git", "clone", "--recurse-submodules", "https://github.com/PaoloCappelli/yolo_tracking.git"])
+    subprocess.run(["git", "clone", "--recurse-submodules", "https://github.com/mikel-brostrom/yolo_tracking.git"])
     subprocess.run(["pip", "install", "boxmot"])
 
 
 # global variables
-TRACKING_METHOD = "deepocsort"
-YOLO_WEIGHTS = "weights/yolov8_100.pt"
+TRACKING_METHOD = "hybridsort"
+YOLO_WEIGHTS = "weights/yolov8l_150.pt"
 YOLOv8_model = None
 FIXED_THRESHOLD = False
 WORLD_NAME = "stereo_close_rows"
@@ -201,7 +201,7 @@ def track_filter_and_count(working_directory):
 
     print('Running tracker and tracker evaluator...')
 
-    # subprocess.run(["python3", "yolo_tracking/tracking/track.py", "--yolo-model", YOLO_WEIGHTS, "--tracking-method", TRACKING_METHOD, "--source", SOURCE, "--save", "--save-txt"]) 
+    subprocess.run(["python3", "yolo_tracking/tracking/track.py", "--yolo-model", YOLO_WEIGHTS, "--tracking-method", TRACKING_METHOD, "--source", SOURCE, "--save", "--save-txt"]) 
 
     # get the bounding boxes from the file
     bounding_boxes = read_bounding_boxes()

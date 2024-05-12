@@ -221,7 +221,7 @@ def track_filter_and_count(working_directory):
         try:
             filtered_points, skipped_points = filtrar_puntos(timestamp,bounding_boxes[timestamp], img_original, mapa_profundidad, trunk_model, working_directory, generar_imagen_plano=True)
                
-            draw_boxes_and_save(image_path,img_original, filtered_points, skipped_points, output_folder)
+            #draw_boxes_and_save(image_path,img_original, filtered_points, skipped_points, output_folder)
         except CantidadPuntosInsuficiente as e:
             print(f"frame skipped, error: {e}")
 
