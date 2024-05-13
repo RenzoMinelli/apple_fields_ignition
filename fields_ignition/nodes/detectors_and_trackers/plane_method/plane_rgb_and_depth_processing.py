@@ -188,7 +188,7 @@ def total_amount_apples_for_trees_ids(working_directory, ids):
     return apple_amount
 
 # when the node is killed, run the tracker and filter the results
-def track_filter_and_count(working_directory, track):
+def track_filter_and_count(working_directory, track, generar_imagen_plano):
     os.chdir(working_directory)
     print('working inside directory ', os.getcwd())
     
@@ -243,9 +243,12 @@ def track_filter_and_count(working_directory, track):
     print(f"amount of apples exactly for trees id (5,6,7,8,9): {total_amount_apples_for_trees_ids(working_directory, [5,6,7,8,9])}")
 
 if __name__ == "__main__":
+    # execution example
+    # python3 /home/pincho/catkin_ws/src/apple_fields_ignition/fields_ignition/nodes/detectors_and_trackers/plane_method/plane_rgb_and_depth_processing.py --working_directory '/home/pincho/catkin_ws' --track True
     parser = argparse.ArgumentParser()
     parser.add_argument("--working_directory", required=True)
     parser.add_argument("--track", default='False', type=lambda x: (str(x).lower() == 'true'))
+    parser.add_argument("--gen_planos", default='False', type=lambda x: (str(x).lower() == 'true'))
     args = parser.parse_args()
 
-    track_filter_and_count(args.working_directory, args.track)
+    track_filter_and_count(args.working_directory, args.track, args.gen_planos)
