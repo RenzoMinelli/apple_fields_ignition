@@ -273,6 +273,9 @@ def filtrar_puntos(timestamp, puntos_manzanas, img_original, mapa_profundidad, m
 
     a, b, c, d = obtener_plano(total_puntos)
 
+    print('plano generado: ')
+    print(f"a: {a}, b: {b}, c: {c}, d: {d}")
+
     if generar_imagen_plano:
         img_with_plane = visualizar_plano_en_imagen(img_original, puntos_manzanas, mapa_profundidad, a, b, c, d)
         cv2.imwrite(f"{working_directory}/deteccion/pixeles_filtrados_{timestamp}.png", img_with_plane)
