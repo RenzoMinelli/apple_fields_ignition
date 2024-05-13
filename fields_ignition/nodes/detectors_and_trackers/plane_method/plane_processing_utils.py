@@ -7,7 +7,7 @@ import sys
 
 #OFFSET_HORIZONTAL = 53
 OFFSET_HORIZONTAL = 70
-MARGEN_PLANO = -2
+MARGEN_PLANO = 2
 
 class CantidadPuntosInsuficiente(Exception):
     def __init__(self, m):
