@@ -4,17 +4,11 @@
 import time as Time
 from ultralytics import YOLO
 import cv2
-# from cv_bridge import CvBridge, CvBridgeError
-# import torch
-import datetime
-# import pdb
-import subprocess
 import os
 import numpy
 from sklearn.cluster import KMeans
-import sys
+import argparse
 from plane_processing_utils import filtrar_puntos, CantidadPuntosInsuficiente
-import traceback
 
 ros_namespace = os.getenv('ROS_NAMESPACE')
 
@@ -229,11 +223,13 @@ def track_filter_and_count(working_directory):
         # print(f"puntos rechazados: {skipped_points}")
 
 if __name__ == "__main__":
-    working_directory=sys.argv[1]
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--working_directory", required=True)
+    args = parser.parse_args()
 
     folder_names = ["test_depth_i10", "test_filtered_images"]
     for folder_name in folder_names:
-        folder_path = f"{working_directory}/{folder_name}"
+        folder_path = f"{args.working_directory}/{folder_name}"
         if not os.path.exists(folder_path):
             os.makedirs(folder_path)
         else:
@@ -242,4 +238,4 @@ if __name__ == "__main__":
                 file_path = os.path.join(folder_path, file_name)
                 os.remove(file_path)
 
-    track_filter_and_count(working_directory)
+    track_filter_and_count(args.working_directory)
