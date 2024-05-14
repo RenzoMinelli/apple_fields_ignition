@@ -227,7 +227,7 @@ if __name__ == "__main__":
     parser.add_argument("--working_directory", required=True)
     args = parser.parse_args()
 
-    folder_names = ["test_depth_i10", "test_filtered_images"]
+    folder_names = ["test_depth_i10", "test_filtered_images", "deteccion"]
     for folder_name in folder_names:
         folder_path = f"{args.working_directory}/{folder_name}"
         if not os.path.exists(folder_path):
