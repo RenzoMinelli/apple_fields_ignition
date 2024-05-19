@@ -5,8 +5,6 @@ from ultralytics import YOLO
 import cv2
 import subprocess
 import os
-import numpy
-from sklearn.cluster import KMeans
 import json 
 from plane_processing_utils import filtrar_puntos, CantidadPuntosInsuficiente
 import argparse
@@ -30,40 +28,6 @@ FIXED_THRESHOLD = False
 WORLD_NAME = "stereo_trees_close"
 trunk_model = YOLO('weights/simulado_lateral.pt')
 SOURCE = "left_rgb_images"
-
-def find_clusters(lista):
-    """
-    Encuentra el punto que divide una lista ordenada de enteros en dos clusters,
-    minimizando la suma de las varianzas internas de los clusters.
-    """
-    lista.sort()
-    # print(lista)
-    lista = numpy.array(lista)
-    
-    data = lista.reshape(-1, 1)
-
-    # Initialize KMeans model for 1 cluster
-    kmeans_1 = KMeans(n_clusters=1, n_init=10)
-    kmeans_1.fit(data)
-    inertia_1 = kmeans_1.inertia_
-
-    # Initialize KMeans model for 2 clusters
-    kmeans_2 = KMeans(n_clusters=2, n_init=10)
-    kmeans_2.fit(data)
-    inertia_2 = kmeans_2.inertia_
-
-    if inertia_1 < inertia_2:
-        # print("Mejor con 1 cluster.")
-        cluster_centers = kmeans_1.cluster_centers_
-        # print(f"cluster center: {cluster_centers[0][0]}")
-        return cluster_centers[0][0]
-    else:
-        # print("Mejor con 2 clusters.")
-        # Get the cluster centers for 2 clusters
-        cluster_centers = kmeans_2.cluster_centers_
-        # print('cluster centers: ', '0:', cluster_centers[0][0], '1: ', cluster_centers[1][0])
-        return cluster_centers[0][0] if cluster_centers[0][0] > cluster_centers[1][0] else cluster_centers[1][0]
-
 
 # read bounding boxes from the bounding box file
 def read_bounding_boxes():
@@ -124,34 +88,6 @@ def read_bounding_boxes():
     # The return value is a dictionary with the timestamp as the key and an array with the bounding boxes centers of the corresponding frame as the value, and as a third value, the bounding box id.
     return bounding_boxes
 
-# when the nodes ends track the apples and evaluate the tracking
-
-# given a sequence number (seq and a dictionary with the bounding boxes (bounding_boxes), return an array with the depths of the bounding boxes
-def get_depths(timestamp, bounding_boxes):
-    # read the depth image
-    # print("warning: reading depth image from file using grayscale parameter. For other kinds of images, change the code.")
-    depth_image = cv2.imread("disparity_images/" + str(timestamp) + ".png", cv2.IMREAD_GRAYSCALE)
-
-    if type(depth_image) != numpy.ndarray:
-        print('timestamp ' + str(timestamp) + ' not found in detected_images_depth_data folder')
-        return []
-
-    # get the depths of the bounding boxes
-    depths = []
-    for bb_center in bounding_boxes[timestamp]:
-        bb_id = bb_center[2]
-        depth = depth_image[int(bb_center[1]), int(bb_center[0])]
-
-        depths.append([bb_id, depth])
-    return depths
-
-def filter_depths(depths, threshold):
-    filtered_depths = []
-    for depth in depths:
-        if depth[1] >= threshold:
-            filtered_depths.append(depth)
-    return filtered_depths
-
 def total_amount_apples(working_directory):
     dir_path = f"{working_directory}/src/apple_fields_ignition/fields_ignition/generated/{WORLD_NAME}/apple_field/"
     apple_amount = 0
@@ -187,7 +123,7 @@ def total_amount_apples_for_trees_ids(working_directory, ids):
                     apple_amount += data["count_apples"]
     return apple_amount
 
-# when the node is killed, run the tracker and filter the results
+# run the tracker and filter the results
 def track_filter_and_count(working_directory, track, generar_imagen_plano):
     os.chdir(working_directory)
     print('working inside directory ', os.getcwd())
