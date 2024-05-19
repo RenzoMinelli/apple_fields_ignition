@@ -144,6 +144,17 @@ def track_filter_and_count(working_directory, track, generar_imagen_plano):
         # run the tracker
         subprocess.run(["python3", "yolo_tracking/tracking/track.py", "--yolo-model", YOLO_WEIGHTS, "--tracking-method", TRACKING_METHOD, "--source", SOURCE, "--save", "--save-txt"]) 
 
+    if generar_imagen_plano:
+        folder_path = f"{working_directory}/planos"
+        if not os.path.exists(folder_path):
+            os.makedirs(folder_path)
+        else:
+            # vaciar carpeta de planos
+            files = os.listdir(folder_path)
+            for file_name in files:
+                file_path = os.path.join(folder_path, file_name)
+                os.remove(file_path)
+
     # get the bounding boxes from the file
     bounding_boxes = read_bounding_boxes()
 
