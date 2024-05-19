@@ -16,9 +16,17 @@ image_width = 1024
 
 # clone repository with tracker and tracker evaluator - after running the node for the first time, run `pip install --upgrade sentry-sdk`
 def clone_tracker_repo():
-    subprocess.run(["git", "clone", "--recurse-submodules", "https://github.com/mikel-brostrom/yolo_tracking.git"])
-    subprocess.run(["pip", "install", "boxmot"])
+    subprocess.run(["git", "clone", "--recurse-submodules", "https://github.com/PaoloCappelli/yolo_tracking.git"])
 
+    # in folder yolo_tracking run git pull to get the latest version
+    os.chdir("yolo_tracking")
+    
+    subprocess.run(["git", "reset", "--hard","origin/master"])
+    subprocess.run(["git", "pull"])
+
+    # go back to the original directory and install the tracker
+    os.chdir("..")
+    subprocess.run(["pip", "install", "boxmot"])
 
 # global variables
 TRACKING_METHOD = "deepocsort"
