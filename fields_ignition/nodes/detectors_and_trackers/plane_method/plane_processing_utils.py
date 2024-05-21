@@ -9,6 +9,8 @@ import sys
 OFFSET_HORIZONTAL = 70
 MARGEN_PLANO = 1
 
+model_tronco = YOLO('weights/simulado_lateral.pt')
+
 class CantidadPuntosInsuficiente(Exception):
     def __init__(self, m):
         self.message = m
@@ -253,7 +255,7 @@ def visualizar_plano_en_imagen(img, puntos_manzanas, depth_map, a, b, c, d):
 
     return img_with_plane
 
-def filtrar_puntos(timestamp, puntos_manzanas, img_original, mapa_profundidad, model_tronco, working_directory, generar_imagen_plano=False):
+def filtrar_puntos(timestamp, puntos_manzanas, img_original, mapa_profundidad, working_directory, generar_imagen_plano=False):
     # print(f"puntos manzanas: {puntos_manzanas}")
     puntos_arboles = obtener_puntos_arboles(timestamp,img_original, model_tronco)
     puntos_con_profundidad = obtener_puntos_con_profunidad(puntos_arboles, mapa_profundidad)
