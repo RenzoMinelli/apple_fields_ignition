@@ -1,7 +1,6 @@
 # Load the YOLOv8 model
 from ultralytics import YOLO
 import cv2
-from PIL import Image
 import numpy as np
 import sys 
 
@@ -37,17 +36,13 @@ def find_clusters(nums, threshold=10):
     
     return min(puntos_incluidos)
 
-def obtener_puntos_arboles(timestamp,img, model):
+def obtener_puntos_arboles(timestamp, img, model):
     puntos_arboles = {}
 
     results = model([img], iou=0.1, conf=0.35,show_conf=True,show_labels=False,show=False)
 
     # Visualize the results
     for res_id, res in enumerate(results):
-        # Plot results image
-        im_bgr = res.plot()  # BGR-order numpy array
-        im_rgb = Image.fromarray(im_bgr[..., ::-1])  # RGB-order PIL image
-
         if res.masks == None or len(res.masks.xy) < 2:
             raise CantidadPuntosInsuficiente("Hay menos de 2 troncos en la imagen")
 
