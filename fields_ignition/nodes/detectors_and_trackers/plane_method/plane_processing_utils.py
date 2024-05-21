@@ -300,7 +300,6 @@ def filtrar_puntos(timestamp, puntos_manzanas, img_original, mapa_profundidad, w
 
 if __name__ == "__main__":
     working_directory=sys.argv[1]
-    model_tronco = YOLO(f"{working_directory}/weights/simulado_lateral.pt") 
     
     #img_test = cv2.imread("/home/renzo/Desktop/recorrida_ambos_lados/left_rgb_images/41086000000.png")
     #mapa_profundidad = cv2.imread("/home/renzo/Desktop/recorrida_ambos_lados/disparity_images/41086000000.png", cv2.IMREAD_GRAYSCALE)
