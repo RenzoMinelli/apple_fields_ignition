@@ -278,7 +278,6 @@ def filtrar_puntos(timestamp, puntos_manzanas, img_original, mapa_profundidad, w
         cv2.imwrite(f"{working_directory}/planos/pixeles_filtrados_{timestamp}.png", img_with_plane)
 
     puntos_filtrados = []
-    puntos_rechazados = []
 
     for [x, y, *rest] in puntos_manzanas:
         if x <= OFFSET_HORIZONTAL:
@@ -297,7 +296,7 @@ def filtrar_puntos(timestamp, puntos_manzanas, img_original, mapa_profundidad, w
         else:
             puntos_rechazados.append([x, y, *rest])
 
-    return puntos_filtrados, puntos_rechazados
+    return puntos_filtrados
 
 if __name__ == "__main__":
     working_directory=sys.argv[1]
