@@ -93,6 +93,7 @@ def read_bounding_boxes():
                     bounding_boxes[timestamp] = [bb_center]
 
     # The return value is a dictionary with the timestamp as the key and an array with the bounding boxes centers of the corresponding frame as the value, and as a third value, the bounding box id.
+    # Example: {timestamp1: [[x1, y1, id1], [x2, y2, id2], ...], timestamp2: [[x1, y1, id1], [x2, y2, id2], ...], ...}
     return bounding_boxes
 
 def total_amount_apples(working_directory):
