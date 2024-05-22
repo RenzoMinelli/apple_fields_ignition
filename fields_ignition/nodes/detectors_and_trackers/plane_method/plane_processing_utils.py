@@ -293,8 +293,6 @@ def filtrar_puntos(timestamp, puntos_manzanas, img_original, mapa_profundidad, w
 
         if esta_delante:
             puntos_filtrados.append([x, y, *rest])
-        else:
-            puntos_rechazados.append([x, y, *rest])
 
     return puntos_filtrados
 
