@@ -5,9 +5,9 @@ from ultralytics import YOLO
 import cv2
 import subprocess
 import os
-import json 
 from plane_processing_utils import filtrar_puntos, CantidadPuntosInsuficiente
 import argparse
+from ..counting_apples_utils import total_amount_apples_for_trees_ids
 
 ros_namespace = os.getenv('ROS_NAMESPACE')
 
@@ -33,7 +33,6 @@ TRACKING_METHOD = "deepocsort"
 YOLO_WEIGHTS = "weights/yolov8l_150.pt"
 YOLOv8_model = None
 FIXED_THRESHOLD = False
-WORLD_NAME = "stereo_trees_close"
 SOURCE = "left_rgb_images"
 
 # read bounding boxes from the bounding box file
@@ -148,7 +147,7 @@ def track_filter_and_count(working_directory, track, generar_imagen_plano, gen_i
         # run the tracker
         extra_args = []
         if gen_imagenes_tracker: extra_args = ["--save", "--show-conf"]
-        
+
         subprocess.run(["python3", "yolo_tracking/tracking/track.py", "--yolo-model", YOLO_WEIGHTS, "--tracking-method", TRACKING_METHOD, "--source", SOURCE, "--save-txt", *extra_args]) 
 
     if generar_imagen_plano:
