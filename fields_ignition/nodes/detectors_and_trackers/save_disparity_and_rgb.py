@@ -12,7 +12,7 @@ import sys
 def read_cameras():
     ros_namespace = os.getenv('ROS_NAMESPACE') == None and 'stereo' or os.getenv('ROS_NAMESPACE')
     imageL = message_filters.Subscriber("/" + ros_namespace + "/left/image_rect_color", Image)
-    imageR = message_filters.Subscriber("/" + ros_namespace + "/right/image_rect_color", Image)
+    # imageR = message_filters.Subscriber("/" + ros_namespace + "/right/image_rect_color", Image)
     disparity = message_filters.Subscriber("/" + ros_namespace + "/disparity", DisparityImage)
 
     # Synchronize images
@@ -26,13 +26,13 @@ def image_callback(imageL, imageR, disparity):
 
     # convert the images to cv2 format and save them
     cv_image_left = br.imgmsg_to_cv2(imageL, 'bgr8')
-    cv_image_right = br.imgmsg_to_cv2(imageR, 'bgr8')
+    # cv_image_right = br.imgmsg_to_cv2(imageR, 'bgr8')
     cv_disparity = br.imgmsg_to_cv2(disparity.image)
 
     timestamp = str(imageR.header.stamp)
 
     cv.imwrite('left_rgb_images/{}.png'.format(timestamp), cv_image_left)
-    cv.imwrite('right_rgb_images/{}.png'.format(timestamp), cv_image_right)
+    # cv.imwrite('right_rgb_images/{}.png'.format(timestamp), cv_image_right)
     cv.imwrite('disparity_images/{}.png'.format(timestamp), cv_disparity)
 
 def empty_folder(folder_path):
@@ -63,7 +63,7 @@ if __name__ == '__main__':
         os.chdir(working_directory)
         # Empty the folders
         empty_folder('left_rgb_images') 
-        empty_folder('right_rgb_images')
+        # empty_folder('right_rgb_images')
         empty_folder('disparity_images')
         delete_folder('yolo_tracking/runs/track/exp')
 
