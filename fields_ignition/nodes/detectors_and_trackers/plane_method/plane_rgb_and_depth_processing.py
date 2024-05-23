@@ -7,7 +7,7 @@ import subprocess
 import os
 from plane_processing_utils import filtrar_puntos, CantidadPuntosInsuficiente
 import argparse
-from ..counting_apples_utils import total_amount_apples_for_trees_ids
+import json
 
 ros_namespace = os.getenv('ROS_NAMESPACE')
 
@@ -34,6 +34,7 @@ YOLO_WEIGHTS = "weights/yolov8l_150.pt"
 YOLOv8_model = None
 FIXED_THRESHOLD = False
 SOURCE = "left_rgb_images"
+WORLD_NAME = "stereo_trees_close"
 
 # read bounding boxes from the bounding box file
 def read_bounding_boxes():
@@ -94,28 +95,6 @@ def read_bounding_boxes():
     # The return value is a dictionary with the timestamp as the key and an array with the bounding boxes centers of the corresponding frame as the value, and as a third value, the bounding box id.
     # Example: {timestamp1: [[x1, y1, id1], [x2, y2, id2], ...], timestamp2: [[x1, y1, id1], [x2, y2, id2], ...], ...}
     return bounding_boxes
-
-def total_amount_apples(working_directory):
-    dir_path = f"{working_directory}/src/apple_fields_ignition/fields_ignition/generated/{WORLD_NAME}/apple_field/"
-    apple_amount = 0
-    for root, dirs, files in os.walk(dir_path):
-        for dir_name in dirs:
-            if dir_name.startswith('apple_'):
-                data_file = os.path.join(root, dir_name, 'markers.json')
-                if os.path.exists(data_file):
-                    with open(data_file, 'r') as f:
-                        data = json.load(f)
-                        apple_amount += data["count_apples"]
-    return apple_amount
-
-def total_amount_trees(working_directory):
-    dir_path = f"{working_directory}/src/apple_fields_ignition/fields_ignition/generated/{WORLD_NAME}/apple_field/"
-    tree_amount = 0
-    for root, dirs, files in os.walk(dir_path):
-        for dir_name in dirs:
-            if dir_name.startswith('apple_'):
-                tree_amount += 1
-    return tree_amount
 
 def total_amount_apples_for_trees_ids(working_directory, ids):
     dir_path = f"{working_directory}/src/apple_fields_ignition/fields_ignition/generated/{WORLD_NAME}/apple_field/"

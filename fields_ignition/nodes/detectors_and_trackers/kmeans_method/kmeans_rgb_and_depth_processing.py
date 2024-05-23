@@ -7,7 +7,7 @@ import os
 import numpy
 from sklearn.cluster import KMeans
 import argparse
-from ..counting_apples_utils import total_amount_apples_for_trees_ids
+import json
 
 ros_namespace = os.getenv('ROS_NAMESPACE')
 
@@ -34,6 +34,7 @@ TRACKING_METHOD = "deepocsort"
 YOLO_WEIGHTS = "weights/yolov8l_150.pt"
 FIXED_THRESHOLD = False
 THRESHOLD_MARGIN = 2
+WORLD_NAME = "stereo_trees_close"
 
 def find_clusters(lista):
     """
@@ -153,6 +154,18 @@ def filter_depths(depths, threshold):
             filtered_depths.append(depth)
     return filtered_depths
 
+def total_amount_apples_for_trees_ids(working_directory, ids):
+    dir_path = f"{working_directory}/src/apple_fields_ignition/fields_ignition/generated/{WORLD_NAME}/apple_field/"
+    apple_amount = 0
+    dir_names_wanted = [f"apple_{x}" for x in ids]
+    for root, dirs, files in os.walk(dir_path):
+        for dir_name in dir_names_wanted:
+            data_file = os.path.join(root, dir_name, 'markers.json')
+            if os.path.exists(data_file):
+                with open(data_file, 'r') as f:
+                    data = json.load(f)
+                    apple_amount += data["count_apples"]
+    return apple_amount
 
 def delete_folder(folder_path):
     subprocess.run(['rm', '-rf', folder_path])
