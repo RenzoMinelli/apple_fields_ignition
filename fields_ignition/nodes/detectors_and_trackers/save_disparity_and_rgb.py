@@ -16,11 +16,11 @@ def read_cameras():
     disparity = message_filters.Subscriber("/" + ros_namespace + "/disparity", DisparityImage)
 
     # Synchronize images
-    ts = message_filters.TimeSynchronizer([imageL, imageR, disparity], queue_size=20)
+    ts = message_filters.TimeSynchronizer([imageL, disparity], queue_size=20)
     ts.registerCallback(image_callback)
     rospy.spin()
 
-def image_callback(imageL, imageR, disparity):
+def image_callback(imageL, disparity):
     br = CvBridge()
     rospy.loginfo("receiving Image")
 
@@ -29,7 +29,7 @@ def image_callback(imageL, imageR, disparity):
     # cv_image_right = br.imgmsg_to_cv2(imageR, 'bgr8')
     cv_disparity = br.imgmsg_to_cv2(disparity.image)
 
-    timestamp = str(imageR.header.stamp)
+    timestamp = str(imageL.header.stamp)
 
     cv.imwrite('left_rgb_images/{}.png'.format(timestamp), cv_image_left)
     # cv.imwrite('right_rgb_images/{}.png'.format(timestamp), cv_image_right)
