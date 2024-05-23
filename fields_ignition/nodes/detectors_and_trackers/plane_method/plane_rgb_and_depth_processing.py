@@ -131,8 +131,11 @@ def total_amount_apples_for_trees_ids(working_directory, ids):
                     apple_amount += data["count_apples"]
     return apple_amount
 
+def delete_folder(folder_path):
+    subprocess.run(['rm', '-rf', folder_path])
+    
 # run the tracker and filter the results
-def track_filter_and_count(working_directory, track, generar_imagen_plano):
+def track_filter_and_count(working_directory, track, generar_imagen_plano, gen_imagenes_tracker):
     os.chdir(working_directory)
     print('working inside directory ', os.getcwd())
     
@@ -141,8 +144,12 @@ def track_filter_and_count(working_directory, track, generar_imagen_plano):
     print('Running tracker and tracker evaluator...')
 
     if track:
+        delete_folder('yolo_tracking/runs/track/exp')
         # run the tracker
-        subprocess.run(["python3", "yolo_tracking/tracking/track.py", "--yolo-model", YOLO_WEIGHTS, "--tracking-method", TRACKING_METHOD, "--source", SOURCE, "--save", "--save-txt"]) 
+        extra_args = []
+        if gen_imagenes_tracker: extra_args = ["--save", "--show-conf"]
+        
+        subprocess.run(["python3", "yolo_tracking/tracking/track.py", "--yolo-model", YOLO_WEIGHTS, "--tracking-method", TRACKING_METHOD, "--source", SOURCE, "--save-txt", *extra_args]) 
 
     if generar_imagen_plano:
         folder_path = f"{working_directory}/planos"
@@ -203,7 +210,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--working_directory", required=True)
     parser.add_argument("--track", default='False', type=lambda x: (str(x).lower() == 'true'))
+    parser.add_argument("--gen_imagenes_tracker", default='False', type=lambda x: (str(x).lower() == 'true'))
     parser.add_argument("--gen_planos", default='False', type=lambda x: (str(x).lower() == 'true'))
     args = parser.parse_args()
 
-    track_filter_and_count(args.working_directory, args.track, args.gen_planos)
+    track_filter_and_count(args.working_directory, args.track, args.gen_planos, args.gen_imagenes_tracker)

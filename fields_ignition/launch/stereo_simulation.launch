@@ -1,7 +1,7 @@
 <launch>
   <!-- Run stereo_image_proc -->
   <arg name="folder_path" default="/home/paolo/catkin_ws"/>
-  <arg name="stereo_config_path" default="/home/renzo/catkin_ws/src/apple_fields_ignition/fields_ignition/config/stereoParamsSim2Blocks.yaml"/>
+  <arg name="stereo_config_path" default="/home/renzo/catkin_ws/src/apple_fields_ignition/fields_ignition/config/stereoParamsSim1Block.yaml"/>
 
   <group ns="/costar_husky_sensor_config_1">
     <node pkg="stereo_image_proc" type="stereo_image_proc" name="stereo_image_proc" output="screen">
