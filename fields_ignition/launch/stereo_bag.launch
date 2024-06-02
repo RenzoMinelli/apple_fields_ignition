@@ -4,9 +4,9 @@
   <arg name="folder_path" default="/home/paolo/catkin_ws"/>
 
   <!-- Camera image left topic -->
-  <arg name="left_camera_image_topic" default="/zed_lateral/zed_lateral/left/image_rect_color"/>
+  <arg name="left_camera_image_topic" default="/stereo/left/image_raw"/>
   <!-- Camera image right topic -->
-  <arg name="right_camera_image_topic" default="/zed_lateral/zed_lateral/right/image_rect_color"/>
+  <arg name="right_camera_image_topic" default="/stereo/right/image_raw"/>
   <!-- Camera info left topic -->
   <arg name="left_camera_info_topic" default="/zed_lateral/zed_lateral/left/camera_info"/>
   <!-- Camera info right topic -->
@@ -23,7 +23,7 @@
   <!-- Run stereo_image_proc -->
   <group ns="stereo">
     <node pkg="stereo_image_proc" type="stereo_image_proc" name="stereo_image_proc" output="screen">
-      <rosparam command="load" file="$(arg folder_path)/src/apple_fields_ignition/fields_ignition/config/stereoParamsBag.yaml"/>
+      <rosparam command="load" file="$(arg folder_path)/src/apple_fields_ignition/fields_ignition/config/stereoParamsSim2Blocks.yaml"/>
     </node>
   </group>
 
