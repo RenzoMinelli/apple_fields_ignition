@@ -4,7 +4,7 @@ Generar capetas de mapas de profunidad e imágenes RGB de la cámara izquierda (
 Correr tracker con detector sobre todas las imágenes RGB izquierdas para tener los ids de cada manzanas
 
 Procedimiento TrackFilterCount()
-    BoundingBoxes <- Cargar en hash BoundingBoxes todos los bounding boxes del tracker indexados por timestamp
+    BoundingBoxes <- Para cada frame identificado por un timestamp cargar las bounding boxes correspondientes
 
     Ids <- [] # Lista de ids de manzanas
     For timestamp in Timestamps
@@ -12,10 +12,9 @@ Procedimiento TrackFilterCount()
         MapaProfundidad <- Cargamos el mapa de profundidad correspondiente al timestamp
 
         BoundingBoxes_t <- BoundingBoxes[timestamp]
-        BoundingBoxes_t_filtradas <- FiltrarBoundingBoxes()
+        BoundingBoxes_t_filtradas <- FiltrarBoundingBoxes( _actualmente parametro depende de variante_ ) # la implementacion depende de que variante se este ejecutando (kmeans o filtrado por plano)
         
-        ids_manzanas_t <- ids_manzanas(BoundingBoxes_t_filtradas) # obtenemos los ids de las manzanas filtradas
-        Ids.append(ids_manzanas_t) # Agregamos los ids de las manzanas filtradas a la lista de ids
+        Ids.append(BoundingBoxes_t_filtradas) # Agregamos los ids de las manzanas filtradas a la lista de ids
     Fin For
 
     Ids <- set(Ids) # Eliminamos duplicados
@@ -73,7 +72,8 @@ Procedimiento FiltrarBoundingBoxes(BoundingBoxes, ImagenOriginal, MapaProfundida
         Punto <- (X, Y, Z) # punto en 3D
 
         If DelantePlano(Plano, Punto) # si el punto está delante del plano
-            BoundingBoxes_filtradas.append(BoundingBox) # Agregamos el bounding box a la lista de bounding boxes filtradas
+            Id_BB <- BoundingBox.id
+            BoundingBoxes_filtradas.append(Id_BB) # Agregamos el bounding box a la lista de bounding boxes filtradas
         End If
     End For
 
