@@ -1,0 +1,81 @@
+Pseudocódigo del pipeline de conteo
+
+Generar capetas de mapas de profunidad e imágenes RGB de la cámara izquierda (cada imágen con su timestamp de nombre)
+Correr tracker con detector sobre todas las imágenes RGB izquierdas para tener los ids de cada manzanas
+
+Procedimiento TrackFilterCount()
+    BoundingBoxes <- Cargar en hash BoundingBoxes todos los bounding boxes del tracker indexados por timestamp
+
+    Ids <- [] # Lista de ids de manzanas
+    For timestamp in Timestamps
+        ImagenOriginal <- Cargar datos de imagen correspondientea timestamp # solo para variante de plano
+        MapaProfundidad <- Cargamos el mapa de profundidad correspondiente al timestamp
+
+        BoundingBoxes_t <- BoundingBoxes[timestamp]
+        BoundingBoxes_t_filtradas <- FiltrarBoundingBoxes()
+        
+        ids_manzanas_t <- ids_manzanas(BoundingBoxes_t_filtradas) # obtenemos los ids de las manzanas filtradas
+        Ids.append(ids_manzanas_t) # Agregamos los ids de las manzanas filtradas a la lista de ids
+    Fin For
+
+    Ids <- set(Ids) # Eliminamos duplicados
+    N_manzanas <- len(Ids) # Contamos el número de manzanas
+
+    Return N_manzanas
+Fin Procedimiento
+
+# Filtrado KMeans 
+
+Procedimiento FiltrarBoundingBoxes(BoundingBoxes, MapaProfundidad)
+    BoundingBoxes_filtradas <- []
+    Lista_id_distancia <- []
+    For BoundingBox in BoundingBoxes
+        Id_BB <- BoundingBox.id
+        (X, Y) <- ObtenerCentroCaja(BoundingBox)
+        Distancia <- ObtenerDistancia((X, Y), MapaProfundidad) # MapaProfundidad[(X, Y)]
+        Lista_id_distancia.append([Id_BB, Distancia]) # guardamos la distancia al BB y el id del mismo
+    Fin For
+
+    Distancias <- Distancias(Lista_id_distancia) # Obtenemos las distancias de la lista
+    Clusters <- KMeans(Distancias) # clusterizamos los datos para obtener el centroide de la primera fila
+    Centroide <- Clusters[0] # centroide de la primera fila.
+
+
+    For Id_BB, Distancia in Lista_id_distancia
+        If Distancia > Centroide # cuanto mas grande sea el valor, mas cerca está el objeto
+            BoundingBoxes_filtradas.append(Id_BB) # Agregamos el bounding box a la lista de bounding boxes filtradas
+        End If
+    Fin For 
+
+    Return BoundingBoxes_filtradas
+Fin Procedimiento
+
+# Filtrado Plano
+
+Procedimiento FiltrarBoundingBoxes(BoundingBoxes, ImagenOriginal, MapaProfundidad)
+    ModeloTroncos <- CargarModeloTroncos()
+    PuntosTroncos <- DetectarTroncos(ImagenOriginal, ModeloTroncos) # indexado por el id del arbol
+    PuntosTroncosConDistancia <- CalcularDistancia(PuntosTroncos, MapaProfundidad) # buscamos la distancia de cada puntos en el mapa de profundidad
+    PuntosTroncosFiltrados <- FiltrarPuntosTroncos(PuntosTroncosConDistancia, MapaProfundidad) # removemos los puntos que esten muy lejos (otra fila)
+
+    Arboles <- obtenemos los id de árboles a partir de PuntosTroncosFiltrados
+    If len(Arboles) < 2
+        Return [] # Si no hay suficientes puntos troncos, no hay manzanas
+    End If
+
+    Plano <- CalcularPlano(PuntosTroncosFiltrados) # usamos mínimos cuadrados para calcular el plano
+
+    BoundingBoxes_filtradas <- []
+    
+    For BoundingBox in BoundingBoxes
+        (X, Y) <- ObtenerCentroCaja(BoundingBox)
+        Z <- CalcularDistancia((X, Y), MapaProfundidad) # distancia al centro de la caja 
+        Punto <- (X, Y, Z) # punto en 3D
+
+        If DelantePlano(Plano, Punto) # si el punto está delante del plano
+            BoundingBoxes_filtradas.append(BoundingBox) # Agregamos el bounding box a la lista de bounding boxes filtradas
+        End If
+    End For
+
+    Return BoundingBoxes_filtradas
+Fin Procedimiento
