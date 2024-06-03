@@ -1,5 +1,2 @@
 *.bag
-fields_ignition/nodes/detectors_and_trackers/__pycache__/
-fields_ignition/nodes/detectors_and_trackers/plane_method/__pycache__/
-fields_ignition/nodes/detectors_and_trackers/kmeans_method/__pycache__/
-
+**/__pycache__/
