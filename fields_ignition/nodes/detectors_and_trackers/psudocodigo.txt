@@ -1,6 +1,7 @@
 Pseudocódigo del pipeline de conteo
 
-Generar capetas de mapas de profunidad e imágenes RGB de la cámara izquierda (cada imágen con su timestamp de nombre)
+Generar mapas de profunidad e imágenes RGB de la cámara izquierda (cada imágen con su timestamp de nombre)
+
 Correr tracker con detector sobre todas las imágenes RGB izquierdas para tener los ids de cada manzanas
 
 Procedimiento TrackFilterCount()
