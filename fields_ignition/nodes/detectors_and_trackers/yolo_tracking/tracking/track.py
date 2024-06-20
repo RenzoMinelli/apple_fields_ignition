@@ -12,16 +12,11 @@ from boxmot import TRACKERS
 from boxmot.tracker_zoo import create_tracker
 from boxmot.utils import ROOT, WEIGHTS, TRACKER_CONFIGS
 from boxmot.utils.checks import TestRequirements
-from tracking.detectors import get_yolo_inferer
 
 __tr = TestRequirements()
 __tr.check_packages(('ultralytics @ git+https://github.com/mikel-brostrom/ultralytics.git', ))  # install
 
 from ultralytics import YOLO
-from ultralytics.utils.plotting import Annotator, colors
-from ultralytics.data.utils import VID_FORMATS
-from ultralytics.utils.plotting import save_one_box
-
 
 def on_predict_start(predictor, persist=False):
     """
@@ -91,21 +86,11 @@ def run(args, image=None, yolo_model_instance=None):
         line_width=args.line_width
     )
 
-    yolo.add_callback('on_predict_start', partial(on_predict_start, persist=True))
+    if yolo_model_instance is None:
+        yolo.add_callback('on_predict_start', partial(on_predict_start, persist=True))
+        # store custom args in predictor
+        yolo.predictor.custom_args = args
     
-    if 'yolov8' not in str(args.yolo_model) and 'yolov9' not in str(args.yolo_model):
-        # replace yolov8 model
-        m = get_yolo_inferer(args.yolo_model)
-        model = m(
-            model=args.yolo_model,
-            device=yolo.predictor.device,
-            args=yolo.predictor.args
-        )
-        yolo.predictor.model = model
-
-    # store custom args in predictor
-    yolo.predictor.custom_args = args
-
     for r in results:
 
         img = yolo.predictor.trackers[0].plot_results(r.orig_img, args.show_trajectories)
@@ -181,7 +166,7 @@ def parse_opt(args=None):
 
 def main(args=None, image=None, yolo_model_instance=None):
     opt = parse_opt(args)
-    run(opt, image=image, yolo_model_instance=yolo_model_instance)
+    return run(opt, image=image, yolo_model_instance=yolo_model_instance)
 
 
 if __name__ == "__main__":
