@@ -9,6 +9,20 @@ import os
 import subprocess
 import sys
 
+from yolo_tracking.tracking.track import main as track_main
+
+YOLO_INSTANCE = None
+TRACKING_METHOD = "deepocsort"
+YOLO_WEIGHTS = "weights/yolov8l_150.pt"
+WORLD_NAME = "stereo_trees_close"
+
+YOLO_ARGS = [
+    "--yolo-model", f"/home/renzo/catkin_ws/{YOLO_WEIGHTS}",
+    "--tracking-method", TRACKING_METHOD,
+    "--save", "--save-txt",
+    "--exist-ok"
+]
+
 def read_cameras():
     ros_namespace = os.getenv('ROS_NAMESPACE') == None and 'stereo' or os.getenv('ROS_NAMESPACE')
     imageL = message_filters.Subscriber("/" + ros_namespace + "/left/image_rect_color", Image)
@@ -31,9 +45,13 @@ def image_callback(imageL, disparity):
 
     timestamp = str(imageL.header.stamp)
 
-    cv.imwrite('left_rgb_images/{}.png'.format(timestamp), cv_image_left)
+    # cv.imwrite('left_rgb_images/{}.png'.format(timestamp), cv_image_left)
     # cv.imwrite('right_rgb_images/{}.png'.format(timestamp), cv_image_right)
     cv.imwrite('disparity_images/{}.png'.format(timestamp), cv_disparity)
+
+    global YOLO_INSTANCE
+    global YOLO_ARGS
+    YOLO_INSTANCE = track_main(args=YOLO_ARGS, image=cv_image_left, yolo_model_instance=YOLO_INSTANCE)
 
 def empty_folder(folder_path):
     # If the folder does not exist, create it

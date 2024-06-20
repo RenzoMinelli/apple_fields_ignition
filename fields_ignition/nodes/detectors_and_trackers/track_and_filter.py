@@ -9,6 +9,8 @@ import argparse
 import json
 import cv2
 
+from yolo_tracking.tracking.track import main as track_main
+
 ros_namespace = os.getenv('ROS_NAMESPACE')
 image_height = 1024
 image_width = 1024
@@ -35,18 +37,13 @@ class TrackAndFilter:
             raise ValueError(f"Method {method} not recognized")
 
     # clone repository with tracker and tracker evaluator - after running the node for the first time, run `pip install --upgrade sentry-sdk`
-    def __clone_tracker_repo(self):
-        subprocess.run(["git", "clone", "--recurse-submodules", "https://github.com/PaoloCappelli/yolo_tracking.git"])
 
-        # in folder yolo_tracking run git pull to get the latest version
-        os.chdir("yolo_tracking")
-        
-        subprocess.run(["git", "reset", "--hard","origin/master"])
-        subprocess.run(["git", "pull"])
+    def __setup_env(self):
+        # clone the repository
+        subprocess.run(['pip', 'install', 'boxmot'])
 
-        # go back to the original directory and install the tracker
-        os.chdir("..")
-        subprocess.run(["pip", "install", "boxmot"])
+    def __current_path(self):
+        return os.path.dirname(os.path.realpath(__file__))
 
     # read bounding boxes from the bounding box file
     def __read_bounding_boxes(self):
@@ -54,7 +51,7 @@ class TrackAndFilter:
         # Get all detections except the file right_rgb_images.txt
 
         # Specify dir path
-        dir_path = 'yolo_tracking/runs/track/exp/labels/'
+        dir_path = f"{self.__current_path()}/yolo_tracking/runs/track/exp/labels/"
 
         # Use os.listdir to obtain the file names skipping ignored_file
         file_names = os.listdir(dir_path)
@@ -123,21 +120,29 @@ class TrackAndFilter:
 
     # when the node is killed, run the tracker and filter the results
     def track_filter_and_count(self):
+        self.__setup_env()
+
         os.chdir(self.working_directory)
         print('working inside directory ', os.getcwd())
         
-        self.__clone_tracker_repo()
-
         print('Running tracker and tracker evaluator...')
         SOURCE = "left_rgb_images"
 
         if self.track:
-            self.__delete_folder('yolo_tracking/runs/track/exp')
+            self.__delete_folder(f"{self.__current_path()}/yolo_tracking/runs/track/exp")
             # run the tracker
             extra_args = []
             if self.gen_imagenes_tracker: extra_args = ["--save", "--show-conf"]
 
-            subprocess.run(["python3", "yolo_tracking/tracking/track.py", "--yolo-model", YOLO_WEIGHTS, "--tracking-method", TRACKING_METHOD, "--source", SOURCE, "--save", "--save-txt", *extra_args]) 
+            args = [
+                "--yolo-model", f"{self.working_directory}/{YOLO_WEIGHTS}",
+                "--tracking-method", TRACKING_METHOD,
+                "--source", SOURCE,
+                "--save", "--save-txt",
+                *extra_args
+            ]
+
+            track_main(args=args)
 
         # get the bounding boxes from the file
         bounding_boxes = self.__read_bounding_boxes()
@@ -186,4 +191,4 @@ if __name__ == "__main__":
     track_filter.track_filter_and_count()
 
 # export PYTHONPATH=/home/renzo/catkin_ws/src/apple_fields_ignition/fields_ignition/nodes
-# python3 -m detectors_and_trackers.track_and_filter
+# python3 -m detectors_and_trackers.track_and_filter --working_directory /home/renzo/catkin_ws --method kmeans --track true
