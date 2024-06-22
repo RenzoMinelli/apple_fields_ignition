@@ -10,6 +10,7 @@ import subprocess
 import sys
 
 from yolo_tracking.tracking.track import main as track_main
+from track_and_filter import TrackAndFilter
 
 YOLO_INSTANCE = None
 TRACKING_METHOD = "deepocsort"
@@ -21,6 +22,9 @@ YOLO_ARGS = [
     "--tracking-method", TRACKING_METHOD,
     "--exist-ok"
 ]
+
+FILTRO = TrackAndFilter("/home/renzo/catkin_ws", "kmeans")
+IDS = set()
 
 def read_cameras():
     ros_namespace = os.getenv('ROS_NAMESPACE') == None and 'stereo' or os.getenv('ROS_NAMESPACE')
@@ -50,7 +54,16 @@ def image_callback(imageL, disparity):
 
     global YOLO_INSTANCE
     global YOLO_ARGS
-    YOLO_INSTANCE, results = track_main(args=YOLO_ARGS, image=cv_image_left, yolo_model_instance=YOLO_INSTANCE)
+    YOLO_INSTANCE, bounding_boxes = track_main(args=YOLO_ARGS, image=cv_image_left, yolo_model_instance=YOLO_INSTANCE)
+
+    global FILTRO
+    ids_filtrados = FILTRO.filter_boundig_boxes(timestamp, bounding_boxes, cv_image_left, cv_disparity)
+
+    global IDS
+    for id in ids_filtrados:
+        IDS.add(id)
+
+    print("cantidad de ids: ", len(IDS))
 
 def empty_folder(folder_path):
     # If the folder does not exist, create it

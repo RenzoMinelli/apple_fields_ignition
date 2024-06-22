@@ -178,6 +178,27 @@ class TrackAndFilter:
         print('Number of apples counted: ' + str(len(ids)))
         print(f"amount of apples exactly for trees id (5,6,7,8,9): { self.__total_amount_apples_for_trees_ids([5,6,7,8,9])}")
 
+
+    def filter_boundig_boxes(self, timestamp, bounding_boxes, img_original, mapa_profundidad):
+
+        # seteo configs para el filtrado
+        configs = {
+            "working_directory": self.working_directory,
+            "generar_imagen_plano": self.generar_imagen_plano
+        }
+
+        # instancio filtro
+        filtro = self.method(configs)
+
+        filtered_bbs = filtro.filter(timestamp, bounding_boxes, img_original, mapa_profundidad)
+
+        ids = []
+        for bb in filtered_bbs:
+            ids.append(bb[2])
+
+        return ids
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--working_directory", required=True)
