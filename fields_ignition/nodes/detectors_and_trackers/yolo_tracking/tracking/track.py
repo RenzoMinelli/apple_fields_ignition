@@ -101,7 +101,7 @@ def run(args, image=None, yolo_model_instance=None):
 
             bbs.append([x, y, int(id)])
     
-    return yolo, results
+    return yolo, bbs
 
 def parse_opt(args=None):
     parser = argparse.ArgumentParser()
