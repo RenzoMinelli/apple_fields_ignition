@@ -90,18 +90,18 @@ def run(args, image=None, yolo_model_instance=None):
         yolo.add_callback('on_predict_start', partial(on_predict_start, persist=True))
         # store custom args in predictor
         yolo.predictor.custom_args = args
+
+    # arreglo de (x,y,bb_id)
+    bbs = []
+    for r in results:   
+        # por cada bounding box
+        for i in range(r.boxes.shape[0]):
+            id = r.boxes[i].id[0].item()
+            x, y, *_ = r.boxes[i].xywh[0].cpu().numpy()
+
+            bbs.append([x, y, int(id)])
     
-    for r in results:
-
-        img = yolo.predictor.trackers[0].plot_results(r.orig_img, args.show_trajectories)
-
-        if args.show is True:
-            cv2.imshow('BoxMOT', img)     
-            key = cv2.waitKey(1) & 0xFF
-            if key == ord(' ') or key == ord('q'):
-                break
-
-    return yolo 
+    return yolo, results
 
 def parse_opt(args=None):
     parser = argparse.ArgumentParser()

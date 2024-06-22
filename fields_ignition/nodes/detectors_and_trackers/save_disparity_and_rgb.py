@@ -19,7 +19,6 @@ WORLD_NAME = "stereo_trees_close"
 YOLO_ARGS = [
     "--yolo-model", f"/home/renzo/catkin_ws/{YOLO_WEIGHTS}",
     "--tracking-method", TRACKING_METHOD,
-    "--save", "--save-txt",
     "--exist-ok"
 ]
 
@@ -51,7 +50,7 @@ def image_callback(imageL, disparity):
 
     global YOLO_INSTANCE
     global YOLO_ARGS
-    YOLO_INSTANCE = track_main(args=YOLO_ARGS, image=cv_image_left, yolo_model_instance=YOLO_INSTANCE)
+    YOLO_INSTANCE, results = track_main(args=YOLO_ARGS, image=cv_image_left, yolo_model_instance=YOLO_INSTANCE)
 
 def empty_folder(folder_path):
     # If the folder does not exist, create it
