@@ -1,8 +1,6 @@
 # Mikel Broström 🔥 Yolo Tracking 🧾 AGPL-3.0 license
 
 import argparse
-import cv2
-import numpy as np
 from functools import partial
 from pathlib import Path
 
