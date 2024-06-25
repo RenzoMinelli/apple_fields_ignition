@@ -7,24 +7,10 @@ from stereo_msgs.msg import DisparityImage
 import message_filters
 import os
 import subprocess
-import sys
+import argparse
 
-from yolo_tracking.tracking.track import main as track_main
 from track_and_filter import TrackAndFilter
-
-YOLO_INSTANCE = None
-TRACKING_METHOD = "deepocsort"
-YOLO_WEIGHTS = "weights/yolov8l_150.pt"
-WORLD_NAME = "stereo_trees_close"
-
-YOLO_ARGS = [
-    "--yolo-model", f"/home/renzo/catkin_ws/{YOLO_WEIGHTS}",
-    "--tracking-method", TRACKING_METHOD,
-    "--exist-ok"
-]
-
-FILTRO = TrackAndFilter("/home/renzo/catkin_ws", "kmeans")
-IDS = set()
+FILTRO = None
 
 def read_cameras():
     ros_namespace = os.getenv('ROS_NAMESPACE') == None and 'stereo' or os.getenv('ROS_NAMESPACE')
@@ -35,7 +21,6 @@ def read_cameras():
     # Synchronize images
     ts = message_filters.TimeSynchronizer([imageL, disparity], queue_size=20)
     ts.registerCallback(image_callback)
-    rospy.spin()
 
 def image_callback(imageL, disparity):
     br = CvBridge()
@@ -48,22 +33,15 @@ def image_callback(imageL, disparity):
 
     timestamp = str(imageL.header.stamp)
 
-    # cv.imwrite('left_rgb_images/{}.png'.format(timestamp), cv_image_left)
-    # cv.imwrite('right_rgb_images/{}.png'.format(timestamp), cv_image_right)
-    cv.imwrite('disparity_images/{}.png'.format(timestamp), cv_disparity)
-
-    global YOLO_INSTANCE
-    global YOLO_ARGS
-    YOLO_INSTANCE, bounding_boxes = track_main(args=YOLO_ARGS, image=cv_image_left, yolo_model_instance=YOLO_INSTANCE)
-
     global FILTRO
-    ids_filtrados = FILTRO.filter_boundig_boxes(timestamp, bounding_boxes, cv_image_left, cv_disparity)
 
-    global IDS
-    for id in ids_filtrados:
-        IDS.add(id)
-
-    print("cantidad de ids: ", len(IDS))
+    if FILTRO:
+        FILTRO.track_filter_and_count_one_frame(timestamp, cv_image_left, cv_disparity)
+        print(f"conteo por ahora: {FILTRO.get_apple_count()}")
+    else: # solo generar para post procesado
+        cv.imwrite('left_rgb_images/{}.png'.format(timestamp), cv_image_left)
+        # cv.imwrite('right_rgb_images/{}.png'.format(timestamp), cv_image_right)
+        cv.imwrite('disparity_images/{}.png'.format(timestamp), cv_disparity)
 
 def empty_folder(folder_path):
     # If the folder does not exist, create it
@@ -83,10 +61,26 @@ def delete_folder(folder_path):
     subprocess.run(['rm', '-rf', folder_path])
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--working_directory", required=True)
+    parser.add_argument("--post_procesamiento", default='True', type=lambda x: (str(x).lower() == 'true'))
+    parser.add_argument("--metodo", type=str)
+    parser.add_argument("__name", type=str)
+    parser.add_argument("__log", type=str)
+
+    args = parser.parse_args()
+
     rospy.init_node('save_disparity_and_rgb')
 
-    working_directory = sys.argv[1]
+    working_directory = args.working_directory
     print("working inside directory ", working_directory)
+
+    if not args.post_procesamiento:
+        metodo = args.metodo
+        if metodo is None:
+            raise Exception("No se ha especificado un metodo de post procesamiento")
+        
+        FILTRO = TrackAndFilter(working_directory, metodo)
 
     try:
         # Change the current directory to the one sent as argument
@@ -98,6 +92,10 @@ if __name__ == '__main__':
         delete_folder('yolo_tracking/runs/track/exp')
 
         read_cameras()
+        rospy.spin()
+
+        if FILTRO:
+            print(f"Conteo final: {FILTRO.get_apple_count()}")
 
     except rospy.ROSInterruptException:
         pass

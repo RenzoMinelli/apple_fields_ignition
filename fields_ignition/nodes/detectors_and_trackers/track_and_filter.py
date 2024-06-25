@@ -9,7 +9,7 @@ import argparse
 import json
 import cv2
 
-from yolo_tracking.tracking.track import main as track_main
+from detectors_and_trackers.yolo_tracking.tracking.track import main as track_main
 
 ros_namespace = os.getenv('ROS_NAMESPACE')
 image_height = 1024
@@ -19,6 +19,11 @@ offset_horizontal = 53
 TRACKING_METHOD = "deepocsort"
 YOLO_WEIGHTS = "weights/yolov8l_150.pt"
 WORLD_NAME = "stereo_trees_close"
+YOLO_ARGS = [
+    "--yolo-model", f"/home/renzo/catkin_ws/{YOLO_WEIGHTS}",
+    "--tracking-method", TRACKING_METHOD,
+    "--exist-ok"
+]
 
 class TrackAndFilter:
     def __init__(self, working_directory, method, track=False, gen_imagenes_tracker=False, generar_imagen_plano=False):
@@ -26,6 +31,8 @@ class TrackAndFilter:
         self.track = track
         self.gen_imagenes_tracker = gen_imagenes_tracker
         self.generar_imagen_plano = generar_imagen_plano
+        self.yolo_instance = None
+        self.ids_filtrados = set()
 
         if method == "kmeans":
             self.method = FiltradoKMeans
@@ -155,8 +162,6 @@ class TrackAndFilter:
 
         # instancio filtro
         filtro = self.method(configs)
-        
-        bounding_boxes_filtrados = []
 
         for timestamp in bounding_boxes:
             
@@ -166,20 +171,16 @@ class TrackAndFilter:
             filtered_bbs = filtro.filter(timestamp, bounding_boxes[timestamp], img_original, mapa_profundidad)
 
             # print(f"Amount of apples in image: {len(image_depth_data)}, filtered apples: {len(filtered_depths)}")
-            bounding_boxes_filtrados.extend(filtered_bbs)
-
-        # Count the distinct ids that remained after filtering
-        ids = []
-        for bb in bounding_boxes_filtrados:
-            ids.append(bb[2])
-        ids = set(ids)
+            for bb in filtered_bbs:
+                self.ids_filtrados.add(bb[2])
         
         # Print the number of apples
-        print('Number of apples counted: ' + str(len(ids)))
+        print('Number of apples counted: ' + str(len(self.ids_filtrados)))
         print(f"amount of apples exactly for trees id (5,6,7,8,9): { self.__total_amount_apples_for_trees_ids([5,6,7,8,9])}")
 
-
-    def filter_boundig_boxes(self, timestamp, bounding_boxes, img_original, mapa_profundidad):
+    def track_filter_and_count_one_frame(self, timestamp, img_original, mapa_profundidad):
+        new_yolo_instance, bounding_boxes = track_main(args=YOLO_ARGS, image=img_original, yolo_model_instance=self.yolo_instance)
+        self.yolo_instance = new_yolo_instance
 
         # seteo configs para el filtrado
         configs = {
@@ -192,13 +193,12 @@ class TrackAndFilter:
 
         filtered_bbs = filtro.filter(timestamp, bounding_boxes, img_original, mapa_profundidad)
 
-        ids = []
         for bb in filtered_bbs:
-            ids.append(bb[2])
+            self.ids_filtrados.add(bb[2])
 
-        return ids
-
-
+    def get_apple_count(self):
+        return len(self.ids_filtrados)
+    
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--working_directory", required=True)

@@ -2,6 +2,8 @@
   <!-- Launch file to run bag file -->
   <arg name="bag_file_path" default="/home/paolo/catkin_ws/bag_mas_lento.bag"/>
   <arg name="folder_path" default="/home/paolo/catkin_ws"/>
+  <arg name="post_procesamiento" default="true"/>
+  <arg name="metodo" default="kmeans"/>
 
   <!-- Camera image left topic -->
   <arg name="left_camera_image_topic" default="/costar_husky_sensor_config_1/left/image_raw"/>
@@ -30,7 +32,7 @@
   <!-- Run script to save the images -->
   <!-- use remap instead of the namespace -->
   <env name="ROS_NAMESPACE" value="stereo" />
-  <node pkg="fields_ignition" type="save_disparity_and_rgb.py" name="save_disparity_and_rgb" args="$(arg folder_path)" output="screen"/>
+  <node pkg="fields_ignition" type="save_disparity_and_rgb.py" name="save_disparity_and_rgb" args="--working_directory=$(arg folder_path) --post_procesamiento=$(arg post_procesamiento) --metodo=$(arg metodo)" output="screen"/>
 </launch>
 
 <!-- Ejemplo de ejecucion -->
