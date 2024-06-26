@@ -11,9 +11,7 @@ class FiltradoFilasPosteriores(filtrado_base.FiltradoBase):
         super().__init__(config)
 
     def filter(self, timestamp, bounding_boxes, img_original, mapa_profundidad):
-        working_directory = self.config['working_directory']
-
-        return self.__filtrar_puntos(timestamp,bounding_boxes, img_original, mapa_profundidad, working_directory, generar_imagen_plano)
+        return self.__filtrar_puntos(bounding_boxes, mapa_profundidad)
     
     def __find_clusters(self, nums, threshold=10):
         if not nums:
@@ -56,7 +54,7 @@ class FiltradoFilasPosteriores(filtrado_base.FiltradoBase):
     def __quitar_profunidad(self, puntos):
         return [[x,y,*rest] for [x,y,z,*rest] in puntos]
     
-    def __filtrar_puntos(self, timestamp, puntos_manzanas, img_original, mapa_profundidad, working_directory, generar_imagen_plano=False):
+    def __filtrar_puntos(self, puntos_manzanas, mapa_profundidad):
         puntos_con_profundidad = self.__obtener_puntos_con_profunidad(puntos_manzanas, mapa_profundidad)
         puntos_filtrados = self.__filtrar_puntos_threshold(puntos_con_profundidad)
 

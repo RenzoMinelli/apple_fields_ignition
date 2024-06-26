@@ -5,6 +5,7 @@ import subprocess
 from detectors_and_trackers.filtrado.filtrado_kmeans import FiltradoKMeans
 from detectors_and_trackers.filtrado.filtrado_plano import FiltradoPlano
 from detectors_and_trackers.filtrado.sin_filtrado import SinFiltrado
+from detectors_and_trackers.filtrado.filtrado_filas_posteriores import FiltradoFilasPosteriores
 import argparse
 import json
 import cv2
@@ -40,6 +41,8 @@ class TrackAndFilter:
             self.method = FiltradoPlano
         elif method == "sin_filtrado":
             self.method = SinFiltrado
+        elif method == "filas_posteriores":
+            self.method = FiltradoFilasPosteriores
         else:
             raise ValueError(f"Method {method} not recognized")
 
