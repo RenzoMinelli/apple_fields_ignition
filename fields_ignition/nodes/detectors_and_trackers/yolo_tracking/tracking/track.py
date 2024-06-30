@@ -61,7 +61,6 @@ def run(args, image=None, yolo_model_instance=None):
     if image is not None:
         source = image
     
-
     results = yolo.track(
         source=source,
         conf=args.conf,
