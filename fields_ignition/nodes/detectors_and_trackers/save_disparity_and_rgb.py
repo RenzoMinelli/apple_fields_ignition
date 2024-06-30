@@ -13,12 +13,11 @@ from track_and_filter import TrackAndFilter
 FILTRO = None
 
 def read_cameras():
-    ros_namespace = os.getenv('ROS_NAMESPACE') == None and 'stereo' or os.getenv('ROS_NAMESPACE')
+    ros_namespace = os.getenv('ROS_NAMESPACE') if os.getenv('ROS_NAMESPACE') else 'stereo'
     imageL = message_filters.Subscriber("/" + ros_namespace + "/left/image_rect_color", Image)
-    # imageR = message_filters.Subscriber("/" + ros_namespace + "/right/image_rect_color", Image)
     disparity = message_filters.Subscriber("/" + ros_namespace + "/disparity", DisparityImage)
 
-    # Synchronize images
+    # Use ApproximateTimeSynchronizer instead of TimeSynchronizer
     ts = message_filters.TimeSynchronizer([imageL, disparity], queue_size=20)
     ts.registerCallback(image_callback)
 
@@ -26,9 +25,8 @@ def image_callback(imageL, disparity):
     br = CvBridge()
     rospy.loginfo("receiving Image")
 
-    # convert the images to cv2 format and save them
+    # convert the images to cv2 format
     cv_image_left = br.imgmsg_to_cv2(imageL, 'bgr8')
-    # cv_image_right = br.imgmsg_to_cv2(imageR, 'bgr8')
     cv_disparity = br.imgmsg_to_cv2(disparity.image)
 
     timestamp = str(imageL.header.stamp)
@@ -40,7 +38,6 @@ def image_callback(imageL, disparity):
         print(f"conteo por ahora: {FILTRO.get_apple_count()}")
     else: # solo generar para post procesado
         cv.imwrite('left_rgb_images/{}.png'.format(timestamp), cv_image_left)
-        # cv.imwrite('right_rgb_images/{}.png'.format(timestamp), cv_image_right)
         cv.imwrite('disparity_images/{}.png'.format(timestamp), cv_disparity)
 
 def empty_folder(folder_path):
@@ -89,8 +86,7 @@ if __name__ == '__main__':
         # Change the current directory to the one sent as argument
         os.chdir(working_directory)
         # Empty the folders
-        empty_folder('left_rgb_images') 
-        # empty_folder('right_rgb_images')
+        empty_folder('left_rgb_images')
         empty_folder('disparity_images')
         delete_folder('yolo_tracking/runs/track/exp')
 
