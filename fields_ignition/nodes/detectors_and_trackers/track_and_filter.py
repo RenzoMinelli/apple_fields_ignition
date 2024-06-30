@@ -46,8 +46,6 @@ class TrackAndFilter:
         else:
             raise ValueError(f"Method {method} not recognized")
 
-    # clone repository with tracker and tracker evaluator - after running the node for the first time, run `pip install --upgrade sentry-sdk`
-
     def __setup_env(self):
         # clone the repository
         subprocess.run(['pip', 'install', 'boxmot'])
@@ -178,7 +176,7 @@ class TrackAndFilter:
                 self.ids_filtrados.add(bb[2])
         
         # Print the number of apples
-        print('Number of apples counted: ' + str(len(self.ids_filtrados)))
+        print('Number of apples counted: ' + str(self.get_apple_count()))
         print(f"amount of apples exactly for trees id (5,6,7,8,9): { self.__total_amount_apples_for_trees_ids([5,6,7,8,9])}")
 
     def track_filter_and_count_one_frame(self, timestamp, img_original, mapa_profundidad):
