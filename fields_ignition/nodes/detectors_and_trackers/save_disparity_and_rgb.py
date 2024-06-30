@@ -80,6 +80,9 @@ if __name__ == '__main__':
         if metodo is None:
             raise Exception("No se ha especificado un metodo de post procesamiento")
         
+        # need to delete foler runs/track/exp to avoid errors
+        delete_folder(f"{os.path.dirname(os.path.realpath(__file__))}/yolo_tracking/runs/track/exp")
+
         FILTRO = TrackAndFilter(working_directory, metodo)
 
     try:
