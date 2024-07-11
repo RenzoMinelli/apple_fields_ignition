@@ -4,8 +4,13 @@ from . import filtrado_base
 import numpy
 from sklearn.cluster import KMeans
 
-FIXED_THRESHOLD = False
-THRESHOLD_MARGIN = 2
+# paquete para importar configuraciones
+import configparser
+config.read('config.ini')
+config = configparser.ConfigParser()
+
+FIXED_THRESHOLD = config.getboolean('CONSTANTS', 'fixed_threshold')
+THRESHOLD_MARGIN = config.getint('CONSTANTS', 'threshold_margin')
 
 class FiltradoKMeans(filtrado_base.FiltradoBase):
     def filter(self, timestamp, bounding_boxes, img_original, mapa_profundidad):
