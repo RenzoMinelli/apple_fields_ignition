@@ -54,7 +54,6 @@ class FiltradoFilasPosteriores(filtrado_base.FiltradoBase):
     # Encuentra la distancia mas lejana del cluster mas cercano
     # esta distancia sera el threshold para filtrar los puntos.
     def __dar_distancia_maxima_de_cluster_cercano(self, lista):
-        lista.sort()
         lista = np.array(lista)
         
         data = lista.reshape(-1, 1)
@@ -71,7 +70,7 @@ class FiltradoFilasPosteriores(filtrado_base.FiltradoBase):
         inertia_2 = kmeans_2.inertia_
 
         if inertia_1 < inertia_2:
-            return lista[0]
+            return None
         else:
             # Get the cluster centers for 2 clusters
             cluster_centers = kmeans_2.cluster_centers_
