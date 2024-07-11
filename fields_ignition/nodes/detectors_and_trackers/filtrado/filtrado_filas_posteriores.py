@@ -58,13 +58,15 @@ class FiltradoFilasPosteriores(filtrado_base.FiltradoBase):
         
         data = lista.reshape(-1, 1)
 
-        # Initialize KMeans model for 1 cluster
+        # Inicializar KMeans para 1 cluster, ajustar a los puntos
+        # y obtener la inercia
         kmeans_1 = KMeans(n_clusters=1, n_init=10)
         kmeans_1.fit(data)
 
         inertia_1 = kmeans_1.inertia_
 
-        # Initialize KMeans model for 2 clusters
+        # Inicializar KMeans para 2 clusters, ajustar a los puntos
+        # y obtener la inercia
         kmeans_2 = KMeans(n_clusters=2, n_init=10)
         kmeans_2.fit(data)
         inertia_2 = kmeans_2.inertia_
@@ -72,15 +74,15 @@ class FiltradoFilasPosteriores(filtrado_base.FiltradoBase):
         if inertia_1 < inertia_2:
             return None
         else:
-            # Get the cluster centers for 2 clusters
+            # Obtener los centros de los 2 clusters
             cluster_centers = kmeans_2.cluster_centers_
             labels = kmeans_2.labels_
 
-            # Group elements by their cluster labels
+            # Agrupar los elementos por las labels de sus clusters
             cluster_0 = lista[labels == 0].tolist()
             cluster_1 = lista[labels == 1].tolist()
 
             if cluster_centers[0][0] > cluster_centers[1][0]:
-                return min(cluster_0)
+                return min(cluster_0) # las distancias estan invertidas, asi que se toma el minimo.
             else:
                 return min(cluster_1)
