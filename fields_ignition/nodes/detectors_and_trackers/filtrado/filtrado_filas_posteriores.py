@@ -4,15 +4,19 @@ from . import filtrado_base
 import numpy as np
 from sklearn.cluster import KMeans
 
-#OFFSET_HORIZONTAL = 53
-OFFSET_HORIZONTAL = 70
-MARGEN_PLANO = 1
+# paquete para importar configuraciones
+import configparser
+config.read('config.ini')
+config = configparser.ConfigParser()
+
+OFFSET_HORIZONTAL = config.getint('CONSTANTS', 'offset_horizontal')
+MARGEN_PLANO = config.getint('CONSTANTS', 'margen_plano')
 
 class FiltradoFilasPosteriores(filtrado_base.FiltradoBase):
     def __init__(self, config):
         super().__init__(config)
 
-    def filter(self, timestamp, bounding_boxes, img_original, mapa_profundidad):
+    def filter(self, _, bounding_boxes, _, mapa_profundidad):
         return self.__filtrar_puntos(bounding_boxes, mapa_profundidad)
 
     def __obtener_puntos_con_profunidad(self, puntos, mapa_profunidad):

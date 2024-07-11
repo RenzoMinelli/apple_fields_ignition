@@ -15,7 +15,6 @@ from detectors_and_trackers.yolo_tracking.tracking.track import main as track_ma
 ros_namespace = os.getenv('ROS_NAMESPACE')
 image_height = 1024
 image_width = 1024
-offset_horizontal = 53
 # global variables
 TRACKING_METHOD = "deepocsort"
 YOLO_WEIGHTS = "weights/yolov8l_150.pt"
@@ -214,5 +213,5 @@ if __name__ == "__main__":
     track_filter = TrackAndFilter(args.working_directory, args.method, args.track, args.gen_imagenes_tracker, args.generar_imagen_plano)
     track_filter.track_filter_and_count()
 
-# export PYTHONPATH=/home/renzo/catkin_ws/src/apple_fields_ignition/fields_ignition/nodes
+# export PYTHONPATH=/home/<user>/catkin_ws/src/apple_fields_ignition/fields_ignition/nodes
 # python3 -m detectors_and_trackers.track_and_filter --working_directory /home/renzo/catkin_ws --method kmeans --track true
