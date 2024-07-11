@@ -142,7 +142,7 @@ class TrackAndFilter:
             extra_args = []
             if self.gen_imagenes_tracker: extra_args = ["--save", "--show-conf"]
 
-            args = [
+            model_args = [
                 "--yolo-model", f"{self.working_directory}/{YOLO_WEIGHTS}",
                 "--tracking-method", TRACKING_METHOD,
                 "--source", SOURCE,
@@ -150,7 +150,7 @@ class TrackAndFilter:
                 *extra_args
             ]
 
-            track_main(args=args)
+            track_main(args=model_args)
 
         # get the bounding boxes from the file
         bounding_boxes = self.__read_bounding_boxes()
