@@ -4,10 +4,10 @@ from . import filtrado_base
 import numpy
 from sklearn.cluster import KMeans
 
-# paquete para importar configuraciones
+# importar configuraciones
 import configparser
 config = configparser.ConfigParser()
-config.read('../..config.ini')
+config.read('src/apple_fields_ignition/fields_ignition/nodes/config.ini')
 
 FIXED_THRESHOLD = config.getboolean('CONSTANTS', 'fixed_threshold')
 THRESHOLD_MARGIN = config.getint('CONSTANTS', 'threshold_margin')

@@ -4,10 +4,10 @@ from . import filtrado_base
 import numpy as np
 from sklearn.cluster import KMeans
 
-# paquete para importar configuraciones
+# importar configuraciones
 import configparser
 config = configparser.ConfigParser()
-config.read('../../config.ini')
+config.read('src/apple_fields_ignition/fields_ignition/nodes/config.ini')
 
 OFFSET_HORIZONTAL = config.getint('CONSTANTS', 'offset_horizontal')
 MARGEN_PLANO = config.getint('CONSTANTS', 'margen_plano')
@@ -16,7 +16,7 @@ class FiltradoFilasPosteriores(filtrado_base.FiltradoBase):
     def __init__(self, config):
         super().__init__(config)
 
-    def filter(self, _, bounding_boxes, _, mapa_profundidad):
+    def filter(self, _1, bounding_boxes, _2, mapa_profundidad):
         return self.__filtrar_puntos(bounding_boxes, mapa_profundidad)
 
     def __obtener_puntos_con_profunidad(self, puntos, mapa_profunidad):
