@@ -6,8 +6,8 @@ from sklearn.cluster import KMeans
 
 # paquete para importar configuraciones
 import configparser
-config.read('config.ini')
 config = configparser.ConfigParser()
+config.read('../..config.ini')
 
 FIXED_THRESHOLD = config.getboolean('CONSTANTS', 'fixed_threshold')
 THRESHOLD_MARGIN = config.getint('CONSTANTS', 'threshold_margin')

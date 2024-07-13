@@ -6,8 +6,8 @@ from sklearn.cluster import KMeans
 
 # paquete para importar configuraciones
 import configparser
-config.read('config.ini')
 config = configparser.ConfigParser()
+config.read('../../config.ini')
 
 OFFSET_HORIZONTAL = config.getint('CONSTANTS', 'offset_horizontal')
 MARGEN_PLANO = config.getint('CONSTANTS', 'margen_plano')
