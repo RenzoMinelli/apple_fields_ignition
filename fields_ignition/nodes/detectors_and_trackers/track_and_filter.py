@@ -52,7 +52,7 @@ class TrackAndFilter:
         subprocess.run(['pip', 'install', 'boxmot'])
 
     def __current_path(self):
-        return os.path.dirname(os.path.realpath(__file__))
+        return os.getcwd()
 
     # read bounding boxes from the bounding box file
     def __read_bounding_boxes(self):
@@ -213,5 +213,7 @@ if __name__ == "__main__":
     track_filter = TrackAndFilter(args.working_directory, args.method, args.track, args.gen_imagenes_tracker, args.generar_imagen_plano)
     track_filter.track_filter_and_count()
 
+# 'poetry shell' dentro de /home/<user>/catkin_ws/yolo_tracking
+# 
 # export PYTHONPATH=/home/<user>/catkin_ws/src/apple_fields_ignition/fields_ignition/nodes
-# python3 -m detectors_and_trackers.track_and_filter --working_directory /home/renzo/catkin_ws --method kmeans --track true
+# python3 -m detectors_and_trackers.track_and_filter --working_directory /home/<user>/catkin_ws --method kmeans --track true
