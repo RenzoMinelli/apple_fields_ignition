@@ -4,6 +4,7 @@ from . import filtrado_base
 from ultralytics import YOLO
 import cv2
 import numpy as np
+import os
 
 #OFFSET_HORIZONTAL = 53
 OFFSET_HORIZONTAL = 70
@@ -20,19 +21,17 @@ class FiltradoPlano(filtrado_base.FiltradoBase):
     def __init__(self, config):
         super().__init__(config)
         self.modelo_tronco = YOLO(f"{config['working_directory']}/weights/simulado_lateral.pt")
+        self.__preparar_carpetas()
 
     def filter(self, timestamp, bounding_boxes, img_original, mapa_profundidad):
-        working_directory = self.config['working_directory']
-        generar_imagen_plano = self.config['generar_imagen_plano']
         filtered_points = []
 
         try:
-            filtered_points = self.__filtrar_puntos(timestamp,bounding_boxes, img_original, mapa_profundidad, working_directory, generar_imagen_plano)
+            filtered_points = self.__filtrar_puntos(timestamp,bounding_boxes, img_original, mapa_profundidad)
         except CantidadPuntosInsuficiente as e:
             print(f"frame skipped, error: {e}")
 
         return filtered_points
-    
 
     def __find_clusters(self, nums, threshold=10):
         if not nums:
@@ -268,7 +267,7 @@ class FiltradoPlano(filtrado_base.FiltradoBase):
 
         return img_with_plane
 
-    def __filtrar_puntos(self, timestamp, puntos_manzanas, img_original, mapa_profundidad, working_directory, generar_imagen_plano=False):
+    def __filtrar_puntos(self, timestamp, puntos_manzanas, img_original, mapa_profundidad):
         # print(f"puntos manzanas: {puntos_manzanas}")
         puntos_arboles = self.__obtener_puntos_arboles(timestamp,img_original)
         puntos_con_profundidad = self.__obtener_puntos_con_profunidad(puntos_arboles, mapa_profundidad)
@@ -291,9 +290,9 @@ class FiltradoPlano(filtrado_base.FiltradoBase):
         print('plano generado: ')
         print(f"a: {a}, b: {b}, c: {c}, d: {d}")
 
-        if generar_imagen_plano:
+        if self.config["generar_imagen_plano"]:
             img_with_plane = self.__visualizar_plano_en_imagen(img_original, puntos_manzanas, mapa_profundidad, a, b, c, d)
-            cv2.imwrite(f"{working_directory}/planos/pixeles_filtrados_{timestamp}.png", img_with_plane)
+            cv2.imwrite(f"{self.config['working_directory']}/planos/pixeles_filtrados_{timestamp}.png", img_with_plane)
 
         puntos_filtrados = []
 
@@ -313,3 +312,15 @@ class FiltradoPlano(filtrado_base.FiltradoBase):
                 puntos_filtrados.append([x, y, *rest])
 
         return puntos_filtrados
+
+    def __preparar_carpetas(self):
+        working_directory = self.config['working_directory']
+
+        # si la carpeta no existe, la crea, sino se vacia
+        if not os.path.exists(f"{working_directory}/planos"):
+            os.makedirs(f"{working_directory}/planos")
+        else:
+            for file in os.listdir(f"{working_directory}/planos"):
+                os.remove(f"{working_directory}/planos/{file}")
+
+        return working_directory
