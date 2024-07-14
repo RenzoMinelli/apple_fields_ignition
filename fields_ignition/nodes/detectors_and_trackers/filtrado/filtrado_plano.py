@@ -54,7 +54,7 @@ class FiltradoPlano(filtrado_base.FiltradoBase):
         
         return min(puntos_incluidos)
 
-    def __obtener_puntos_arboles(self, timestamp, img, model):
+    def __obtener_puntos_arboles(self, timestamp, img):
         puntos_arboles = {}
 
         results = self.modelo_tronco([img], iou=0.1, conf=0.35,show_conf=True,show_labels=False,show=False)
