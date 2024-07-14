@@ -39,7 +39,9 @@
 <!-- Parado en la carpeta de catkin_ws -->
 <!-- roslaunch fields_ignition stereo_sim_bag.launch bag_file_path:=/home/paolo/catkin_ws/s1_230228.bag folder_path:=/home/paolo/catkin_ws -->
 
-rosbag play /home/renzo/catkin_ws/bag_mercedes_una_vuelta_completa.bag /zed_lateral/zed_lateral/left/camera_info:=/stereo/left/camera_info /zed_lateral/zed_lateral/right/camera_info:=/stereo/right/camera_info
-rosrun image_transport republish compressed in:=/stereo/left/image_raw raw out:=/stereo/left/image_raw
-rosrun image_transport republish compressed in:=/stereo/right/image_raw raw out:=/stereo/right/image_raw  
-ROS_NAMESPACE=stereo rosrun stereo_image_proc stereo_image_proc
+<!--  rosbag play /home/renzo/catkin_ws/bag_mercedes_una_vuelta_completa.bag /zed_lateral/zed_lateral/left/camera_info:=/stereo/left/camera_info /zed_lateral/zed_lateral/right/camera_info:=/stereo/right/camera_info -->
+<!--  rosrun image_transport republish compressed in:=/stereo/left/image_raw raw out:=/stereo/left/image_raw -->
+<!--  rosrun image_transport republish compressed in:=/stereo/right/image_raw raw out:=/stereo/right/image_raw   -->
+<!--  ROS_NAMESPACE=stereo rosrun stereo_image_proc stereo_image_proc -->
+<!--  rosrun image_view stereo_view stereo:=/stereo image:=image_rect_color -->
+<!--  rosrun rqt_reconfigure rqt_reconfigure 
