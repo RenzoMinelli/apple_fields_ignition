@@ -15,7 +15,7 @@ THRESHOLD_MARGIN = config.getint('CONSTANTS', 'threshold_margin')
 class FiltradoKMeans(filtrado_base.FiltradoBase):
     def filter(self, _1, bounding_boxes, _2, mapa_profundidad):
         # se obtienen las profundidades de los bounding boxes
-        # [<x, y, profundidad, id >,....]
+        # [<x, y, z(profundidad), id >,....]
         bounding_boxes_with_depth = self.obtener_puntos_con_profunidad(bounding_boxes, mapa_profundidad)
 
         # se obtiene el threshold
@@ -23,10 +23,10 @@ class FiltradoKMeans(filtrado_base.FiltradoBase):
         # sino, se calcula el threshold con KMeans.
         threshold = 57 if FIXED_THRESHOLD else self.__find_clusters([bb[2] for bb in bounding_boxes_with_depth])
 
-        # se aplica una margen que evita que se cuenten
-        # dos veces las manzanas del centro.
+        # se aplica un margen que evita que se cuenten
+        # dos veces las manzanas del centro de la fila.
         threshold += THRESHOLD_MARGIN
-        print(f"with threshold adjusted: {threshold}")
+        print(f"Threshold luego de aplicar el margen central: {threshold}")
 
         filtered_bounding_boxes = []
 
@@ -45,8 +45,6 @@ class FiltradoKMeans(filtrado_base.FiltradoBase):
     # Encuentra el punto que divide una lista ordenada de enteros en dos clusters,
     # minimizando la suma de las varianzas internas de los clusters.
     def __find_clusters(self, lista):
-        lista.sort() # TODO este sort me parece que no es necesario.
-
         data = numpy.array(lista).reshape(-1, 1)
 
         # Inicializar KMeans para 1 cluster y obtener la inercia que
