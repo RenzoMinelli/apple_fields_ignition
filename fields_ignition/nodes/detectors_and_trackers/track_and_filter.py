@@ -15,15 +15,14 @@ from detectors_and_trackers.yolo_tracking.tracking.track import main as track_ma
 ros_namespace = os.getenv('ROS_NAMESPACE')
 image_height = 1024
 image_width = 1024
-# global variables
-TRACKING_METHOD = "deepocsort"
-YOLO_WEIGHTS = "weights/yolov8l_150.pt"
-WORLD_NAME = "stereo_trees_close"
-YOLO_ARGS = [
-    "--yolo-model", f"/home/renzo/catkin_ws/{YOLO_WEIGHTS}",
-    "--tracking-method", TRACKING_METHOD,
-    "--exist-ok"
-]
+
+import configparser
+config = configparser.ConfigParser()
+
+TRACKING_METHOD = None
+YOLO_WEIGHTS = None
+WORLD_NAME = None 
+YOLO_ARGS = None
 
 METODOS_FILTRADO = {
     "kmeans": FiltradoKMeans, 
@@ -112,7 +111,7 @@ class TrackAndFilter:
 
     # when the nodes ends track the apples and evaluate the tracking
     def __total_amount_apples_for_trees_ids(self, ids):
-        dir_path = f"{self.working_directory}/src/apple_fields_ignition/fields_ignition/generated/{WORLD_NAME}/apple_field/"
+        dir_path = f"{cwd}/src/apple_fields_ignition/fields_ignition/generated/{WORLD_NAME}/apple_field/"
         apple_amount = 0
         dir_names_wanted = [f"apple_{x}" for x in ids]
         for root, dirs, files in os.walk(dir_path):
@@ -131,7 +130,7 @@ class TrackAndFilter:
     def track_filter_and_count(self):
         self.__setup_env()
 
-        os.chdir(self.working_directory)
+        os.chdir(cwd)
         print('working inside directory ', os.getcwd())
         
         print('Running tracker and tracker evaluator...')
@@ -144,7 +143,7 @@ class TrackAndFilter:
             if self.gen_imagenes_tracker: extra_args = ["--save", "--show-conf"]
 
             model_args = [
-                "--yolo-model", f"{self.working_directory}/{YOLO_WEIGHTS}",
+                "--yolo-model", f"{cwd}/{YOLO_WEIGHTS}",
                 "--tracking-method", TRACKING_METHOD,
                 "--source", SOURCE,
                 "--save", "--save-txt",
@@ -158,7 +157,7 @@ class TrackAndFilter:
 
         # seteo configs para el filtrado
         configs = {
-            "working_directory": self.working_directory,
+            "working_directory": cwd,
             "generar_imagen_plano": self.generar_imagen_plano
         }
 
@@ -186,7 +185,7 @@ class TrackAndFilter:
 
         # seteo configs para el filtrado
         configs = {
-            "working_directory": self.working_directory,
+            "working_directory": cwd,
             "generar_imagen_plano": self.generar_imagen_plano
         }
 
@@ -203,17 +202,34 @@ class TrackAndFilter:
     
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--working_directory", required=True)
-    parser.add_argument("--method", required=True)
-    parser.add_argument("--track", default='False', type=lambda x: (str(x).lower() == 'true'))
-    parser.add_argument("--gen_imagenes_tracker", default='False', type=lambda x: (str(x).lower() == 'true'))
-    parser.add_argument("--generar_imagen_plano", default='False', type=lambda x: (str(x).lower() == 'true'))
+    parser.add_argument("--config", required=True)
     args = parser.parse_args()
+    
+    # directorio de trabajo
+    cwd = os.getcwd()
+    
+    config.read(args.config)
 
-    track_filter = TrackAndFilter(args.working_directory, args.method, args.track, args.gen_imagenes_tracker, args.generar_imagen_plano)
+    # configuracion general
+    TRACKING_METHOD = config.get('TRACK_AND_FILTER', 'tracking_method')
+    YOLO_WEIGHTS = config.get('TRACK_AND_FILTER', 'yolo_weights')
+    WORLD_NAME = config.get('TRACK_AND_FILTER', 'world_name')
+    YOLO_ARGS = [
+        "--yolo-model", f"{cwd}/{YOLO_WEIGHTS}",
+        "--tracking-method", TRACKING_METHOD,
+        "--exist-ok"
+    ]
+    METHOD = config.get('TRACK_AND_FILTER', 'method')
+    TRACK = config.get('TRACK_AND_FILTER', 'track')
+    GEN_IMAGENES_TRACKER = config.get('TRACK_AND_FILTER', 'gen_imagenes_tracker')
+    GENERAR_IMAGEN_PLANO = config.get('TRACK_AND_FILTER', 'generar_imagen_plano')
+    
+    track_filter = TrackAndFilter(cwd, METHOD, TRACK, GEN_IMAGENES_TRACKER, GENERAR_IMAGEN_PLANO)
     track_filter.track_filter_and_count()
 
 # 'poetry shell' dentro de /home/<user>/catkin_ws/yolo_tracking
 # 
 # export PYTHONPATH=/home/<user>/catkin_ws/src/apple_fields_ignition/fields_ignition/nodes
-# python3 -m detectors_and_trackers.track_and_filter --working_directory /home/<user>/catkin_ws --method kmeans --track true
+# python3 -m detectors_and_trackers.track_and_filter --config <path to config.ini>
+# EJEMPLO
+# python3 -m detectors_and_trackers.track_and_filter --config /home/pincho/catkin_ws/src/apple_fields_ignition/fields_ignition/nodes/config.ini
