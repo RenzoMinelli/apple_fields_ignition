@@ -26,6 +26,13 @@ YOLO_ARGS = [
     "--exist-ok"
 ]
 
+METODOS_FILTRADO = {
+    "kmeans": FiltradoKMeans, 
+    "plano": FiltradoPlano, 
+    "sin_filtrado": SinFiltrado, 
+    "filas_posteriores": FiltradoFilasPosteriores 
+}
+
 class TrackAndFilter:
     def __init__(self, working_directory, method, track=False, gen_imagenes_tracker=False, generar_imagen_plano=False):
         self.working_directory = working_directory
@@ -35,16 +42,11 @@ class TrackAndFilter:
         self.yolo_instance = None
         self.ids_filtrados = set()
 
-        if method == "kmeans":
-            self.method = FiltradoKMeans
-        elif method == "plano":
-            self.method = FiltradoPlano
-        elif method == "sin_filtrado":
-            self.method = SinFiltrado
-        elif method == "filas_posteriores":
-            self.method = FiltradoFilasPosteriores
-        else:
-            raise ValueError(f"Method {method} not recognized")
+        if method not in METODOS_FILTRADO.keys():
+            allowed_methods = ", ".join(METODOS_FILTRADO.keys())
+            raise ValueError(f"Method {method} not recognized, please use one of the following: {allowed_methods}")
+        
+        self.method = METODOS_FILTRADO[method]
 
     def __setup_env(self):
         # clone the repository
