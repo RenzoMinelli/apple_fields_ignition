@@ -51,7 +51,7 @@ class TrackAndFilter:
         subprocess.run(['pip', 'install', 'boxmot'])
 
     def __current_path(self):
-        return os.getcwd()
+        return os.path.dirname(os.path.realpath(__file__))
 
     # read bounding boxes from the bounding box file
     def __read_bounding_boxes(self):
