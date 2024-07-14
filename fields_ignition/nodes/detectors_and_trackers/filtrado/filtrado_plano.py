@@ -6,9 +6,13 @@ import cv2
 import numpy as np
 import os
 
-#OFFSET_HORIZONTAL = 53
-OFFSET_HORIZONTAL = 70
-MARGEN_PLANO = 1
+# importar configuraciones
+import configparser
+config = configparser.ConfigParser()
+config.read('src/apple_fields_ignition/fields_ignition/nodes/config.ini')
+
+OFFSET_HORIZONTAL = config.getint('CONSTANTS', 'offset_horizontal')
+MARGEN_PLANO = config.getint('CONSTANTS', 'margen_plano')
 
 class CantidadPuntosInsuficiente(Exception):
     def __init__(self, m):
@@ -159,7 +163,6 @@ class FiltradoPlano(filtrado_base.FiltradoBase):
                 cv2.circle(img, (int(above_point[0]), int(above_point[1])), 3, (0, 155, 0), -1)
                 cv2.circle(img, (int(below_point[0]), int(below_point[1])), 3, (155, 0, 0), -1)
 
-                #cv2.imwrite(f"/home/renzo/catkin_ws/planos/marcado_{id_imagen}_{mask_id}.png", img)
 
                 #print("PUNTOS ENCONTRADOS")
                 #print(f"centro: {closest_point}, above: {above_point}, below: {below_point}\n\n")
@@ -169,7 +172,6 @@ class FiltradoPlano(filtrado_base.FiltradoBase):
                 puntos_arboles[mask_id].append(above_point)
                 puntos_arboles[mask_id].append(below_point)               
 
-            #res.save(filename=f'/home/renzo/catkin_ws/planos/result_{timestamp}_{res_id}_.jpg')
 
         return puntos_arboles
 
