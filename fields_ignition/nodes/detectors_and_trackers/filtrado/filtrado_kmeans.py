@@ -13,14 +13,15 @@ FIXED_THRESHOLD = config.getboolean('CONSTANTS', 'fixed_threshold')
 THRESHOLD_MARGIN = config.getint('CONSTANTS', 'threshold_margin')
 
 class FiltradoKMeans(filtrado_base.FiltradoBase):
-    def filter(self, timestamp, bounding_boxes, img_original, mapa_profundidad):
+    def filter(self, _1, bounding_boxes, _2, mapa_profundidad):
         # se obtienen las profundidades de los bounding boxes
-        bounding_boxes_with_depth = self.__get_depths(bounding_boxes, mapa_profundidad)
+        # [<x, y, profundidad, id >,....]
+        bounding_boxes_with_depth = self.obtener_puntos_con_profunidad(bounding_boxes, mapa_profundidad)
 
         # se obtiene el threshold
         # si FIXED_THRESHOLD es True, se usa un threshold fijo
         # sino, se calcula el threshold con KMeans.
-        threshold = 57 if FIXED_THRESHOLD else self.__find_clusters([bb[3] for bb in bounding_boxes_with_depth])
+        threshold = 57 if FIXED_THRESHOLD else self.__find_clusters([bb[2] for bb in bounding_boxes_with_depth])
 
         # se aplica una margen que evita que se cuenten
         # dos veces las manzanas del centro.
@@ -33,24 +34,14 @@ class FiltradoKMeans(filtrado_base.FiltradoBase):
         # profundidad mayor al threshold. Lo que implica 
         # que son las manzanas que están más cerca de la cámara. 
         for bb in bounding_boxes_with_depth:
-            if bb[3] >= threshold:
+            if bb[2] >= threshold:
                 filtered_bounding_boxes.append(bb)
 
         return filtered_bounding_boxes
 
-    # utilizamos el mapa de profunidad para obtener la profundidad de cada bounding box
-    def __get_depths(self, bounding_boxes, mapa_profundidad):
-        bb_with_depth = []
-        for bb in bounding_boxes:
-            bb_id = bb[2]
-            depth = mapa_profundidad[int(bb[1]), int(bb[0])]
+    def obtener_puntos_con_profunidad(self, bounding_boxes, mapa_profundidad):
+        return super().obtener_puntos_con_profunidad(bounding_boxes, mapa_profundidad)
 
-            bb_with_depth.append([bb[0], bb[1], bb_id, depth])
-        
-        # se retorna una lista de la forma
-        # [<x, y, id, profundidad>,....]
-        return bb_with_depth
-    
     # Encuentra el punto que divide una lista ordenada de enteros en dos clusters,
     # minimizando la suma de las varianzas internas de los clusters.
     def __find_clusters(self, lista):

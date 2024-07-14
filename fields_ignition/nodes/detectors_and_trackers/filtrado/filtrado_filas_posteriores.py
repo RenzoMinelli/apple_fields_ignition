@@ -19,17 +19,8 @@ class FiltradoFilasPosteriores(filtrado_base.FiltradoBase):
     def filter(self, _1, bounding_boxes, _2, mapa_profundidad):
         return self.__filtrar_puntos(bounding_boxes, mapa_profundidad)
 
-    def __obtener_puntos_con_profunidad(self, puntos, mapa_profunidad):
-        puntos_con_profundidad = []
-        for [x, y, *rest] in puntos:
-
-            if x <= OFFSET_HORIZONTAL:
-                continue
-
-            z = mapa_profunidad[y, x]
-            puntos_con_profundidad.append([x,y,z,*rest])
-
-        return puntos_con_profundidad
+    def obtener_puntos_con_profunidad(self, bounding_boxes, mapa_profundidad):
+        return super().obtener_puntos_con_profunidad(bounding_boxes, mapa_profundidad)
 
     def __filtrar_puntos_threshold(self, puntos):
         threshold = self.__dar_distancia_maxima_de_cluster_cercano([p[2] for p in puntos])
@@ -46,7 +37,7 @@ class FiltradoFilasPosteriores(filtrado_base.FiltradoBase):
         return [[x,y,*rest] for [x,y,z,*rest] in puntos]
     
     def __filtrar_puntos(self, puntos_manzanas, mapa_profundidad):
-        puntos_con_profundidad = self.__obtener_puntos_con_profunidad(puntos_manzanas, mapa_profundidad)
+        puntos_con_profundidad = self.obtener_puntos_con_profunidad(puntos_manzanas, mapa_profundidad)
         puntos_filtrados = self.__filtrar_puntos_threshold(puntos_con_profundidad)
 
         return self.__quitar_profunidad(puntos_filtrados)
