@@ -19,8 +19,10 @@ class FiltradoKMeans(filtrado_base.FiltradoBase):
         bounding_boxes_with_depth = self.obtener_puntos_con_profunidad(bounding_boxes, mapa_profundidad)
 
         # se obtiene el threshold
-        # si FIXED_THRESHOLD es True, se usa un threshold fijo
+        # si FIXED_THRESHOLD es True, se usa un threshold fijo,
         # sino, se calcula el threshold con KMeans.
+        # usualmente no es una buena idea utilizar un threshold fijo,
+        # de todas formas damos la opcion como forma de experimentación.
         threshold = 57 if FIXED_THRESHOLD else self.__find_clusters([bb[2] for bb in bounding_boxes_with_depth])
 
         # se aplica un margen que evita que se cuenten
@@ -32,7 +34,7 @@ class FiltradoKMeans(filtrado_base.FiltradoBase):
 
         # nos quedamos con las bounding boxes que tienen una
         # profundidad mayor al threshold. Lo que implica 
-        # que son las manzanas que están más cerca de la cámara. 
+        # que son las manzanas que están más cerca de la cámara.
         for bb in bounding_boxes_with_depth:
             if bb[2] >= threshold:
                 filtered_bounding_boxes.append(bb)
@@ -47,7 +49,7 @@ class FiltradoKMeans(filtrado_base.FiltradoBase):
     def __find_clusters(self, lista):
         data = numpy.array(lista).reshape(-1, 1)
 
-        # Inicializar KMeans para 1 cluster y obtener la inercia que
+        # Inicializar KMeans para 1 cluster y obtener la inercia, que
         # es una medida de que tan bien se ajustan los datos a los clusters.
         kmeans_1 = KMeans(n_clusters=1, n_init=10)
         kmeans_1.fit(data)
