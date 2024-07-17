@@ -32,7 +32,7 @@ class FiltradoPlano(filtrado_base.FiltradoBase):
         filtered_points = []
 
         try:
-            filtered_points = self.__filtrar_puntos(timestamp,bounding_boxes, img_original, mapa_profundidad)
+            filtered_points = self.__filtrar_puntos(timestamp, bounding_boxes, img_original, mapa_profundidad)
         except CantidadPuntosInsuficiente as e:
             print(f"frame skipped, error: {e}")
 
@@ -58,10 +58,10 @@ class FiltradoPlano(filtrado_base.FiltradoBase):
         
         return min(puntos_incluidos)
 
-    def __obtener_puntos_arboles(self, timestamp, img):
+    def __obtener_puntos_arboles(self, img):
         puntos_arboles = {}
 
-        results = self.modelo_tronco([img], iou=0.1, conf=0.35,show_conf=True,show_labels=False,show=False)
+        results = self.modelo_tronco([img], iou=0.1, conf=0.35, show_conf=True, show_labels=False, show=False)
 
         # Visualize the results
         for res_id, res in enumerate(results):
@@ -271,8 +271,7 @@ class FiltradoPlano(filtrado_base.FiltradoBase):
         return img_with_plane
 
     def __filtrar_puntos(self, timestamp, puntos_manzanas, img_original, mapa_profundidad):
-        # print(f"puntos manzanas: {puntos_manzanas}")
-        puntos_arboles = self.__obtener_puntos_arboles(timestamp,img_original)
+        puntos_arboles = self.__obtener_puntos_arboles(img_original)
         puntos_con_profundidad = self.__obtener_puntos_con_profunidad(puntos_arboles, mapa_profundidad)
         puntos_filtrados = self.__filtrar_puntos_threshold(puntos_con_profundidad)
 
