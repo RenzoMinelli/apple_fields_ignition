@@ -49,7 +49,7 @@ class FiltradoPlano(filtrado_base.FiltradoBase):
         # Initialize the first group
         puntos_incluidos = [maximo]
 
-        # Iterate through sorted numbers and form groups
+        # Iterar a través de los números ordenados y formar grupos
         for i in range(1, len(sorted_nums)):
             if abs(maximo - sorted_nums[i]) > threshold:
                 break
@@ -63,23 +63,19 @@ class FiltradoPlano(filtrado_base.FiltradoBase):
 
         results = self.modelo_tronco([img], iou=0.1, conf=0.35, show_conf=True, show_labels=False, show=False)
 
-        # Visualize the results
-        for res_id, res in enumerate(results):
+        # Visualizar resultados
+        for _, res in enumerate(results):
             if res.masks == None or len(res.masks.xy) < 2:
                 raise CantidadPuntosInsuficiente("Hay menos de 2 troncos en la imagen")
-
-            # Show results to screen (in supported environments)
-            # im_rgb.show()
             
             for mask_id, mask in enumerate(res.masks.xy):
 
                 # inicializo con una lista vacia
                 puntos_arboles[mask_id] = []
 
-                # get the center of each tree            
-                x, y, w, h = res.boxes[mask_id].xywh[0].cpu().numpy()
+                # obtener el centro de cada tronco
+                x, y, _, _ = res.boxes[mask_id].xywh[0].cpu().numpy()
                 
-                #print(f"x: {x}, y: {y}, w: {w}, h: {h}")
                 x_center = x
                 y_center = y
 
