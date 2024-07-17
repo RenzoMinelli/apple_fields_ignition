@@ -74,13 +74,8 @@ class FiltradoPlano(filtrado_base.FiltradoBase):
                 puntos_arboles[mask_id] = []
 
                 # obtener el centro de cada tronco
-                x, y, _, _ = res.boxes[mask_id].xywh[0].cpu().numpy()
+                x_center, y_center, _, _ = res.boxes[mask_id].xywh[0].cpu().numpy()
                 
-                x_center = x
-                y_center = y
-
-                #print(f"x_center: {x_center}, y_center: {y_center}")
-
                 cv2.circle(img, (int(x_center), int(y_center)), 3, (255, 255, 255), -1)
 
                 # Inicializa una máscara binaria
