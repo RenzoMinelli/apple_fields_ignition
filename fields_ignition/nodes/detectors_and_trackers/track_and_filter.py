@@ -143,7 +143,7 @@ class TrackAndFilter:
             if self.gen_imagenes_tracker: extra_args = ["--save", "--show-conf"]
 
             model_args = [
-                "--yolo-model", f"{cwd}/{YOLO_WEIGHTS}",
+                "--yolo-model", f"{cwd}/weights/{YOLO_WEIGHTS}",
                 "--tracking-method", TRACKING_METHOD,
                 "--source", SOURCE,
                 "--save", "--save-txt",
@@ -215,7 +215,7 @@ if __name__ == "__main__":
     YOLO_WEIGHTS = config.get('TRACK_AND_FILTER', 'yolo_weights')
     WORLD_NAME = config.get('TRACK_AND_FILTER', 'world_name')
     YOLO_ARGS = [
-        "--yolo-model", f"{cwd}/{YOLO_WEIGHTS}",
+        "--yolo-model", f"{cwd}/weights/{YOLO_WEIGHTS}",
         "--tracking-method", TRACKING_METHOD,
         "--exist-ok"
     ]

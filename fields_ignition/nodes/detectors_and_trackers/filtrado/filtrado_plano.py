@@ -13,6 +13,7 @@ config.read('src/apple_fields_ignition/fields_ignition/nodes/config.ini')
 
 OFFSET_HORIZONTAL = config.getint('CONSTANTS', 'offset_horizontal')
 MARGEN_PLANO = config.getint('CONSTANTS', 'margen_plano')
+MODELO_PLANO = config.get('MODELO_PLANO', 'modelo_plano')
 
 class CantidadPuntosInsuficiente(Exception):
     def __init__(self, m):
@@ -24,7 +25,7 @@ class CantidadPuntosInsuficiente(Exception):
 class FiltradoPlano(filtrado_base.FiltradoBase):
     def __init__(self, config):
         super().__init__(config)
-        self.modelo_tronco = YOLO(f"{config['working_directory']}/weights/simulado_lateral.pt")
+        self.modelo_tronco = YOLO(f"{config['working_directory']}/weights/{MODELO_PLANO}.pt")
         self.__preparar_carpetas()
 
     def filter(self, timestamp, bounding_boxes, img_original, mapa_profundidad):
