@@ -58,12 +58,12 @@ class FiltradoPlano(filtrado_base.FiltradoBase):
         
         return min(puntos_incluidos)
 
+    # obtiene 3 puntos reales dentro del tronco, uno central, uno arriba y uno abajo
+    # ademas permite la visualizacion de esos puntos mediante cv2
     def __obtener_puntos_arboles(self, img):
         puntos_arboles = {}
 
         results = self.modelo_tronco([img], iou=0.1, conf=0.35, show_conf=True, show_labels=False, show=False)
-
-        # Visualizar resultados
 
         # Este metodo solo recibe una imagen, por lo que en el vector resultado del llamado
         # al modelo solo habra un resultado
@@ -156,6 +156,7 @@ class FiltradoPlano(filtrado_base.FiltradoBase):
             cv2.circle(img, (int(above_point[0]), int(above_point[1])), 3, (0, 155, 0), -1)
             cv2.circle(img, (int(below_point[0]), int(below_point[1])), 3, (155, 0, 0), -1)
 
+            # se retornan tres puntos reales del tronco, uno central, uno arriba y uno abajo.
             puntos_arboles[mask_id].append(closest_point)
             puntos_arboles[mask_id].append(above_point)
             puntos_arboles[mask_id].append(below_point)               
