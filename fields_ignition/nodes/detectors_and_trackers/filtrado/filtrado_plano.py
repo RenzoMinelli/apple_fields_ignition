@@ -173,7 +173,7 @@ class FiltradoPlano(filtrado_base.FiltradoBase):
                 
                 if mask_id not in puntos_con_profundidad: puntos_con_profundidad[mask_id] = [] 
 
-                z = self.__escalar_profundidad(mapa_profunidad[y, x])
+                z = mapa_profunidad[y, x]
                 puntos_con_profundidad[mask_id].append([x,y,z])
 
         return puntos_con_profundidad
@@ -219,11 +219,6 @@ class FiltradoPlano(filtrado_base.FiltradoBase):
     def __delante_de_plano(self, x, y, z, a, b, c, d):
         return a * x + b * y + c * z + d > 0
 
-    def __escalar_profundidad(self, valor_z):
-        # Invierte el valor z ya que en el mapa de profundidad, un valor más alto significa más cerca
-        #return ((255 - valor_z) / 255) * (MAX_DEPTH - MIN_DEPTH) + MIN_DEPTH
-        return valor_z
-
     def __visualizar_plano_en_imagen(self, img, puntos_manzanas, depth_map, a, b, c, d):
         # Crear una copia de la imagen para dibujar el plano
         img_with_plane = img.copy()
@@ -234,21 +229,18 @@ class FiltradoPlano(filtrado_base.FiltradoBase):
 
                 # Obtener la profundidad desde el mapa de profundidad
                 z = depth_map[y, x]
-                # Escala la profundidad al rango correcto
-                z_scaled = self.__escalar_profundidad(z)
 
                 # Comprobar si el punto está delante del plano
-                esta_delante = self.__delante_de_plano(x, y, z_scaled, a, b, c, d)
+                esta_delante = self.__delante_de_plano(x, y, z, a, b, c, d)
 
                 current_color = img_with_plane[y, x]
                 img_with_plane[y, x] = current_color if esta_delante else (int(current_color[0]/2), int(current_color[1]/2), int(current_color[2]/2))
         for [x, y, *rest] in puntos_manzanas:
             # calcular profundidad de la manzana
             z = depth_map[y, x]
-            z_scaled = self.__escalar_profundidad(z)
 
             # Comprobar si el punto está delante del plano
-            esta_delante = self.__delante_de_plano(x, y, z_scaled, a, b, c, d)
+            esta_delante = self.__delante_de_plano(x, y, z, a, b, c, d)
 
             if esta_delante:
                 cv2.circle(img_with_plane, (x, y), 3, (0, 255, 0), -1)
@@ -291,11 +283,9 @@ class FiltradoPlano(filtrado_base.FiltradoBase):
 
             # Obtener la profundidad desde el mapa de profundidad
             z = mapa_profundidad[y, x]
-            # Escala la profundidad al rango correcto
-            z_scaled = self.__escalar_profundidad(z)
 
             # Comprobar si el punto está delante del plano
-            esta_delante = self.__delante_de_plano(x, y, z_scaled, a, b, c, d)
+            esta_delante = self.__delante_de_plano(x, y, z, a, b, c, d)
 
             if esta_delante:
                 puntos_filtrados.append([x, y, *rest])
