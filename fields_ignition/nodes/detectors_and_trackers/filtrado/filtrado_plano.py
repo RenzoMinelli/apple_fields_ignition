@@ -139,7 +139,8 @@ class FiltradoPlano(filtrado_base.FiltradoBase):
             cv2.circle(img, (int(above_center_x), int(above_center_y)), 3, (0, 55, 0), -1)
             cv2.circle(img, (int(below_center_x), int(below_center_y)), 3, (55, 0, 0), -1)
 
-            # search for points in pixeles_tronco_coords
+            # buscar los puntos reales del tronco que estan mas cerca
+            # de los puntos calculados
             for point in pixeles_tronco_coords:
                 point_x, point_y = point[0], point[1]
                 above_x, above_y = above_point[0], above_point[1]
