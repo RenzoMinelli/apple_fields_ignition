@@ -85,7 +85,7 @@ class FiltradoPlano(filtrado_base.FiltradoBase):
 
             # tuplas de los bordes de la mascara
             data_points = [tuple(elem) for elem in mask]
-            data_points = np.array([data_points], dtype=np.int32)  # Convertir a matriz numpy de tipo int32
+            data_points = np.array([data_points], dtype=np.int32) # Convertir a matriz numpy de tipo int32
 
             # Pinta la máscara binaria
             cv2.fillPoly(mask_binaria, data_points, 1)
@@ -119,6 +119,10 @@ class FiltradoPlano(filtrado_base.FiltradoBase):
             cv2.circle(img, (int(below_point[0]), int(below_point[1])), 3, (255, 0, 0), -1)
 
             # now find the point in the middle of center and above
+            # this is because if we use the furhtest point above (or furhtest below),
+            # later, the disparity image
+            # may give wrong measurement because the point is too
+            # close to the edge of the trunk
             diff_x = (closest_x - above_point[0])/2
             diff_y = (closest_y - above_point[1])/2
 
