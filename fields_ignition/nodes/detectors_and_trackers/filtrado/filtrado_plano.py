@@ -64,106 +64,96 @@ class FiltradoPlano(filtrado_base.FiltradoBase):
         results = self.modelo_tronco([img], iou=0.1, conf=0.35, show_conf=True, show_labels=False, show=False)
 
         # Visualizar resultados
-        for _, res in enumerate(results):
-            if res.masks == None or len(res.masks.xy) < 2:
-                raise CantidadPuntosInsuficiente("Hay menos de 2 troncos en la imagen")
+
+        # Este metodo solo recibe una imagen, por lo que en el vector resultado del llamado
+        # al modelo solo habra un resultado
+        res = results[0]
+        if res.masks == None or len(res.masks.xy) < 2:
+            raise CantidadPuntosInsuficiente("Hay menos de 2 troncos en la imagen")
+        
+        for mask_id, mask in enumerate(res.masks.xy):
+            # inicializo con una lista vacia
+            puntos_arboles[mask_id] = []
+
+            # obtener el centro de cada tronco
+            x_center, y_center, _, _ = res.boxes[mask_id].xywh[0].cpu().numpy()
             
-            for mask_id, mask in enumerate(res.masks.xy):
+            cv2.circle(img, (int(x_center), int(y_center)), 3, (255, 255, 255), -1)
 
-                # inicializo con una lista vacia
-                puntos_arboles[mask_id] = []
+            # Inicializa una máscara binaria
+            mask_binaria = np.zeros(img.shape[:2], dtype=np.uint8)
 
-                # obtener el centro de cada tronco
-                x_center, y_center, _, _ = res.boxes[mask_id].xywh[0].cpu().numpy()
-                
-                cv2.circle(img, (int(x_center), int(y_center)), 3, (255, 255, 255), -1)
+            # tuplas de los bordes de la mascara
+            data_points = [tuple(elem) for elem in mask]
+            data_points = np.array([data_points], dtype=np.int32)  # Convertir a matriz numpy de tipo int32
 
-                # Inicializa una máscara binaria
-                mask_binaria = np.zeros(img.shape[:2], dtype=np.uint8)
+            # Pinta la máscara binaria
+            cv2.fillPoly(mask_binaria, data_points, 1)
 
-                # tuplas de los bordes de la mascara
-                data_points = [tuple(elem) for elem in mask]
-                data_points = np.array([data_points], dtype=np.int32)  # Convertir a matriz numpy de tipo int32
+            # Encuentra las coordenadas de los píxeles dentro de la máscara
+            y, x = np.where(mask_binaria == 1)
+            pixeles_tronco_coords = list(zip(x, y))  # Convertir el zip en una lista
 
-                # Pinta la máscara binaria
-                cv2.fillPoly(mask_binaria, data_points, 1)
-
-                # Encuentra las coordenadas de los píxeles dentro de la máscara
-                y, x = np.where(mask_binaria == 1)
-                pixeles_tronco_coords = list(zip(x, y))  # Convertir el zip en una lista
-
-                # find the closest point in the mask array to the calculated center
-                closest_point = pixeles_tronco_coords[0]
-                for point in pixeles_tronco_coords:
-                    point_x, point_y = point[0], point[1]
-                    closest_x, closest_y = closest_point[0], closest_point[1]
-
-                    if abs(point_x - x_center) + abs(point_y - y_center) < abs(closest_x - x_center) + abs(closest_y - y_center):
-                        closest_point = point
-                    
-                # find the furthest point above and below the center
-                above_point = closest_point
-                below_point = closest_point
+            # find the closest point in the mask array to the calculated center
+            closest_point = pixeles_tronco_coords[0]
+            for point in pixeles_tronco_coords:
+                point_x, point_y = point[0], point[1]
                 closest_x, closest_y = closest_point[0], closest_point[1]
 
-                for point in pixeles_tronco_coords:
-                    if point[1] <= closest_y and point[1] <= above_point[1]:
-                        above_point = point
-                    if point[1] >= closest_y and point[1] >= below_point[1]:
-                        below_point = point
+                if abs(point_x - x_center) + abs(point_y - y_center) < abs(closest_x - x_center) + abs(closest_y - y_center):
+                    closest_point = point
+                
+            # find the furthest point above and below the center
+            above_point = closest_point
+            below_point = closest_point
+            closest_x, closest_y = closest_point[0], closest_point[1]
 
-                #print("ANTES DE AJUSTAR QUARTERS")
-                #print(f"centro: {closest_point}, above: {above_point}, below: {below_point}")
+            for point in pixeles_tronco_coords:
+                if point[1] <= closest_y and point[1] <= above_point[1]:
+                    above_point = point
+                if point[1] >= closest_y and point[1] >= below_point[1]:
+                    below_point = point
 
-                cv2.circle(img, (int(closest_point[0]), int(closest_point[1])), 3, (0, 0, 255), -1)
-                cv2.circle(img, (int(above_point[0]), int(above_point[1])), 3, (0, 255, 0), -1)
-                cv2.circle(img, (int(below_point[0]), int(below_point[1])), 3, (255, 0, 0), -1)
+            cv2.circle(img, (int(closest_point[0]), int(closest_point[1])), 3, (0, 0, 255), -1)
+            cv2.circle(img, (int(above_point[0]), int(above_point[1])), 3, (0, 255, 0), -1)
+            cv2.circle(img, (int(below_point[0]), int(below_point[1])), 3, (255, 0, 0), -1)
 
-                # now find the point in the middle of center and above
-                diff_x = (closest_x - above_point[0])/2
-                diff_y = (closest_y - above_point[1])/2
+            # now find the point in the middle of center and above
+            diff_x = (closest_x - above_point[0])/2
+            diff_y = (closest_y - above_point[1])/2
 
-                above_center_x = above_point[0] + diff_x
-                above_center_y = above_point[1] + diff_y
+            above_center_x = above_point[0] + diff_x
+            above_center_y = above_point[1] + diff_y
 
-                # now for below
-                diff_x = (closest_x - below_point[0])/2
-                diff_y = (closest_y - below_point[1])/2
+            # now for below
+            diff_x = (closest_x - below_point[0])/2
+            diff_y = (closest_y - below_point[1])/2
 
-                below_center_x = below_point[0] + diff_x
-                below_center_y = below_point[1] + diff_y
+            below_center_x = below_point[0] + diff_x
+            below_center_y = below_point[1] + diff_y
 
-                #print("LUEGO DE AJUSTAR")
-                #print(f"above: ({above_center_x},{above_center_y}) below: ({below_center_x},{below_center_y})")
+            cv2.circle(img, (int(above_center_x), int(above_center_y)), 3, (0, 55, 0), -1)
+            cv2.circle(img, (int(below_center_x), int(below_center_y)), 3, (55, 0, 0), -1)
 
-                cv2.circle(img, (int(above_center_x), int(above_center_y)), 3, (0, 55, 0), -1)
-                cv2.circle(img, (int(below_center_x), int(below_center_y)), 3, (55, 0, 0), -1)
+            # search for points in pixeles_tronco_coords
+            for point in pixeles_tronco_coords:
+                point_x, point_y = point[0], point[1]
+                above_x, above_y = above_point[0], above_point[1]
+                below_x, below_y = below_point[0], below_point[1]
 
-                # search for points in pixeles_tronco_coords
-                for point in pixeles_tronco_coords:
-                    point_x, point_y = point[0], point[1]
-                    above_x, above_y = above_point[0], above_point[1]
-                    below_x, below_y = below_point[0], below_point[1]
+                if abs(point_x - below_center_x) + abs(point_y - below_center_y) <= abs(below_x - below_center_x) + abs(below_y - below_center_y):
+                    below_point = point
 
-                    if abs(point_x - below_center_x) + abs(point_y - below_center_y) <= abs(below_x - below_center_x) + abs(below_y - below_center_y):
-                        below_point = point
-
-                    if abs(point_x - above_center_x) + abs(point_y - above_center_y) <= abs(above_x - above_center_x) + abs(above_y - above_center_y):
-                        above_point = point
-
-
-                cv2.circle(img, (int(above_point[0]), int(above_point[1])), 3, (0, 155, 0), -1)
-                cv2.circle(img, (int(below_point[0]), int(below_point[1])), 3, (155, 0, 0), -1)
+                if abs(point_x - above_center_x) + abs(point_y - above_center_y) <= abs(above_x - above_center_x) + abs(above_y - above_center_y):
+                    above_point = point
 
 
-                #print("PUNTOS ENCONTRADOS")
-                #print(f"centro: {closest_point}, above: {above_point}, below: {below_point}\n\n")
+            cv2.circle(img, (int(above_point[0]), int(above_point[1])), 3, (0, 155, 0), -1)
+            cv2.circle(img, (int(below_point[0]), int(below_point[1])), 3, (155, 0, 0), -1)
 
-
-                puntos_arboles[mask_id].append(closest_point)
-                puntos_arboles[mask_id].append(above_point)
-                puntos_arboles[mask_id].append(below_point)               
-
+            puntos_arboles[mask_id].append(closest_point)
+            puntos_arboles[mask_id].append(above_point)
+            puntos_arboles[mask_id].append(below_point)               
 
         return puntos_arboles
 
