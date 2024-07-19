@@ -13,8 +13,8 @@ import cv2
 from detectors_and_trackers.yolo_tracking.tracking.track import main as track_main
 
 ros_namespace = os.getenv('ROS_NAMESPACE')
-image_height = 1024
-image_width = 1024
+image_height = 1080 # modifique esto para el bag real
+image_width = 1920
 offset_horizontal = 53
 # global variables
 TRACKING_METHOD = "deepocsort"
@@ -34,11 +34,13 @@ METODOS_FILTRADO = {
 }
 
 class TrackAndFilter:
-    def __init__(self, working_directory, method, track=False, gen_imagenes_tracker=False, generar_imagen_plano=False):
+    def __init__(self, working_directory, method, track=False, gen_imagenes_tracker=False, generar_imagen_plano=False, rotar_imagenes=False):
         self.working_directory = working_directory
         self.track = track
         self.gen_imagenes_tracker = gen_imagenes_tracker
         self.generar_imagen_plano = generar_imagen_plano
+        self.rotar_imagenes = rotar_imagenes
+
         self.yolo_instance = None
         self.ids_filtrados = set()
 
@@ -160,7 +162,8 @@ class TrackAndFilter:
         # seteo configs para el filtrado
         configs = {
             "working_directory": self.working_directory,
-            "generar_imagen_plano": self.generar_imagen_plano
+            "generar_imagen_plano": self.generar_imagen_plano,
+            "rotar_imagenes": self.rotar_imagenes
         }
 
         # instancio filtro
@@ -188,7 +191,8 @@ class TrackAndFilter:
         # seteo configs para el filtrado
         configs = {
             "working_directory": self.working_directory,
-            "generar_imagen_plano": self.generar_imagen_plano
+            "generar_imagen_plano": self.generar_imagen_plano,
+            "rotar_imagenes": self.rotar_imagenes
         }
 
         # instancio filtro
@@ -209,9 +213,10 @@ if __name__ == "__main__":
     parser.add_argument("--track", default='False', type=lambda x: (str(x).lower() == 'true'))
     parser.add_argument("--gen_imagenes_tracker", default='False', type=lambda x: (str(x).lower() == 'true'))
     parser.add_argument("--generar_imagen_plano", default='False', type=lambda x: (str(x).lower() == 'true'))
+    parser.add_argument("--rotar_imagenes", default='False', type=lambda x: (str(x).lower() == 'true'))
     args = parser.parse_args()
 
-    track_filter = TrackAndFilter(args.working_directory, args.method, args.track, args.gen_imagenes_tracker, args.generar_imagen_plano)
+    track_filter = TrackAndFilter(args.working_directory, args.method, args.track, args.gen_imagenes_tracker, args.generar_imagen_plano, args.rotar_imagenes)
     track_filter.track_filter_and_count()
 
 # export PYTHONPATH=/home/renzo/catkin_ws/src/apple_fields_ignition/fields_ignition/nodes

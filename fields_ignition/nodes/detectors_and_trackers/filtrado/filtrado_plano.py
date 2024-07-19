@@ -20,7 +20,7 @@ class CantidadPuntosInsuficiente(Exception):
 class FiltradoPlano(filtrado_base.FiltradoBase):
     def __init__(self, config):
         super().__init__(config)
-        self.modelo_tronco = YOLO(f"{config['working_directory']}/weights/simulado_lateral.pt")
+        self.modelo_tronco = YOLO(f"{config['working_directory']}/weights/real_lateral.pt")
         self.__preparar_carpetas()
 
     def filter(self, timestamp, bounding_boxes, img_original, mapa_profundidad):
@@ -55,6 +55,9 @@ class FiltradoPlano(filtrado_base.FiltradoBase):
 
     def __obtener_puntos_arboles(self, timestamp, img):
         puntos_arboles = {}
+
+        if self.config["rotar_imagenes"]:
+            img = cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
 
         results = self.modelo_tronco([img], iou=0.1, conf=0.35,show_conf=True,show_labels=False,show=False)
 
@@ -159,17 +162,18 @@ class FiltradoPlano(filtrado_base.FiltradoBase):
                 cv2.circle(img, (int(above_point[0]), int(above_point[1])), 3, (0, 155, 0), -1)
                 cv2.circle(img, (int(below_point[0]), int(below_point[1])), 3, (155, 0, 0), -1)
 
-                #cv2.imwrite(f"/home/renzo/catkin_ws/planos/marcado_{id_imagen}_{mask_id}.png", img)
-
-                #print("PUNTOS ENCONTRADOS")
-                #print(f"centro: {closest_point}, above: {above_point}, below: {below_point}\n\n")
-
+                if self.config["rotar_imagenes"]:
+                    # rotate back
+                    closest_point = (closest_point[1], img.shape[1] - closest_point[0])
+                    above_point = (above_point[1], img.shape[1] - above_point[0])
+                    below_point = (below_point[1], img.shape[1] - below_point[0])
 
                 puntos_arboles[mask_id].append(closest_point)
                 puntos_arboles[mask_id].append(above_point)
                 puntos_arboles[mask_id].append(below_point)               
 
             #res.save(filename=f'/home/renzo/catkin_ws/planos/result_{timestamp}_{res_id}_.jpg')
+            cv2.imwrite(f"/home/renzo/catkin_ws/planos/marcado_{timestamp}.png", img)
 
         return puntos_arboles
 
