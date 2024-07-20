@@ -25,6 +25,7 @@ YOLO_ARGS = [
     "--tracking-method", TRACKING_METHOD,
     "--exist-ok"
 ]
+SOURCE = "left_rgb_images"
 
 METODOS_FILTRADO = {
     "kmeans": FiltradoKMeans, 
@@ -132,6 +133,43 @@ class TrackAndFilter:
     def __delete_folder(self, folder_path):
         subprocess.run(['rm', '-rf', folder_path])
 
+    def __configs_filtro(self):
+        return {
+            "working_directory": self.working_directory,
+            "generar_imagen_plano": self.generar_imagen_plano,
+            "rotar_imagenes": self.rotar_imagenes,
+            "verbose": self.verbose
+        }
+    
+    def __configs_yolo(self):
+        extra_args = []
+        if self.gen_imagenes_tracker: extra_args = ["--save", "--show-conf"]
+        
+        model_args = [
+            "--yolo-model", f"{self.working_directory}/{YOLO_WEIGHTS}",
+            "--tracking-method", TRACKING_METHOD,
+            "--source", SOURCE,
+            "--save", "--save-txt",
+            *extra_args
+        ]
+
+        if not self.verbose:
+            model_args.extend("--verbose", "false")
+
+        return model_args
+
+    def __configs_yolo_one_frame(self):
+        model_args = [
+            "--yolo-model", f"{self.working_directory}/{YOLO_WEIGHTS}",
+            "--tracking-method", TRACKING_METHOD,
+            "--exist-ok"
+        ]
+
+        if not self.verbose:
+            model_args.extend("--verbose", "false")
+
+        return model_args
+                
     # when the node is killed, run the tracker and filter the results
     def track_filter_and_count(self):
         self.__setup_env()
@@ -140,40 +178,19 @@ class TrackAndFilter:
         print('working inside directory ', os.getcwd())
         
         print('Running tracker and tracker evaluator...')
-        SOURCE = "left_rgb_images"
+        
 
         if self.track:
             self.__delete_folder(f"{self.__current_path()}/yolo_tracking/runs/track/exp")
             # run the tracker
-            extra_args = []
-            if self.gen_imagenes_tracker: extra_args = ["--save", "--show-conf"]
-
-            model_args = [
-                "--yolo-model", f"{self.working_directory}/{YOLO_WEIGHTS}",
-                "--tracking-method", TRACKING_METHOD,
-                "--source", SOURCE,
-                "--save", "--save-txt",
-                *extra_args
-            ]
-
-            if not self.verbose:
-                model_args.extend("--verbose", "false")
-
-            track_main(args=model_args)
+           
+            track_main(args=self.__configs_yolo())
 
         # get the bounding boxes from the file
         bounding_boxes = self.__read_bounding_boxes()
 
-        # seteo configs para el filtrado
-        configs = {
-            "working_directory": self.working_directory,
-            "generar_imagen_plano": self.generar_imagen_plano,
-            "rotar_imagenes": self.rotar_imagenes,
-            "verbose": self.verbose
-        }
-
         # instancio filtro
-        filtro = self.method(configs)
+        filtro = self.method(self.__configs_filtro())
 
         for timestamp in bounding_boxes:
             
@@ -191,18 +208,11 @@ class TrackAndFilter:
         print(f"amount of apples exactly for trees id (5,6,7,8,9): { self.__total_amount_apples_for_trees_ids([5,6,7,8,9])}")
 
     def track_filter_and_count_one_frame(self, timestamp, img_original, mapa_profundidad):
-        new_yolo_instance, bounding_boxes = track_main(args=YOLO_ARGS, image=img_original, yolo_model_instance=self.yolo_instance)
+        new_yolo_instance, bounding_boxes = track_main(args=self.__configs_yolo_one_frame(), image=img_original, yolo_model_instance=self.yolo_instance)
         self.yolo_instance = new_yolo_instance
 
-        # seteo configs para el filtrado
-        configs = {
-            "working_directory": self.working_directory,
-            "generar_imagen_plano": self.generar_imagen_plano,
-            "rotar_imagenes": self.rotar_imagenes
-        }
-
         # instancio filtro
-        filtro = self.method(configs)
+        filtro = self.method(self.__configs_filtro())
 
         filtered_bbs = filtro.filter(timestamp, bounding_boxes, img_original, mapa_profundidad)
 
