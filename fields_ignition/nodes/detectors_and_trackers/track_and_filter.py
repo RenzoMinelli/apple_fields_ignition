@@ -34,16 +34,17 @@ METODOS_FILTRADO = {
 }
 
 class TrackAndFilter:
-    def __init__(self, working_directory, method, track=False, gen_imagenes_tracker=False, generar_imagen_plano=False, rotar_imagenes=False):
-        self.working_directory = working_directory
-        self.track = track
-        self.gen_imagenes_tracker = gen_imagenes_tracker
-        self.generar_imagen_plano = generar_imagen_plano
-        self.rotar_imagenes = rotar_imagenes
+    def __init__(self, args):
+        self.working_directory = args["working_directory"]
+        self.track = args["track"]
+        self.gen_imagenes_tracker = args["gen_imagenes_tracker"]
+        self.generar_imagen_plano = args["generar_imagen_plano"]
+        self.rotar_imagenes = args["rotar_imagenes"]
 
         self.yolo_instance = None
         self.ids_filtrados = set()
 
+        method = args["method"]
         if method not in METODOS_FILTRADO.keys():
             allowed_methods = ", ".join(METODOS_FILTRADO.keys())
             raise ValueError(f"Method {method} not recognized, please use one of the following: {allowed_methods}")
@@ -216,7 +217,9 @@ if __name__ == "__main__":
     parser.add_argument("--rotar_imagenes", default='False', type=lambda x: (str(x).lower() == 'true'))
     args = parser.parse_args()
 
-    track_filter = TrackAndFilter(args.working_directory, args.method, args.track, args.gen_imagenes_tracker, args.generar_imagen_plano, args.rotar_imagenes)
+    args_filtro = args.__dict__
+
+    track_filter = TrackAndFilter(args_filtro)
     track_filter.track_filter_and_count()
 
 # export PYTHONPATH=/home/renzo/catkin_ws/src/apple_fields_ignition/fields_ignition/nodes

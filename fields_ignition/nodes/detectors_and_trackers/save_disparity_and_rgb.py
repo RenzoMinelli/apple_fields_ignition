@@ -80,7 +80,11 @@ if __name__ == '__main__':
         # need to delete foler runs/track/exp to avoid errors
         delete_folder(f"{os.path.dirname(os.path.realpath(__file__))}/yolo_tracking/runs/track/exp")
 
-        FILTRO = TrackAndFilter(working_directory, metodo)
+        args_filtro = {
+            "working_directory": working_directory,
+            "metodo": metodo,
+        }
+        FILTRO = TrackAndFilter(args_filtro)
 
     try:
         # Change the current directory to the one sent as argument
