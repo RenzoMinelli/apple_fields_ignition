@@ -40,6 +40,7 @@ class TrackAndFilter:
         self.gen_imagenes_tracker = args["gen_imagenes_tracker"]
         self.generar_imagen_plano = args["generar_imagen_plano"]
         self.rotar_imagenes = args["rotar_imagenes"]
+        self.verbose = args["verbose"]
 
         self.yolo_instance = None
         self.ids_filtrados = set()
@@ -155,6 +156,9 @@ class TrackAndFilter:
                 *extra_args
             ]
 
+            if not self.verbose:
+                model_args.extend("--verbose", "false")
+
             track_main(args=model_args)
 
         # get the bounding boxes from the file
@@ -164,7 +168,8 @@ class TrackAndFilter:
         configs = {
             "working_directory": self.working_directory,
             "generar_imagen_plano": self.generar_imagen_plano,
-            "rotar_imagenes": self.rotar_imagenes
+            "rotar_imagenes": self.rotar_imagenes,
+            "verbose": self.verbose
         }
 
         # instancio filtro
@@ -215,6 +220,7 @@ if __name__ == "__main__":
     parser.add_argument("--gen_imagenes_tracker", default='False', type=lambda x: (str(x).lower() == 'true'))
     parser.add_argument("--generar_imagen_plano", default='False', type=lambda x: (str(x).lower() == 'true'))
     parser.add_argument("--rotar_imagenes", default='False', type=lambda x: (str(x).lower() == 'true'))
+    parser.add_argument("--verbose", default='True', type=lambda x: (str(x).lower() == 'true'))
     args = parser.parse_args()
 
     args_filtro = args.__dict__

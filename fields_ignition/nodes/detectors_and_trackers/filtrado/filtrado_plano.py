@@ -29,7 +29,8 @@ class FiltradoPlano(filtrado_base.FiltradoBase):
         try:
             filtered_points = self.__filtrar_puntos(timestamp,bounding_boxes, img_original, mapa_profundidad)
         except CantidadPuntosInsuficiente as e:
-            print(f"frame skipped, error: {e}")
+            if self.config["verbose"]:
+                print(f"frame skipped, error: {e}")
 
         return filtered_points
 
@@ -59,7 +60,8 @@ class FiltradoPlano(filtrado_base.FiltradoBase):
         if self.config["rotar_imagenes"]:
             img = cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
 
-        results = self.modelo_tronco([img], iou=0.1, conf=0.35,show_conf=True,show_labels=False,show=False)
+
+        results = self.modelo_tronco([img], iou=0.1, conf=0.35,show_conf=True,show_labels=False,show=False,verbose=self.config["verbose"])
 
         # Visualize the results
         for res_id, res in enumerate(results):
@@ -291,8 +293,9 @@ class FiltradoPlano(filtrado_base.FiltradoBase):
 
         a, b, c, d = self.__obtener_plano(total_puntos)
 
-        print('plano generado: ')
-        print(f"a: {a}, b: {b}, c: {c}, d: {d}")
+        if self.config["verbose"]:
+            print('plano generado: ')
+            print(f"a: {a}, b: {b}, c: {c}, d: {d}")
 
         if self.config["generar_imagen_plano"]:
             img_with_plane = self.__visualizar_plano_en_imagen(img_original, puntos_manzanas, mapa_profundidad, a, b, c, d)
