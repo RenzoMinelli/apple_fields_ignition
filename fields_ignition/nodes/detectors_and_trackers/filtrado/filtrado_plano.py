@@ -180,12 +180,12 @@ class FiltradoPlano(filtrado_base.FiltradoBase):
 
     def __filtrar_puntos_threshold(self, puntos_arboles):
         puntos = []
+
+        # Tomar todos los puntos de los troncos encontrados.
         for mask_id, puntos_de_arbol in puntos_arboles.items():
             puntos += puntos_de_arbol
-
+        
         threshold = int(self.__find_clusters([p[2] for p in puntos]))
-
-        # print(f"threshold hallado: {threshold}")
 
         puntos_filtrados = {}
         for mask_id, puntos_de_arbol in puntos_arboles.items():
