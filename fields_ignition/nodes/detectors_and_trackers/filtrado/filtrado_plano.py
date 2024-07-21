@@ -37,7 +37,7 @@ class FiltradoPlano(filtrado_base.FiltradoBase):
         try:
             filtered_points = self.__filtrar_puntos(timestamp, bounding_boxes, img_original, mapa_profundidad)
         except CantidadPuntosInsuficiente as e:
-            print(f"frame skipped, error: {e}")
+            print(f"frame skippeado, error: {e}")
 
         return filtered_points
 
@@ -226,16 +226,18 @@ class FiltradoPlano(filtrado_base.FiltradoBase):
 
         for y in range(img.shape[0]):
             for x in range(img.shape[1]):
-                # Asegúrate de que el índice no salga del rango de la imagen
-
                 # Obtener la profundidad desde el mapa de profundidad
                 z = depth_map[y, x]
 
-                # Comprobar si el punto está delante del plano
+                # Comprobar si el punto está delante del plano.
                 esta_delante = self.__delante_de_plano(x, y, z, a, b, c, d)
 
                 current_color = img_with_plane[y, x]
+
+                # Oscurecer el pixel si cae detras del plano.
                 img_with_plane[y, x] = current_color if esta_delante else (int(current_color[0]/2), int(current_color[1]/2), int(current_color[2]/2))
+
+        # Imprimir puntos para las manzanas que estan delante del plano.                
         for [x, y, *rest] in puntos_manzanas:
             # calcular profundidad de la manzana
             z = depth_map[y, x]
@@ -289,6 +291,7 @@ class FiltradoPlano(filtrado_base.FiltradoBase):
 
         for [x, y, *rest] in puntos_manzanas:
             if x <= OFFSET_HORIZONTAL:
+                # Evitar franja negra en el mapa de profundidad.
                 continue
 
             # Obtener la profundidad desde el mapa de profundidad
