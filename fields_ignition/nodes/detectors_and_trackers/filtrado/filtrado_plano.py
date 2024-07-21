@@ -6,6 +6,8 @@ import cv2
 import numpy as np
 import os
 
+cwd = os.getcwd()
+
 # importar configuraciones
 import configparser
 config = configparser.ConfigParser()
@@ -14,6 +16,7 @@ config.read('src/apple_fields_ignition/fields_ignition/nodes/config.ini')
 OFFSET_HORIZONTAL = config.getint('CONSTANTS', 'offset_horizontal')
 MARGEN_PLANO = config.getint('CONSTANTS', 'margen_plano')
 MODELO_PLANO = config.get('MODELO_PLANO', 'modelo_plano')
+GENERAR_IMAGEN_PLANO = config.getboolean('FILTRADO_PLANO', 'generar_imagen_plano')
 
 class CantidadPuntosInsuficiente(Exception):
     def __init__(self, m):
@@ -25,7 +28,7 @@ class CantidadPuntosInsuficiente(Exception):
 class FiltradoPlano(filtrado_base.FiltradoBase):
     def __init__(self, config):
         super().__init__(config)
-        self.modelo_tronco = YOLO(f"{config['working_directory']}/weights/{MODELO_PLANO}.pt")
+        self.modelo_tronco = YOLO(f"{cwd}/weights/{MODELO_PLANO}.pt")
         self.__preparar_carpetas()
 
     def filter(self, timestamp, bounding_boxes, img_original, mapa_profundidad):
@@ -200,15 +203,13 @@ class FiltradoPlano(filtrado_base.FiltradoBase):
         if len(puntos) < 3:
             raise CantidadPuntosInsuficiente("Hay menos de 3 puntos, no se puede definir el plano")
         
-        # print(f"Puntos del plano: {puntos}")
-        A = np.array(puntos)
+        puntos_a_interpolar = np.array(puntos)
         b = np.ones(len(puntos))
-        
         # Solve for the coefficients using least squares
         # The normal equation is (A.T * A) * x = A.T * b
         # We use np.linalg.lstsq to solve this equation which minimizes ||Ax - b||
         # Where x corresponds to the coefficients [a, b, c]
-        coeffs, _, _, _ = np.linalg.lstsq(A, b, rcond=None)
+        coeffs, _, _, _ = np.linalg.lstsq(puntos_a_interpolar, b, rcond=None)
         
         # The result is the coefficients a, b, c, where we have assumed d = 1
         a, b, c = coeffs
@@ -250,20 +251,29 @@ class FiltradoPlano(filtrado_base.FiltradoBase):
         return img_with_plane
 
     def __filtrar_puntos(self, timestamp, puntos_manzanas, img_original, mapa_profundidad):
+        # se obtienen 3 puntos dentro de cada tronco detectado en la imagen        
         puntos_arboles = self.__obtener_puntos_arboles(img_original)
+
+        # se obtiene la profunidad asociada aesos puntos
         puntos_con_profundidad = self.__obtener_puntos_con_profunidad(puntos_arboles, mapa_profundidad)
+
+        # se utiliza la profundidad para filtrar los puntos de los troncos que
+        # corresponden a otras filas utilizando kmeans.
         puntos_filtrados = self.__filtrar_puntos_threshold(puntos_con_profundidad)
 
         numero_arboles = len(puntos_filtrados.keys())
 
         if numero_arboles < 2:
+            # raise error porque con solo 1 tronco detectado el plano interpolado seria
+            # muy poco preciso.
             raise CantidadPuntosInsuficiente("Luego de filtrado los puntos, no quedan 2 arboles")
 
         total_puntos = []
         for puntos_tronco in puntos_filtrados.values():
             total_puntos += puntos_tronco
 
-        # vamos a correr el plano en z un margen
+        # vamos a correr el plano en z un margen para no contar 
+        # dos veces las manzanas del centro.
         total_puntos = [[x, y, z + MARGEN_PLANO] for x, y, z in total_puntos]
 
         a, b, c, d = self.__obtener_plano(total_puntos)
@@ -271,9 +281,9 @@ class FiltradoPlano(filtrado_base.FiltradoBase):
         print('plano generado: ')
         print(f"a: {a}, b: {b}, c: {c}, d: {d}")
 
-        if self.config["generar_imagen_plano"]:
+        if GENERAR_IMAGEN_PLANO:
             img_with_plane = self.__visualizar_plano_en_imagen(img_original, puntos_manzanas, mapa_profundidad, a, b, c, d)
-            cv2.imwrite(f"{self.config['working_directory']}/planos/pixeles_filtrados_{timestamp}.png", img_with_plane)
+            cv2.imwrite(f"{cwd}/planos/pixeles_filtrados_{timestamp}.png", img_with_plane)
 
         puntos_filtrados = []
 
@@ -293,13 +303,11 @@ class FiltradoPlano(filtrado_base.FiltradoBase):
         return puntos_filtrados
 
     def __preparar_carpetas(self):
-        working_directory = self.config['working_directory']
-
         # si la carpeta no existe, la crea, sino se vacia
-        if not os.path.exists(f"{working_directory}/planos"):
-            os.makedirs(f"{working_directory}/planos")
+        if not os.path.exists(f"{cwd}/planos"):
+            os.makedirs(f"{cwd}/planos")
         else:
-            for file in os.listdir(f"{working_directory}/planos"):
-                os.remove(f"{working_directory}/planos/{file}")
+            for file in os.listdir(f"{cwd}/planos"):
+                os.remove(f"{cwd}/planos/{file}")
 
-        return working_directory
+        return cwd
