@@ -121,11 +121,11 @@ class FiltradoPlano(filtrado_base.FiltradoBase):
             cv2.circle(img, (int(above_point[0]), int(above_point[1])), 3, (0, 255, 0), -1)
             cv2.circle(img, (int(below_point[0]), int(below_point[1])), 3, (255, 0, 0), -1)
 
-            # now find the point in the middle of center and above
-            # this is because if we use the furhtest point above (or furhtest below),
-            # later, the disparity image
-            # may give wrong measurement because the point is too
-            # close to the edge of the trunk
+            # ahora encuentra el punto en el medio del centro y arriba
+            # esto es porque si usamos el punto más lejano arriba (o más lejano abajo),
+            # más tarde, la imagen de disparidad
+            # puede dar una medición incorrecta porque el punto está demasiado
+            # cerca del borde del tronco
             diff_x = (closest_x - above_point[0])/2
             diff_y = (closest_y - above_point[1])/2
 
@@ -205,10 +205,10 @@ class FiltradoPlano(filtrado_base.FiltradoBase):
         
         puntos_a_interpolar = np.array(puntos)
         b = np.ones(len(puntos))
-        # Solve for the coefficients using least squares
-        # The normal equation is (A.T * A) * x = A.T * b
-        # We use np.linalg.lstsq to solve this equation which minimizes ||Ax - b||
-        # Where x corresponds to the coefficients [a, b, c]
+
+        # La ecuación normal es (A.T * A) * x = A.T * b
+        # Usamos np.linalg.lstsq para resolver esta ecuación que minimiza ||Ax - b||
+        # Donde x corresponde a los coeficientes [a, b, c]
         coeffs, _, _, _ = np.linalg.lstsq(puntos_a_interpolar, b, rcond=None)
         
         # The result is the coefficients a, b, c, where we have assumed d = 1
