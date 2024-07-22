@@ -13,6 +13,9 @@ FIXED_THRESHOLD = config.getboolean('CONSTANTS', 'fixed_threshold')
 THRESHOLD_MARGIN = config.getint('CONSTANTS', 'threshold_margin')
 
 class FiltradoKMeans(filtrado_base.FiltradoBase):
+    def __init__(self):
+        pass
+
     def filter(self, _1, bounding_boxes, _2, mapa_profundidad):
         # se obtienen las profundidades de los bounding boxes
         # [<x, y, z(profundidad), id >,....]
