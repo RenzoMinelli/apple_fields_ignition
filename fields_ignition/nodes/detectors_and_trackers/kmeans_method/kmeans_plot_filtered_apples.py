@@ -12,7 +12,6 @@ ros_namespace = os.getenv('ROS_NAMESPACE')
 image_height = 1024
 image_width = 1024
 
-# global variables
 YOLOv8_model = None
 FIXED_THRESHOLD = False
 
@@ -203,16 +202,6 @@ def track_filter_and_count(working_directory):
     # bounding_boxes = {<timestamp>: [[<x>, <y>, <id>, <w>, <h>], ...], ...}
     bounding_boxes = read_bounding_boxes()
 
-    # get the depths of the bounding boxes
-    # depths = []
-    
-    # for timestamp in bounding_boxes:
-    #     depths.extend(get_depths(timestamp, bounding_boxes))
-
-    # # Filter the results using depth data
-    # # we must preserve those depths that are within [0, 30]. The rest must be filtered out
-    # threshold = 30 if FIXED_THRESHOLD else find_clusters([pair[1] for pair in depths]) 
-    
     for timestamp in bounding_boxes:
 
         # depths = [[<id>, <depth>, <x>, <y>, <w>, <h>], ...]
