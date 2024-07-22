@@ -200,10 +200,9 @@ class KMeansPlotting:
           image_depth_data = self.get_depths(timestamp, bounding_boxes) 
           mapa_profundidad = cv2.imread("disparity_images/" + str(timestamp) + ".png", cv2.IMREAD_GRAYSCALE)
           
-          # Estas las imprimimos todas en rojo, luego sobreescribimos las que no seran descartadas luego
-          # luego del filtrado con color verde.
+          # Estas las imprimimos todas en rojo
           red_depths = FiltradoKMeans().obtener_puntos_con_profunidad(bounding_boxes[timestamp], mapa_profundidad)
-
+          # Luego sobreescribimos las que no seran descartadas con color verde.
           green_depths = FiltradoKMeans().filter(None, bounding_boxes[timestamp], None, mapa_profundidad)
 
           image_path = 'left_rgb_images/' + timestamp + '.png'
