@@ -24,7 +24,7 @@ class FiltradoKMeans(filtrado_base.FiltradoBase):
 
         # se aplica un margen que evita que se cuenten
         # dos veces las manzanas del centro de la fila.
-        threshold += self.FiltradoKMeans_THRESHOLD_MARGIN
+        threshold -= self.FiltradoKMeans_THRESHOLD_MARGIN
         print(f"Threshold luego de aplicar el margen central: {threshold}")
 
         filtered_bounding_boxes = []
@@ -33,7 +33,7 @@ class FiltradoKMeans(filtrado_base.FiltradoBase):
         # profundidad mayor al threshold. Lo que implica 
         # que son las manzanas que están más cerca de la cámara.
         for bb in bounding_boxes_with_depth:
-            if bb[2] >= threshold:
+            if bb[2] < threshold:
                 filtered_bounding_boxes.append(bb)
 
         return filtered_bounding_boxes
@@ -65,4 +65,4 @@ class FiltradoKMeans(filtrado_base.FiltradoBase):
         else:
             # Dos clusters es mejor.
             cluster_centers = kmeans_2.cluster_centers_
-            return cluster_centers[0][0] if cluster_centers[0][0] > cluster_centers[1][0] else cluster_centers[1][0] 
+            return cluster_centers[0][0] if cluster_centers[0][0] < cluster_centers[1][0] else cluster_centers[1][0]
