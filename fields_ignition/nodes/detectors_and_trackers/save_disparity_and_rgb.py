@@ -8,6 +8,7 @@ import message_filters
 import os
 import subprocess
 import argparse
+import numpy as np
 
 FILTRO = None
 
@@ -27,17 +28,29 @@ def image_callback(imageL, disparity):
     # convert the images to cv2 format
     cv_image_left = br.imgmsg_to_cv2(imageL, 'bgr8')
     cv_disparity = br.imgmsg_to_cv2(disparity.image)
+    
+    # Retrieve camera parameters
+    f = disparity.f  # Focal length
+    t = disparity.T  # Baseline
+
+    # Compute the depth map
+    with np.errstate(divide='ignore'):  # Ignore division errors
+        depth_map = (f * t) / cv_disparity
+
+    # Normalize depth map to range 0-255 for visualization
+    depth_map_normalized = cv.normalize(depth_map, None, 0, 255, cv.NORM_MINMAX)
+    depth_map_normalized = np.uint8(depth_map_normalized)
 
     timestamp = str(imageL.header.stamp)
 
     global FILTRO
 
     if FILTRO:
-        FILTRO.track_filter_and_count_one_frame(timestamp, cv_image_left, cv_disparity)
+        FILTRO.track_filter_and_count_one_frame(timestamp, cv_image_left, depth_map_normalized)
         print(f"conteo por ahora: {FILTRO.get_apple_count()}")
     else: # solo generar para post procesado
         cv.imwrite('left_rgb_images/{}.png'.format(timestamp), cv_image_left)
-        cv.imwrite('disparity_images/{}.png'.format(timestamp), cv_disparity)
+        cv.imwrite('disparity_images/{}.png'.format(timestamp), depth_map_normalized)
 
 def empty_folder(folder_path):
     # If the folder does not exist, create it
