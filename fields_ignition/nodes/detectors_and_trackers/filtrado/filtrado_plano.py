@@ -203,7 +203,7 @@ class FiltradoPlano(filtrado_base.FiltradoBase):
         puntos_filtrados = {}
         for mask_id, puntos_de_arbol in puntos_arboles.items():
             for p in puntos_de_arbol:
-                if p[2] >= threshold:
+                if p[2] < threshold:
                     if mask_id not in puntos_filtrados: puntos_filtrados[mask_id] = []
                     puntos_filtrados[mask_id].append(p)
 
@@ -227,7 +227,7 @@ class FiltradoPlano(filtrado_base.FiltradoBase):
         return a, b, c, d
 
     def __delante_de_plano(self, x, y, z, a, b, c, d):
-        return a * x + b * y + c * z + d > 0
+        return a * x + b * y + c * z + d < 0
 
     def __visualizar_plano_en_imagen(self, img, puntos_manzanas, depth_map, a, b, c, d):
         # Crear una copia de la imagen para dibujar el plano
