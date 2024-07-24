@@ -3,6 +3,7 @@ from ultralytics import YOLO
 import cv2
 import numpy as np
 import sys 
+import os
 
 #OFFSET_HORIZONTAL = 53
 OFFSET_HORIZONTAL = 70
@@ -142,7 +143,6 @@ def obtener_puntos_arboles(timestamp, img, model):
             cv2.circle(img, (int(above_point[0]), int(above_point[1])), 3, (0, 155, 0), -1)
             cv2.circle(img, (int(below_point[0]), int(below_point[1])), 3, (155, 0, 0), -1)
 
-            #cv2.imwrite(f"/home/renzo/catkin_ws/planos/marcado_{id_imagen}_{mask_id}.png", img)
 
             #print("PUNTOS ENCONTRADOS")
             #print(f"centro: {closest_point}, above: {above_point}, below: {below_point}\n\n")
@@ -152,7 +152,6 @@ def obtener_puntos_arboles(timestamp, img, model):
             puntos_arboles[mask_id].append(above_point)
             puntos_arboles[mask_id].append(below_point)               
 
-        #res.save(filename=f'/home/renzo/catkin_ws/planos/result_{timestamp}_{res_id}_.jpg')
 
     return puntos_arboles
 
@@ -299,8 +298,6 @@ def filtrar_puntos(timestamp, puntos_manzanas, img_original, mapa_profundidad, w
 if __name__ == "__main__":
     working_directory=sys.argv[1]
     
-    #img_test = cv2.imread("/home/renzo/Desktop/recorrida_ambos_lados/left_rgb_images/41086000000.png")
-    #mapa_profundidad = cv2.imread("/home/renzo/Desktop/recorrida_ambos_lados/disparity_images/41086000000.png", cv2.IMREAD_GRAYSCALE)
 
     img_test = cv2.imread(f"{working_directory}/right_rgb_images/33396000000.png")
     mapa_profundidad = cv2.imread(f"{working_directory}/disparity_images/33396000000.png", cv2.IMREAD_GRAYSCALE)
@@ -325,7 +322,7 @@ if __name__ == "__main__":
 
     # Crear la imagen con el plano visualizado
     img_with_plane = visualizar_plano_en_imagen(img_test, [], mapa_profundidad, a, b, c, d)
-    cv2.imwrite(f"/home/renzo/catkin_ws/planos/pixeles_filtrados.png", img_with_plane)
+    cv2.imwrite(f"/home/{os.getlogin()}/catkin_ws/planos/pixeles_filtrados.png", img_with_plane)
     
     """
     puntos_manzanas_test = [[487,695], [558,682], [427,464], [100,658], [286,706]]

@@ -9,22 +9,16 @@ from detectors_and_trackers.filtrado.filtrado_filas_posteriores import FiltradoF
 import argparse
 import json
 import cv2
-
 from detectors_and_trackers.yolo_tracking.tracking.track import main as track_main
 
+# importar configuraciones
+import configparser
+
+# directorio de trabajo
+CWD = os.getcwd()
+
 ros_namespace = os.getenv('ROS_NAMESPACE')
-image_height = 1080 # modifique esto para el bag real
-image_width = 1920
-offset_horizontal = 53
-# global variables
-TRACKING_METHOD = "deepocsort"
-YOLO_WEIGHTS = "weights/yolov8l_150.pt"
-WORLD_NAME = "stereo_trees_close"
-YOLO_ARGS = [
-    "--yolo-model", f"/home/renzo/catkin_ws/{YOLO_WEIGHTS}",
-    "--tracking-method", TRACKING_METHOD,
-    "--exist-ok"
-]
+
 SOURCE = "left_rgb_images"
 
 METODOS_FILTRADO = {
@@ -35,23 +29,34 @@ METODOS_FILTRADO = {
 }
 
 class TrackAndFilter:
-    def __init__(self, args):
-        self.working_directory = args["working_directory"]
-        self.track = args["track"]
-        self.gen_imagenes_tracker = args["gen_imagenes_tracker"]
-        self.generar_imagen_plano = args["generar_imagen_plano"]
-        self.rotar_imagenes = args["rotar_imagenes"]
-        self.verbose = args["verbose"]
+    def __init__(self, config_path):
+        
+        config = configparser.ConfigParser()
+        config.read(config_path)
+
+        self.image_height = config.getint('TRACK_AND_FILTER', 'image_height')
+        self.image_width = config.getint('TRACK_AND_FILTER', 'image_width')
+
+        self.tracking_method = config.get('TRACK_AND_FILTER', 'tracking_method')
+        self.yolo_weights = config.get('TRACK_AND_FILTER', 'yolo_weights')
+        self.world_name = config.get('TRACK_AND_FILTER', 'world_name')
+
+        self.track = config.get('TRACK_AND_FILTER', 'track')
+        self.gen_imagenes_tracker = config.get('TRACK_AND_FILTER', 'gen_imagenes_tracker')
+        self.generar_imagen_plano = config.get('TRACK_AND_FILTER', 'generar_imagen_plano')
+        self.rotar_imagenes = config.getboolean('TRACK_AND_FILTER', 'troncos_horizontales')
+        self.verbose = config.getboolean('TRACK_AND_FILTER', 'verbose')
+        self.debug_plano = config.getboolean('FILTRADO_PLANO', 'debug_plano')
 
         self.yolo_instance = None
         self.ids_filtrados = set()
 
-        method = args["method"]
+        method = config.get('TRACK_AND_FILTER', 'method')
         if method not in METODOS_FILTRADO.keys():
             allowed_methods = ", ".join(METODOS_FILTRADO.keys())
             raise ValueError(f"Method {method} not recognized, please use one of the following: {allowed_methods}")
         
-        self.method = METODOS_FILTRADO[method]
+        self.filter_class = METODOS_FILTRADO[method]
 
     def __setup_env(self):
         # clone the repository
@@ -98,8 +103,8 @@ class TrackAndFilter:
                     y = float(y)
 
                     # As the values are normalized we need to multiply them by the image size
-                    x = x * image_width # ESTO HARDCODEADO NO ME PARECE MUCHO PORQUE SI ALGUIEN EN EL FUTURO QUIERE CAMBIAR EL SENSOR SE COMPLICA REVISAR EL CODIGO, ME PARECE QUE DEBERIA SER UN PARAMETRO O UNA VARIABLE GLOABL MINIMO
-                    y = y * image_height
+                    x = x * self.image_width # ESTO HARDCODEADO NO ME PARECE MUCHO PORQUE SI ALGUIEN EN EL FUTURO QUIERE CAMBIAR EL SENSOR SE COMPLICA REVISAR EL CODIGO, ME PARECE QUE DEBERIA SER UN PARAMETRO O UNA VARIABLE GLOABL MINIMO
+                    y = y * self.image_height
 
                     # Convert everything to int
                     x = int(x)
@@ -118,7 +123,7 @@ class TrackAndFilter:
 
     # when the nodes ends track the apples and evaluate the tracking
     def __total_amount_apples_for_trees_ids(self, ids):
-        dir_path = f"{self.working_directory}/src/apple_fields_ignition/fields_ignition/generated/{WORLD_NAME}/apple_field/"
+        dir_path = f"{CWD}/src/apple_fields_ignition/fields_ignition/generated/{self.world_name}/apple_field/"
         apple_amount = 0
         dir_names_wanted = [f"apple_{x}" for x in ids]
         for root, dirs, files in os.walk(dir_path):
@@ -135,10 +140,11 @@ class TrackAndFilter:
 
     def __configs_filtro(self):
         return {
-            "working_directory": self.working_directory,
+            "working_directory": CWD,
             "generar_imagen_plano": self.generar_imagen_plano,
             "rotar_imagenes": self.rotar_imagenes,
-            "verbose": self.verbose
+            "verbose": self.verbose,
+            "debug_plano": self.debug_plano
         }
     
     def __configs_yolo(self):
@@ -146,8 +152,8 @@ class TrackAndFilter:
         if self.gen_imagenes_tracker: extra_args = ["--save", "--show-conf"]
         
         model_args = [
-            "--yolo-model", f"{self.working_directory}/{YOLO_WEIGHTS}",
-            "--tracking-method", TRACKING_METHOD,
+            "--yolo-model", f"{CWD}/{self.yolo_weights}",
+            "--tracking-method", self.tracking_method,
             "--source", SOURCE,
             "--save", "--save-txt",
             *extra_args
@@ -160,8 +166,8 @@ class TrackAndFilter:
 
     def __configs_yolo_one_frame(self):
         model_args = [
-            "--yolo-model", f"{self.working_directory}/{YOLO_WEIGHTS}",
-            "--tracking-method", TRACKING_METHOD,
+            "--yolo-model", f"{CWD}/{self.yolo_weights}",
+            "--tracking-method", self.tracking_method,
             "--exist-ok"
         ]
 
@@ -174,7 +180,7 @@ class TrackAndFilter:
     def track_filter_and_count(self):
         self.__setup_env()
 
-        os.chdir(self.working_directory)
+        os.chdir(CWD)
         print('working inside directory ', os.getcwd())
         
         print('Running tracker and tracker evaluator...')
@@ -190,7 +196,7 @@ class TrackAndFilter:
         bounding_boxes = self.__read_bounding_boxes()
 
         # instancio filtro
-        filtro = self.method(self.__configs_filtro())
+        filtro = self.filter_class(self.__configs_filtro())
 
         for timestamp in bounding_boxes:
             
@@ -212,7 +218,7 @@ class TrackAndFilter:
         self.yolo_instance = new_yolo_instance
 
         # instancio filtro
-        filtro = self.method(self.__configs_filtro())
+        filtro = self.filter_class(self.__configs_filtro())
 
         filtered_bbs = filtro.filter(timestamp, bounding_boxes, img_original, mapa_profundidad)
 
@@ -224,19 +230,15 @@ class TrackAndFilter:
     
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--working_directory", required=True)
-    parser.add_argument("--method", required=True)
-    parser.add_argument("--track", default='False', type=lambda x: (str(x).lower() == 'true'))
-    parser.add_argument("--gen_imagenes_tracker", default='False', type=lambda x: (str(x).lower() == 'true'))
-    parser.add_argument("--generar_imagen_plano", default='False', type=lambda x: (str(x).lower() == 'true'))
-    parser.add_argument("--rotar_imagenes", default='False', type=lambda x: (str(x).lower() == 'true'))
-    parser.add_argument("--verbose", default='True', type=lambda x: (str(x).lower() == 'true'))
+    parser.add_argument("--config", required=True)
     args = parser.parse_args()
 
-    args_filtro = args.__dict__
-
-    track_filter = TrackAndFilter(args_filtro)
+    track_filter = TrackAndFilter(args.config)
     track_filter.track_filter_and_count()
 
-# export PYTHONPATH=/home/renzo/catkin_ws/src/apple_fields_ignition/fields_ignition/nodes
-# python3 -m detectors_and_trackers.track_and_filter --working_directory /home/renzo/catkin_ws --method kmeans --track true
+# 'poetry shell' dentro de /home/<user>/catkin_ws/yolo_tracking
+# 
+# export PYTHONPATH=/home/<user>/catkin_ws/src/apple_fields_ignition/fields_ignition/nodes
+# python3 -m detectors_and_trackers.track_and_filter --config <path to config.ini>
+# EJEMPLO
+# python3 -m detectors_and_trackers.track_and_filter --config /home/pincho/catkin_ws/src/apple_fields_ignition/fields_ignition/nodes/config.ini

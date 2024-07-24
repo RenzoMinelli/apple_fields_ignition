@@ -149,7 +149,6 @@ def draw_boxes_and_save(image_path, img, green_bboxs, red_bboxs, output_folder):
         x = x - w/2
         y -= h/2
 
-        #breakpoint()
         # Draw the bounding box
         cv2.rectangle(img, (int(x), int(y)), (int(x + w), int(y + h)), (0, 255, 0), 2)
 
@@ -161,7 +160,6 @@ def draw_boxes_and_save(image_path, img, green_bboxs, red_bboxs, output_folder):
         x = x - w/2
         y -= h/2
 
-        #breakpoint()
         # Draw the bounding box
         cv2.rectangle(img, (int(x), int(y)), (int(x + w), int(y + h)), (0, 0, 255), 2)
 
