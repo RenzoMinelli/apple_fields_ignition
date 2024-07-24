@@ -41,7 +41,7 @@ class TrackAndFilter:
         self.yolo_weights = config.get('TRACK_AND_FILTER', 'yolo_weights')
         self.world_name = config.get('TRACK_AND_FILTER', 'world_name')
 
-        self.track = config.get('TRACK_AND_FILTER', 'track')
+        self.track = config.getboolean('TRACK_AND_FILTER', 'track')
         self.gen_imagenes_tracker = config.get('TRACK_AND_FILTER', 'gen_imagenes_tracker')
         self.generar_imagen_plano = config.get('TRACK_AND_FILTER', 'generar_imagen_plano')
         self.rotar_imagenes = config.getboolean('TRACK_AND_FILTER', 'troncos_horizontales')
@@ -152,7 +152,7 @@ class TrackAndFilter:
         if self.gen_imagenes_tracker: extra_args = ["--save", "--show-conf"]
         
         model_args = [
-            "--yolo-model", f"{CWD}/{self.yolo_weights}",
+            "--yolo-model", f"{CWD}/weights/{self.yolo_weights}",
             "--tracking-method", self.tracking_method,
             "--source", SOURCE,
             "--save", "--save-txt",
@@ -160,19 +160,19 @@ class TrackAndFilter:
         ]
 
         if not self.verbose:
-            model_args.extend("--verbose", "false")
+            model_args.extend(["--verbose"])
 
         return model_args
 
     def __configs_yolo_one_frame(self):
         model_args = [
-            "--yolo-model", f"{CWD}/{self.yolo_weights}",
+            "--yolo-model", f"{CWD}/weights/{self.yolo_weights}",
             "--tracking-method", self.tracking_method,
             "--exist-ok"
         ]
 
         if not self.verbose:
-            model_args.extend("--verbose", "false")
+            model_args.extend(["--verbose"])
 
         return model_args
                 

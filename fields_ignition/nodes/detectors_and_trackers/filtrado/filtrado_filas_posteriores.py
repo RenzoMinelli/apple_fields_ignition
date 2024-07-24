@@ -13,9 +13,6 @@ OFFSET_HORIZONTAL = config.getint('CONSTANTS', 'offset_horizontal')
 MARGEN_PLANO = config.getint('CONSTANTS', 'margen_plano')
 
 class FiltradoFilasPosteriores(filtrado_base.FiltradoBase):
-    def __init__(self, config):
-        super().__init__(config)
-
     def filter(self, _1, bounding_boxes, _2, mapa_profundidad):
         return self.__filtrar_puntos(bounding_boxes, mapa_profundidad)
 
