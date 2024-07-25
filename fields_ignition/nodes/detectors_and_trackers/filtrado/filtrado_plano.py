@@ -8,11 +8,6 @@ import os
 
 CWD = os.getcwd()
 
-# importar configuraciones
-import configparser
-config = configparser.ConfigParser()
-config.read('src/apple_fields_ignition/fields_ignition/nodes/config.ini')
-
 class CantidadPuntosInsuficiente(Exception):
     def __init__(self, m):
         self.message = m
