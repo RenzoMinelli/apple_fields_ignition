@@ -180,7 +180,8 @@ class TrackAndFilter:
         self.__setup_env()
 
         os.chdir(CWD)
-        print('working inside directory ', os.getcwd())
+        if self.verbose:
+          print('trabajando dentro de directorio ', CWD)
         
         print('Running tracker and tracker evaluator...')
         
