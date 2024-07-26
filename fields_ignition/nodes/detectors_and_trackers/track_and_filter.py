@@ -33,24 +33,23 @@ class TrackAndFilter:
         config.read(config_path)
         self.config_path = config_path
 
-        self.image_height = config.getint('TRACK_AND_FILTER', 'image_height')
-        self.image_width = config.getint('TRACK_AND_FILTER', 'image_width')
-
-        self.tracking_method = config.get('TRACK_AND_FILTER', 'tracking_method')
-        self.yolo_weights = config.get('TRACK_AND_FILTER', 'yolo_weights')
-        self.world_name = config.get('TRACK_AND_FILTER', 'world_name')
-
-        self.track = config.getboolean('TRACK_AND_FILTER', 'track')
-        self.gen_imagenes_tracker = config.get('TRACK_AND_FILTER', 'gen_imagenes_tracker')
-        self.generar_imagen_plano = config.get('TRACK_AND_FILTER', 'generar_imagen_plano')
-        self.rotar_imagenes = config.getboolean('TRACK_AND_FILTER', 'troncos_horizontales')
-        self.verbose = config.getboolean('TRACK_AND_FILTER', 'verbose')
-        self.debug_plano = config.getboolean('FILTRADO_PLANO', 'debug_plano')
+        # Lectura de configuraciones
+        self.image_height =             config.getint('TRACK_AND_FILTER', 'image_height')
+        self.image_width =              config.getint('TRACK_AND_FILTER', 'image_width')
+        self.tracking_method =          config.get('TRACK_AND_FILTER', 'tracking_method')
+        self.yolo_weights =             config.get('TRACK_AND_FILTER', 'yolo_weights')
+        self.world_name =               config.get('TRACK_AND_FILTER', 'world_name')
+        self.track =                    config.getboolean('TRACK_AND_FILTER', 'track')
+        self.gen_imagenes_tracker =     config.get('TRACK_AND_FILTER', 'gen_imagenes_tracker')
+        self.generar_imagen_plano =     config.get('TRACK_AND_FILTER', 'generar_imagen_plano')
+        self.rotar_imagenes =           config.getboolean('TRACK_AND_FILTER', 'troncos_horizontales')
+        self.verbose =                  config.getboolean('TRACK_AND_FILTER', 'verbose')
+        self.debug_plano =              config.getboolean('FILTRADO_PLANO', 'debug_plano')
+        method =                        config.get('TRACK_AND_FILTER', 'method')
 
         self.yolo_instance = None
         self.ids_filtrados = set()
 
-        method = config.get('TRACK_AND_FILTER', 'method')
         if method not in METODOS_FILTRADO.keys():
             allowed_methods = ", ".join(METODOS_FILTRADO.keys())
             raise ValueError(f"Method {method} not recognized, please use one of the following: {allowed_methods}")
