@@ -9,7 +9,6 @@ import os
 import subprocess
 import argparse
 
-from track_and_filter import TrackAndFilter
 FILTRO = None
 
 def read_cameras():
@@ -61,7 +60,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--working_directory", required=True)
     parser.add_argument("--post_procesamiento", default='True', type=lambda x: (str(x).lower() == 'true'))
-    parser.add_argument("--metodo", type=str)
+    parser.add_argument("--config", type=str)
     parser.add_argument("__name", type=str)
     parser.add_argument("__log", type=str)
 
@@ -80,11 +79,8 @@ if __name__ == '__main__':
         # need to delete foler runs/track/exp to avoid errors
         delete_folder(f"{os.path.dirname(os.path.realpath(__file__))}/yolo_tracking/runs/track/exp")
 
-        args_filtro = {
-            "working_directory": working_directory,
-            "metodo": metodo,
-        }
-        FILTRO = TrackAndFilter(args_filtro)
+        from track_and_filter import TrackAndFilter
+        FILTRO = TrackAndFilter(args.config)
 
     try:
         # Change the current directory to the one sent as argument
