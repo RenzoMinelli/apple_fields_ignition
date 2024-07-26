@@ -20,9 +20,6 @@ YOLOv8_model = None
 FIXED_THRESHOLD = False
 
 class KMeansPlotting:
-  def __init__(self):
-    pass
-
   def find_clusters(self, lista):
       """
       Encuentra el punto que divide una lista ordenada de enteros en dos clusters,
