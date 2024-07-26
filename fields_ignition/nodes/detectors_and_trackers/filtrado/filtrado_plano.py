@@ -13,11 +13,6 @@ import configparser
 config = configparser.ConfigParser()
 config.read('src/apple_fields_ignition/fields_ignition/nodes/config.ini')
 
-OFFSET_HORIZONTAL = config.getint('CONSTANTS', 'offset_horizontal')
-MARGEN_PLANO = config.getint('CONSTANTS', 'margen_plano')
-MODELO_TRONCO = config.get('FILTRADO_PLANO', 'modelo_tronco')
-GENERAR_IMAGEN_PLANO = config.getboolean('FILTRADO_PLANO', 'generar_imagen_plano')
-
 class CantidadPuntosInsuficiente(Exception):
     def __init__(self, m):
         self.message = m
@@ -28,7 +23,10 @@ class CantidadPuntosInsuficiente(Exception):
 class FiltradoPlano(filtrado_base.FiltradoBase):
     def __init__(self, config={}):
         super().__init__(config)
-        self.modelo_tronco = YOLO(f"{CWD}/weights/{MODELO_TRONCO}.pt")
+        self.modelo_tronco = YOLO(f"{CWD}/weights/{self.imported_config.get('FILTRADO_PLANO', 'modelo_tronco')}.pt")
+        self.FiltradoPlano_OFFSET_HORIZONTAL = self.imported_config.getint('CONSTANTS', 'offset_horizontal')
+        self.FiltradoPlano_MARGEN_PLANO = self.imported_config.getint('CONSTANTS', 'margen_plano')
+        self.FiltradoPlano_GENERAR_IMAGEN_PLANO = self.imported_config.getboolean('FILTRADO_PLANO', 'generar_imagen_plano')
         self.__preparar_carpetas()
 
     def filter(self, timestamp, bounding_boxes, img_original, mapa_profundidad):
@@ -183,7 +181,7 @@ class FiltradoPlano(filtrado_base.FiltradoBase):
         for mask_id, puntos in puntos_arboles.items():
             for [x,y] in puntos:
 
-                if x <= OFFSET_HORIZONTAL:
+                if x <= self.FiltradoPlano_OFFSET_HORIZONTAL:
                     continue
                 
                 if mask_id not in puntos_con_profundidad: puntos_con_profundidad[mask_id] = [] 
@@ -288,7 +286,7 @@ class FiltradoPlano(filtrado_base.FiltradoBase):
 
         # vamos a correr el plano en z un margen para no contar 
         # dos veces las manzanas del centro.
-        total_puntos = [[x, y, z + MARGEN_PLANO] for x, y, z in total_puntos]
+        total_puntos = [[x, y, z + self.FiltradoPlano_MARGEN_PLANO] for x, y, z in total_puntos]
 
         a, b, c, d = self.__obtener_plano(total_puntos)
 
@@ -296,14 +294,14 @@ class FiltradoPlano(filtrado_base.FiltradoBase):
             print('plano generado: ')
             print(f"a: {a}, b: {b}, c: {c}, d: {d}")
 
-        if GENERAR_IMAGEN_PLANO:
+        if self.FiltradoPlano_GENERAR_IMAGEN_PLANO:
             img_with_plane = self.__visualizar_plano_en_imagen(img_original, puntos_manzanas, mapa_profundidad, a, b, c, d)
             cv2.imwrite(f"{CWD}/planos/pixeles_filtrados_{timestamp}.png", img_with_plane)
 
         puntos_filtrados = []
 
         for [x, y, *rest] in puntos_manzanas:
-            if x <= OFFSET_HORIZONTAL:
+            if x <= self.FiltradoBase_OFFSET_HORIZONTAL:
                 # Evitar franja negra en el mapa de profundidad.
                 continue
 

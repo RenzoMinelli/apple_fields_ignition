@@ -4,15 +4,12 @@ from . import filtrado_base
 import numpy
 from sklearn.cluster import KMeans
 
-# importar configuraciones
-import configparser
-config = configparser.ConfigParser()
-config.read('src/apple_fields_ignition/fields_ignition/nodes/config.ini')
-
-FIXED_THRESHOLD = config.getboolean('CONSTANTS', 'fixed_threshold')
-THRESHOLD_MARGIN = config.getint('CONSTANTS', 'threshold_margin')
-
 class FiltradoKMeans(filtrado_base.FiltradoBase):
+    def __init__(self, config={}):
+        super().__init__(config)
+        self.FiltradoKMeans_FIXED_THRESHOLD = self.imported_config.getboolean('CONSTANTS', 'fixed_threshold')
+        self.FiltradoKMeans_THRESHOLD_MARGIN = self.imported_config.getint('CONSTANTS', 'threshold_margin')
+        
     def filter(self, _1, bounding_boxes, _2, mapa_profundidad):
         # se obtienen las profundidades de los bounding boxes
         # [<x, y, z(profundidad), id >,....]
@@ -23,11 +20,11 @@ class FiltradoKMeans(filtrado_base.FiltradoBase):
         # sino, se calcula el threshold con KMeans.
         # usualmente no es una buena idea utilizar un threshold fijo,
         # de todas formas damos la opcion como forma de experimentación.
-        threshold = 57 if FIXED_THRESHOLD else self.__find_clusters([bb[2] for bb in bounding_boxes_with_depth])
+        threshold = 57 if self.FiltradoKMeans_FIXED_THRESHOLD else self.__find_clusters([bb[2] for bb in bounding_boxes_with_depth])
 
         # se aplica un margen que evita que se cuenten
         # dos veces las manzanas del centro de la fila.
-        threshold += THRESHOLD_MARGIN
+        threshold += self.FiltradoKMeans_THRESHOLD_MARGIN
         print(f"Threshold luego de aplicar el margen central: {threshold}")
 
         filtered_bounding_boxes = []
