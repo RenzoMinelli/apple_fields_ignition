@@ -119,19 +119,20 @@ class TrackAndFilter:
         # The return value is a dictionary with the timestamp as the key and an array with the bounding boxes centers of the corresponding frame as the value, and as a third value, the bounding box id.
         return bounding_boxes
 
-    # when the nodes ends track the apples and evaluate the tracking
-    def __total_amount_apples_for_trees_ids(self, ids):
-        dir_path = f"{CWD}/src/apple_fields_ignition/fields_ignition/generated/{self.world_name}/apple_field/"
-        apple_amount = 0
-        dir_names_wanted = [f"apple_{x}" for x in ids]
-        for root, dirs, files in os.walk(dir_path):
-            for dir_name in dir_names_wanted:
-                data_file = os.path.join(root, dir_name, 'markers.json')
-                if os.path.exists(data_file):
-                    with open(data_file, 'r') as f:
-                        data = json.load(f)
-                        apple_amount += data["count_apples"]
-        return apple_amount
+    # TODO borrar este metodo
+    # when the node ends track the apples and evaluate the tracking
+    # def __total_amount_apples_for_trees_ids(self, ids):
+    #     dir_path = f"{CWD}/src/apple_fields_ignition/fields_ignition/generated/{self.world_name}/apple_field/"
+    #     apple_amount = 0
+    #     dir_names_wanted = [f"apple_{x}" for x in ids]
+    #     for root, dirs, files in os.walk(dir_path):
+    #         for dir_name in dir_names_wanted:
+    #             data_file = os.path.join(root, dir_name, 'markers.json')
+    #             if os.path.exists(data_file):
+    #                 with open(data_file, 'r') as f:
+    #                     data = json.load(f)
+    #                     apple_amount += data["count_apples"]
+    #     return apple_amount
 
     def __delete_folder(self, folder_path):
         subprocess.run(['rm', '-rf', folder_path])
@@ -175,7 +176,7 @@ class TrackAndFilter:
 
         return model_args
                 
-    # when the node is killed, run the tracker and filter the results
+    # cuando el nodo es detenido, corre el tracker y filtra los resultados
     def track_filter_and_count(self):
         self.__setup_env()
 
@@ -188,14 +189,13 @@ class TrackAndFilter:
 
         if self.track:
             self.__delete_folder(f"{self.__current_path()}/yolo_tracking/runs/track/exp")
-            # run the tracker
-           
+            # correr el tracker
             track_main(args=self.__configs_yolo())
 
-        # get the bounding boxes from the file
+        # obtener las bounding boxes del archivo generado por el tracker
         bounding_boxes = self.__read_bounding_boxes()
 
-        # instancio filtro
+        # instanciar filtro
         filtro = self.filter_class(self.__configs_filtro())
 
         for timestamp in bounding_boxes:
@@ -205,13 +205,14 @@ class TrackAndFilter:
 
             filtered_bbs = filtro.filter(timestamp, bounding_boxes[timestamp], img_original, mapa_profundidad)
 
-            # print(f"Amount of apples in image: {len(image_depth_data)}, filtered apples: {len(filtered_depths)}")
             for bb in filtered_bbs:
                 self.ids_filtrados.add(bb[2])
         
-        # Print the number of apples
-        print('Number of apples counted: ' + str(self.get_apple_count()))
-        print(f"amount of apples exactly for trees id (5,6,7,8,9): { self.__total_amount_apples_for_trees_ids([5,6,7,8,9])}")
+        # Imprimir resultados
+        print('Numero de manzanas detectado: ' + str(self.get_apple_count()))
+
+        # TODO borrar este comentario y el metodo __total_amount_apples_for_trees_ids
+        # print(f"amount of apples exactly for trees id (5,6,7,8,9): { self.__total_amount_apples_for_trees_ids([5,6,7,8,9])}")
 
     def track_filter_and_count_one_frame(self, timestamp, img_original, mapa_profundidad):
         new_yolo_instance, bounding_boxes = track_main(args=self.__configs_yolo_one_frame(), image=img_original, yolo_model_instance=self.yolo_instance)
