@@ -63,26 +63,20 @@ class TrackAndFilter:
     def __current_path(self):
         return os.path.dirname(os.path.realpath(__file__))
 
-    # read bounding boxes from the bounding box file
+    # leer las bounding boxes del archivo de bounding boxes
     def __read_bounding_boxes(self):
-
-        # Get all detections except the file right_rgb_images.txt
-
-        # Specify dir path
         dir_path = f"{self.__current_path()}/yolo_tracking/runs/track/exp/labels/"
 
-        # Use os.listdir to obtain the file names skipping ignored_file
+        # Obtener los nombres de los archivos que describen las bounding boxes
         file_names = os.listdir(dir_path)
 
-        # Define bounding_boxes as an empty dictionary 
         bounding_boxes = {}
 
-        # Iterate over file names
         for file_name in file_names:
-            # Obtain the timestamp out of the file name (example name: image_40.png)
+            # Obtener el timestamp del nombre del archivo (ejemplo: 814572000000.png)
             timestamp = file_name.split(".")[0]
 
-            # Obtain bounding boxes from the file
+            # Obtener las bounding boxes del archivo
             with open(os.path.join(dir_path, file_name), 'r') as bb_file:
                 lines = bb_file.readlines()
 
@@ -188,7 +182,9 @@ class TrackAndFilter:
         
 
         if self.track:
+            # borrar runs/track/exp por si habia una corrida anterior guardada
             self.__delete_folder(f"{self.__current_path()}/yolo_tracking/runs/track/exp")
+            
             # correr el tracker
             track_main(args=self.__configs_yolo())
 
