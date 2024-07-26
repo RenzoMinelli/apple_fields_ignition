@@ -83,19 +83,19 @@ class TrackAndFilter:
                 for line in lines:
                     line_split = line.split(" ")
 
-                    # If the line has 6 elements, the bounding box has an id, otherwise it is 0
-                    if len(line_split) < 6: # this is to skip IDs = 0 which correspond to unconfirmed tracks 
+                    # Si la linea tiene 6 elementos, la bounding box tiene un id, de lo contrario es 0
+                    # los ids 0 corresponden a tracks no confirmados
+                    if len(line_split) < 6:
                         continue
 
                     bb_id = int(line_split[5][:-1])
                     x,y = line_split[1:3]
 
-                    # Convert everything to float first
                     x = float(x)
                     y = float(y)
 
-                    # As the values are normalized we need to multiply them by the image size
-                    x = x * self.image_width # ESTO HARDCODEADO NO ME PARECE MUCHO PORQUE SI ALGUIEN EN EL FUTURO QUIERE CAMBIAR EL SENSOR SE COMPLICA REVISAR EL CODIGO, ME PARECE QUE DEBERIA SER UN PARAMETRO O UNA VARIABLE GLOABL MINIMO
+                    # Como los valores estan normalizados, necesitamos multiplicarlos por el tamaño de la imagen
+                    x = x * self.image_width
                     y = y * self.image_height
 
                     # Convert everything to int
