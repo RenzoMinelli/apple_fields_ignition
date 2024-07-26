@@ -10,7 +10,7 @@ from detectors_and_trackers.filtrado.filtrado_plano import FiltradoPlano
 from detectors_and_trackers.filtrado.sin_filtrado import SinFiltrado
 from detectors_and_trackers.filtrado.filtrado_filas_posteriores import FiltradoFilasPosteriores
 
-cwd = os.getcwd()
+CWD = os.getcwd()
 
 image_height = 1024
 image_width = 1024
@@ -27,7 +27,7 @@ class Plotting:
     def read_bounding_boxes(self):
 
         # Specify dir path
-        dir_path = f"{cwd}/src/apple_fields_ignition/fields_ignition/nodes/detectors_and_trackers/yolo_tracking/runs/track/exp/labels/"
+        dir_path = f"{CWD}/src/apple_fields_ignition/fields_ignition/nodes/detectors_and_trackers/yolo_tracking/runs/track/exp/labels/"
 
         # Use os.listdir to obtain the file names skipping ignored_file
         file_names = os.listdir(dir_path)
@@ -78,35 +78,30 @@ class Plotting:
         return bounding_boxes
 
     # Define a function to draw bounding boxes on an image and save the modified image
-    def draw_boxes_and_save(self, image_path, green_bboxs, red_bboxs, output_folder):
-        # Read the image
-        img = cv2.imread(image_path)
-
+    def draw_boxes_and_save(self, timestamp, imagen_original, green_bboxs, red_bboxs, output_folder):
         # Iterate over each RED bounding box in the list
         for i, [x,y,*rest] in enumerate(red_bboxs):
 
             # Draw the bounding box
-            cv2.circle(img, (int(x), int(y)), 2, (0, 0, 255), 2)
+            cv2.circle(imagen_original, (int(x), int(y)), 2, (0, 0, 255), 2)
 
         # Iterate over each GREEN bounding box in the list
         for i, [x,y,*rest] in enumerate(green_bboxs):
 
             # Draw the bounding box
-            cv2.circle(img, (int(x), int(y)), 2, (0, 255, 0), 2)
+            cv2.circle(imagen_original, (int(x), int(y)), 2, (0, 255, 0), 2)
 
         # Save the modified image with bounding boxes
-        filename = os.path.basename(image_path)
-        output_path = os.path.join(output_folder, filename)
+        output_path = os.path.join(output_folder, f"{timestamp}.png")
 
         # debug log
-        print('image: ', image_path)
         print('saving image with bounding boxes in ', output_path)
 
-        cv2.imwrite(output_path, img)
+        cv2.imwrite(output_path, imagen_original)
 
 
     # when the node is killed, run the tracker and filter the results
-    def track_filter_and_count(self, working_directory, filter_class):
+    def track_filter_and_count(self, working_directory, filter_class, config_path, rotar_imagenes):
         os.chdir(working_directory)
         print('working inside directory ', os.getcwd())
         
@@ -118,11 +113,15 @@ class Plotting:
         for timestamp in bounding_boxes:
 
             mapa_profundidad = cv2.imread("disparity_images/" + str(timestamp) + ".png", cv2.IMREAD_GRAYSCALE)
-
+            imagen_original = cv2.imread("left_rgb_images/" + str(timestamp) + ".png")
+            
             configs_filtros = {
                 "verbose": True,
-                "rotar_imagenes": False,
                 "debug_plano": False,
+                "working_directory": CWD,
+                "generar_imagen_plano": False,
+                "rotar_imagenes": rotar_imagenes,
+                "config_path": config_path
             }
             # instancio el filtro
             filtro = filter_class(configs_filtros)
@@ -130,17 +129,18 @@ class Plotting:
             # Estas las imprimimos todas en rojo
             red_depths = filtro.obtener_puntos_con_profunidad(bounding_boxes[timestamp], mapa_profundidad)
             # Luego sobreescribimos las que no seran descartadas con color verde.
-            green_depths = filtro.filter(None, bounding_boxes[timestamp], None, mapa_profundidad)
+            green_depths = filtro.filter(timestamp, bounding_boxes[timestamp], imagen_original, mapa_profundidad)
 
-            image_path = 'left_rgb_images/' + timestamp + '.png'
             output_folder = working_directory + '/test_filtered_images'
-            self.draw_boxes_and_save(image_path, green_depths, red_depths, output_folder)
+            self.draw_boxes_and_save(timestamp, imagen_original, green_depths, red_depths, output_folder)
 
 
 def plot():
     parser = argparse.ArgumentParser()
     parser.add_argument("--working_directory", required=True)
     parser.add_argument("--method", required=True)
+    parser.add_argument("--config", required=True)
+    parser.add_argument("--rotar_imagenes", required=False, default=False, type=bool)
     args = parser.parse_args()
 
     folder_names = ["test_depth_i10", "test_filtered_images"]
@@ -163,7 +163,7 @@ def plot():
         raise ValueError(f"Method {method} not recognized, please use one of the following: {allowed_methods}")
     
     filter_class = METODOS_FILTRADO[method]
-    plotting.track_filter_and_count(args.working_directory, filter_class)
+    plotting.track_filter_and_count(args.working_directory, filter_class, args.config, args.rotar_imagenes)
 
 if __name__ == "__main__":
     plot()

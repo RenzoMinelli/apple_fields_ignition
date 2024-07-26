@@ -265,7 +265,7 @@ class FiltradoPlano(filtrado_base.FiltradoBase):
         return img_with_plane
 
     def __filtrar_puntos(self, timestamp, puntos_manzanas, img_original, mapa_profundidad):
-        # se obtienen 3 puntos dentro de cada tronco detectado en la imagen        
+        # se obtienen 3 puntos dentro de cada tronco detectado en la imagen    
         puntos_arboles = self.__obtener_puntos_arboles(img_original, timestamp)
 
         # se obtiene la profunidad asociada aesos puntos
