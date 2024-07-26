@@ -221,9 +221,8 @@ class FiltradoPlano(filtrado_base.FiltradoBase):
         # Donde x corresponde a los coeficientes [a, b, c]
         coeffs, _, _, _ = np.linalg.lstsq(puntos_a_interpolar, b, rcond=None)
         
-        # The result is the coefficients a, b, c, where we have assumed d = 1
         a, b, c = coeffs
-        d = -1  # We assume d = -1 to solve for a, b, c
+        d = -1  
         
         return a, b, c, d
 
