@@ -114,7 +114,7 @@ class Plotting:
 
             mapa_profundidad = cv2.imread("disparity_images/" + str(timestamp) + ".png", cv2.IMREAD_GRAYSCALE)
             imagen_original = cv2.imread("left_rgb_images/" + str(timestamp) + ".png")
-            
+
             configs_filtros = {
                 "verbose": True,
                 "debug_plano": False,
@@ -167,3 +167,5 @@ def plot():
 
 if __name__ == "__main__":
     plot()
+
+# python -m detectors_and_trackers.plot_filtered_apples --working_directory /home/renzo/catkin_ws --method plano --config /home/renzo/catkin_ws/src/apple_fields_ignition/fields_ignition/nodes/config.ini
