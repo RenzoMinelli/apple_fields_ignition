@@ -26,7 +26,7 @@ class CantidadPuntosInsuficiente(Exception):
     
 
 class FiltradoPlano(filtrado_base.FiltradoBase):
-    def __init__(self, config):
+    def __init__(self, config={}):
         super().__init__(config)
         self.modelo_tronco = YOLO(f"{CWD}/weights/{MODELO_TRONCO}.pt")
         self.__preparar_carpetas()

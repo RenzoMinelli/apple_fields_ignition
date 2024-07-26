@@ -83,17 +83,13 @@ class Plotting:
         img = cv2.imread(image_path)
 
         # Iterate over each RED bounding box in the list
-        for i, bbox in enumerate(red_bboxs):
-
-            x, y, _, _ = bbox
+        for i, [x,y,*rest] in enumerate(red_bboxs):
 
             # Draw the bounding box
             cv2.circle(img, (int(x), int(y)), 2, (0, 0, 255), 2)
 
         # Iterate over each GREEN bounding box in the list
-        for i, bbox in enumerate(green_bboxs):
-
-            x, y, _, _ = bbox
+        for i, [x,y,*rest] in enumerate(green_bboxs):
 
             # Draw the bounding box
             cv2.circle(img, (int(x), int(y)), 2, (0, 255, 0), 2)
@@ -122,9 +118,14 @@ class Plotting:
         for timestamp in bounding_boxes:
 
             mapa_profundidad = cv2.imread("disparity_images/" + str(timestamp) + ".png", cv2.IMREAD_GRAYSCALE)
-            
+
+            configs_filtros = {
+                "verbose": True,
+                "rotar_imagenes": False,
+                "debug_plano": False,
+            }
             # instancio el filtro
-            filtro = filter_class()
+            filtro = filter_class(configs_filtros)
 
             # Estas las imprimimos todas en rojo
             red_depths = filtro.obtener_puntos_con_profunidad(bounding_boxes[timestamp], mapa_profundidad)
