@@ -33,6 +33,7 @@ class TrackAndFilter:
         
         config = configparser.ConfigParser()
         config.read(config_path)
+        self.config_path = config_path
 
         self.image_height = config.getint('TRACK_AND_FILTER', 'image_height')
         self.image_width = config.getint('TRACK_AND_FILTER', 'image_width')
@@ -144,7 +145,8 @@ class TrackAndFilter:
             "generar_imagen_plano": self.generar_imagen_plano,
             "rotar_imagenes": self.rotar_imagenes,
             "verbose": self.verbose,
-            "debug_plano": self.debug_plano
+            "debug_plano": self.debug_plano,
+            "config_path": self.config_path
         }
     
     def __configs_yolo(self):
