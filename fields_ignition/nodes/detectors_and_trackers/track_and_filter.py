@@ -17,8 +17,6 @@ import configparser
 # directorio de trabajo
 CWD = os.getcwd()
 
-ros_namespace = os.getenv('ROS_NAMESPACE')
-
 SOURCE = "left_rgb_images"
 
 METODOS_FILTRADO = {
