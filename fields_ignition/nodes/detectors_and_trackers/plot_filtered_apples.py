@@ -52,7 +52,8 @@ class Plotting:
         bounding_boxes = TrackAndFilter(config_path).read_bounding_boxes()
 
         for timestamp in bounding_boxes:
-            mapa_profundidad = cv2.imread("disparity_images/" + str(timestamp) + ".png", cv2.IMREAD_GRAYSCALE)
+
+            mapa_profundidad = cv2.imread("depth_matrix/" + str(timestamp) + ".png", cv2.IMREAD_GRAYSCALE)
             imagen_original = cv2.imread("left_rgb_images/" + str(timestamp) + ".png")
 
             configs_filtros = {

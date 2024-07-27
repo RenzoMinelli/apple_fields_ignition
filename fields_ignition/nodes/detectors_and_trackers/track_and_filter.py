@@ -194,7 +194,7 @@ class TrackAndFilter:
 
         for timestamp in bounding_boxes:
             img_original = cv2.imread("left_rgb_images/" + str(timestamp) + ".png")
-            mapa_profundidad = cv2.imread("disparity_images/" + str(timestamp) + ".png", cv2.IMREAD_GRAYSCALE)
+            mapa_profundidad = cv2.imread("depth_matrix/" + str(timestamp) + ".png", cv2.IMREAD_GRAYSCALE)   
 
             filtered_bbs = filtro.filter(timestamp, bounding_boxes[timestamp], img_original, mapa_profundidad)
 
