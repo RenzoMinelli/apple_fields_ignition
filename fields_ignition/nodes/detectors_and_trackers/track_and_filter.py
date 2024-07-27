@@ -112,7 +112,6 @@ class TrackAndFilter:
         # El valor de retorno es un diccionario con el timestamp como key y un array con los centros de las bounding boxes del frame correspondiente como valor, y como tercer valor, el id de la bounding box.
         return bounding_boxes
 
-    # TODO borrar este metodo
     # when the node ends track the apples and evaluate the tracking
     # def __total_amount_apples_for_trees_ids(self, ids):
     #     dir_path = f"{CWD}/src/apple_fields_ignition/fields_ignition/generated/{self.world_name}/apple_field/"
