@@ -28,39 +28,30 @@ METODOS_FILTRADO = {
 class Plotting:
     # Define a function to draw bounding boxes on an image and save the modified image
     def draw_boxes_and_save(self, timestamp, imagen_original, green_bboxs, red_bboxs, output_folder):
-        # Iterate over each RED bounding box in the list
+        # Iterar sobre cada bounding box ROJA en la lista
         for i, [x,y,*rest] in enumerate(red_bboxs):
-
-            # Draw the bounding box
+            # Dibujar la bounding box
             cv2.circle(imagen_original, (int(x), int(y)), 2, (0, 0, 255), 2)
 
-        # Iterate over each GREEN bounding box in the list
+        # Iterar sobre cada bounding box VERDE en la lista
         for i, [x,y,*rest] in enumerate(green_bboxs):
-
-            # Draw the bounding box
+            # Dibujar la bounding box
             cv2.circle(imagen_original, (int(x), int(y)), 2, (0, 255, 0), 2)
 
-        # Save the modified image with bounding boxes
+        # Guardar la imagen modificada con las bounding boxes
         output_path = os.path.join(output_folder, f"{timestamp}.png")
-
-        # debug log
-        print('saving image with bounding boxes in ', output_path)
-
+        print('Saving image with bounding boxes in ', output_path)
         cv2.imwrite(output_path, imagen_original)
 
-
-    # when the node is killed, run the tracker and filter the results
-    def track_filter_and_count(self, working_directory, filter_class, config_path, rotar_imagenes):
+    def filter_and_plot(self, working_directory, filter_class, config_path, rotar_imagenes):
         os.chdir(working_directory)
         print('working inside directory ', os.getcwd())
         
-        # obtener los bounding boxes del archivo
-        # dictionary with the timestamp as the key and an array with the bounding boxes centers of the corresponding frame as the value, and as a third value, the bounding box id.
-        # bounding_boxes = {<timestamp>: [[<x>, <y>, <id>, <w>, <h>], ...], ...}
+        # para cada timestamp obtener las bounding boxes en un formato:
+        # bounding_boxes = {<timestamp1>: [[<x>, <y>, <id>], ...], ...}
         bounding_boxes = TrackAndFilter(config_path).read_bounding_boxes()
 
         for timestamp in bounding_boxes:
-
             mapa_profundidad = cv2.imread("disparity_images/" + str(timestamp) + ".png", cv2.IMREAD_GRAYSCALE)
             imagen_original = cv2.imread("left_rgb_images/" + str(timestamp) + ".png")
 
@@ -82,7 +73,6 @@ class Plotting:
 
             output_folder = working_directory + '/test_filtered_images'
             self.draw_boxes_and_save(timestamp, imagen_original, green_depths, red_depths, output_folder)
-
 
 def plot():
     parser = argparse.ArgumentParser()
@@ -110,7 +100,7 @@ def plot():
         raise ValueError(f"Metodo de filtrado {method} no reconocido, usar alguno de los siguientes:\n {allowed_methods}")
     
     filter_class = METODOS_FILTRADO[method]
-    plotting.track_filter_and_count(CWD, filter_class, args.config, rotar_imagenes)
+    plotting.filter_and_plot(CWD, filter_class, args.config, rotar_imagenes)
 
 if __name__ == "__main__":
     plot()
