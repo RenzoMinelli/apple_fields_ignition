@@ -7,8 +7,8 @@ from detectors_and_trackers.filtrado.filtrado_plano import FiltradoPlano
 from detectors_and_trackers.filtrado.sin_filtrado import SinFiltrado
 from detectors_and_trackers.filtrado.filtrado_filas_posteriores import FiltradoFilasPosteriores
 import argparse
-import json
 import cv2
+import numpy as np
 from detectors_and_trackers.yolo_tracking.tracking.track import main as track_main
 
 # importar configuraciones
@@ -194,7 +194,7 @@ class TrackAndFilter:
 
         for timestamp in bounding_boxes:
             img_original = cv2.imread("left_rgb_images/" + str(timestamp) + ".png")
-            mapa_profundidad = cv2.imread("depth_matrix/" + str(timestamp) + ".png", cv2.IMREAD_GRAYSCALE)   
+            mapa_profundidad = np.load("depth_matrix/" + str(timestamp) + ".npy")  
 
             filtered_bbs = filtro.filter(timestamp, bounding_boxes[timestamp], img_original, mapa_profundidad)
 

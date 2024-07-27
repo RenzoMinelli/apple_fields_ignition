@@ -3,7 +3,7 @@
 # imports
 import cv2
 import os
-import numpy
+import numpy as np
 import argparse
 from detectors_and_trackers.filtrado.filtrado_kmeans import FiltradoKMeans
 from detectors_and_trackers.filtrado.filtrado_plano import FiltradoPlano
@@ -52,8 +52,8 @@ class Plotting:
         bounding_boxes = TrackAndFilter(config_path).read_bounding_boxes()
 
         for timestamp in bounding_boxes:
-
-            mapa_profundidad = cv2.imread("depth_matrix/" + str(timestamp) + ".png", cv2.IMREAD_GRAYSCALE)
+            # leer numpy matriz 
+            mapa_profundidad = np.load("depth_matrix/" + str(timestamp) + ".npy")
             imagen_original = cv2.imread("left_rgb_images/" + str(timestamp) + ".png")
 
             configs_filtros = {
