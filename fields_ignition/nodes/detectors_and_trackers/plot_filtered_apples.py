@@ -10,6 +10,7 @@ from detectors_and_trackers.filtrado.filtrado_plano import FiltradoPlano
 from detectors_and_trackers.filtrado.sin_filtrado import SinFiltrado
 from detectors_and_trackers.filtrado.filtrado_filas_posteriores import FiltradoFilasPosteriores
 import configparser
+from detectors_and_trackers.track_and_filter import TrackAndFilter
 config = configparser.ConfigParser()
 
 CWD = os.getcwd()
@@ -25,60 +26,6 @@ METODOS_FILTRADO = {
 }
 
 class Plotting:
-  # Leer los bounding boxes del archivo de bounding boxes
-    def read_bounding_boxes(self):
-
-        # Specify dir path
-        dir_path = f"{CWD}/src/apple_fields_ignition/fields_ignition/nodes/detectors_and_trackers/yolo_tracking/runs/track/exp/labels/"
-
-        # Use os.listdir to obtain the file names skipping ignored_file
-        file_names = os.listdir(dir_path)
-
-        # Define bounding_boxes as an empty dictionary 
-        bounding_boxes = {}
-
-        # Iterate over file names
-        for file_name in file_names:
-            # Obtain the timestamp out of the file name (example name: image_40.png)
-            timestamp = file_name.split(".")[0]
-
-            # Obtain bounding boxes from the file
-            with open(os.path.join(dir_path, file_name), 'r') as bb_file:
-                lines = bb_file.readlines()
-
-                for line in lines:
-                    line_split = line.split(" ")
-
-                    # If the line has 6 elements, the bounding box has an id, otherwise it is 0
-                    if len(line_split) < 6: # this is to skip IDs = 0 which correspond to unconfirmed tracks 
-                        continue
-
-                    bb_id = int(line_split[5][:-1])
-                    x,y = line_split[1:3]
-
-                    # Convert everything to float first
-                    x = float(x)
-                    y = float(y)
-
-                    # As the values are normalized we need to multiply them by the image size
-                    x = x * image_width # ESTO HARDCODEADO NO ME PARECE MUCHO PORQUE SI ALGUIEN EN EL FUTURO QUIERE CAMBIAR EL SENSOR SE COMPLICA REVISAR EL CODIGO, ME PARECE QUE DEBERIA SER UN PARAMETRO O UNA VARIABLE GLOABL MINIMO
-                    y = y * image_height
-
-                    # Convert everything to int
-                    x = int(x)
-                    y = int(y)
-
-                    # Create a list with the bounding box center and the bounding box id which is what will be saved in the dictionary
-                    bb_center = [x, y, bb_id] #EL + 30 PARA CONSIDERAR LA FRANJA NEGRA QUE SALE EN LAS IMAGENES DEPROFUNDIDAD
-
-                    if (timestamp in bounding_boxes):
-                        bounding_boxes[timestamp].append(bb_center)
-                    else:
-                        bounding_boxes[timestamp] = [bb_center]
-
-        # The return value is a dictionary with the timestamp as the key and an array with the bounding boxes centers of the corresponding frame as the value, and as a third value, the bounding box id.
-        return bounding_boxes
-
     # Define a function to draw bounding boxes on an image and save the modified image
     def draw_boxes_and_save(self, timestamp, imagen_original, green_bboxs, red_bboxs, output_folder):
         # Iterate over each RED bounding box in the list
@@ -107,10 +54,10 @@ class Plotting:
         os.chdir(working_directory)
         print('working inside directory ', os.getcwd())
         
-        # get the bounding boxes from the file
+        # obtener los bounding boxes del archivo
         # dictionary with the timestamp as the key and an array with the bounding boxes centers of the corresponding frame as the value, and as a third value, the bounding box id.
         # bounding_boxes = {<timestamp>: [[<x>, <y>, <id>, <w>, <h>], ...], ...}
-        bounding_boxes = self.read_bounding_boxes()
+        bounding_boxes = TrackAndFilter(config_path).read_bounding_boxes()
 
         for timestamp in bounding_boxes:
 

@@ -64,7 +64,7 @@ class TrackAndFilter:
         return os.path.dirname(os.path.realpath(__file__))
 
     # leer las bounding boxes del archivo de bounding boxes
-    def __read_bounding_boxes(self):
+    def read_bounding_boxes(self):
         dir_path = f"{self.__current_path()}/yolo_tracking/runs/track/exp/labels/"
 
         # Obtener los nombres de los archivos que describen las bounding boxes
