@@ -39,8 +39,8 @@ def image_callback(imageL, disparity):
     # Compute the depth map
     with np.errstate(divide='ignore', invalid='ignore'):  # Ignore division errors and invalid values
         depth_map = (focal_length * baseline) / cv_disparity
-        depth_map[np.isinf(depth_map)] = 0  # Set inf values to 0
-        depth_map[np.isnan(depth_map)] = 0  # Set nan values to 0
+        depth_map[np.isinf(depth_map)] = 999999999
+        depth_map[np.isnan(depth_map)] = 0
 
     timestamp = str(imageL.header.stamp)
 
