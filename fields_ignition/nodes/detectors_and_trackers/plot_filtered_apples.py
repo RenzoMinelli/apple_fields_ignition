@@ -9,6 +9,8 @@ from detectors_and_trackers.filtrado.filtrado_kmeans import FiltradoKMeans
 from detectors_and_trackers.filtrado.filtrado_plano import FiltradoPlano
 from detectors_and_trackers.filtrado.sin_filtrado import SinFiltrado
 from detectors_and_trackers.filtrado.filtrado_filas_posteriores import FiltradoFilasPosteriores
+import configparser
+config = configparser.ConfigParser()
 
 CWD = os.getcwd()
 
@@ -23,7 +25,7 @@ METODOS_FILTRADO = {
 }
 
 class Plotting:
-  # read bounding boxes from the bounding box file
+  # Leer los bounding boxes del archivo de bounding boxes
     def read_bounding_boxes(self):
 
         # Specify dir path
@@ -137,33 +139,33 @@ class Plotting:
 
 def plot():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--working_directory", required=True)
-    parser.add_argument("--method", required=True)
     parser.add_argument("--config", required=True)
-    parser.add_argument("--rotar_imagenes", required=False, default=False, type=bool)
     args = parser.parse_args()
 
-    folder_names = ["test_depth_i10", "test_filtered_images"]
-    for folder_name in folder_names:
-        folder_path = f"{args.working_directory}/{folder_name}"
-        if not os.path.exists(folder_path):
-            os.makedirs(folder_path)
-        else:
-            files = os.listdir(folder_path)
-            for file_name in files:
-                file_path = os.path.join(folder_path, file_name)
-                os.remove(file_path)
+    config.read(args.config)
+    method = config.get('TRACK_AND_FILTER', 'method')
+    rotar_imagenes = config.getboolean('TRACK_AND_FILTER', 'troncos_horizontales')
+
+    breakpoint()
+
+    folder_path = f"{CWD}/test_filtered_images"
+    if not os.path.exists(folder_path):
+        os.makedirs(folder_path)
+    else:
+        files = os.listdir(folder_path)
+        for file_name in files:
+            file_path = os.path.join(folder_path, file_name)
+            os.remove(file_path)
 
     plotting = Plotting()
 
     filter_class = None
-    method = args.method
     if method not in METODOS_FILTRADO.keys():
         allowed_methods = ", ".join(METODOS_FILTRADO.keys())
-        raise ValueError(f"Method {method} not recognized, please use one of the following: {allowed_methods}")
+        raise ValueError(f"Metodo de filtrado {method} no reconocido, usar alguno de los siguientes:\n {allowed_methods}")
     
     filter_class = METODOS_FILTRADO[method]
-    plotting.track_filter_and_count(args.working_directory, filter_class, args.config, args.rotar_imagenes)
+    plotting.track_filter_and_count(CWD, filter_class, args.config, rotar_imagenes)
 
 if __name__ == "__main__":
     plot()

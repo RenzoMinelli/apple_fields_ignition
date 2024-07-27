@@ -98,19 +98,18 @@ class TrackAndFilter:
                     x = x * self.image_width
                     y = y * self.image_height
 
-                    # Convert everything to int
                     x = int(x)
                     y = int(y)
 
-                    # Create a list with the bounding box center and the bounding box id which is what will be saved in the dictionary
-                    bb_center = [x, y, bb_id] #EL + 30 PARA CONSIDERAR LA FRANJA NEGRA QUE SALE EN LAS IMAGENES DEPROFUNDIDAD
+                    # Crear una lista con el centro de la bounding box y el id de la bounding box que es lo que se guardara en el diccionario
+                    bb_center = [x, y, bb_id]
 
                     if (timestamp in bounding_boxes):
                         bounding_boxes[timestamp].append(bb_center)
                     else:
                         bounding_boxes[timestamp] = [bb_center]
 
-        # The return value is a dictionary with the timestamp as the key and an array with the bounding boxes centers of the corresponding frame as the value, and as a third value, the bounding box id.
+        # El valor de retorno es un diccionario con el timestamp como key y un array con los centros de las bounding boxes del frame correspondiente como valor, y como tercer valor, el id de la bounding box.
         return bounding_boxes
 
     # TODO borrar este metodo
@@ -176,7 +175,7 @@ class TrackAndFilter:
 
         os.chdir(CWD)
         if self.verbose:
-          print('trabajando dentro de directorio ', CWD)
+          print('Trabajando dentro de directorio ', CWD)
         
         print('Running tracker and tracker evaluator...')
         
@@ -195,9 +194,8 @@ class TrackAndFilter:
         filtro = self.filter_class(self.__configs_filtro())
 
         for timestamp in bounding_boxes:
-            
             img_original = cv2.imread("left_rgb_images/" + str(timestamp) + ".png")
-            mapa_profundidad = cv2.imread("disparity_images/" + str(timestamp) + ".png", cv2.IMREAD_GRAYSCALE)   
+            mapa_profundidad = cv2.imread("disparity_images/" + str(timestamp) + ".png", cv2.IMREAD_GRAYSCALE)
 
             filtered_bbs = filtro.filter(timestamp, bounding_boxes[timestamp], img_original, mapa_profundidad)
 
@@ -207,7 +205,6 @@ class TrackAndFilter:
         # Imprimir resultados
         print('Numero de manzanas detectado: ' + str(self.get_apple_count()))
 
-        # TODO borrar este comentario y el metodo __total_amount_apples_for_trees_ids
         # print(f"amount of apples exactly for trees id (5,6,7,8,9): { self.__total_amount_apples_for_trees_ids([5,6,7,8,9])}")
 
     def track_filter_and_count_one_frame(self, timestamp, img_original, mapa_profundidad):
