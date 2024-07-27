@@ -146,8 +146,6 @@ def plot():
     method = config.get('TRACK_AND_FILTER', 'method')
     rotar_imagenes = config.getboolean('TRACK_AND_FILTER', 'troncos_horizontales')
 
-    breakpoint()
-
     folder_path = f"{CWD}/test_filtered_images"
     if not os.path.exists(folder_path):
         os.makedirs(folder_path)
