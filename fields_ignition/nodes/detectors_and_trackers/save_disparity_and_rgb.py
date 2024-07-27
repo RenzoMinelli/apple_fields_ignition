@@ -2,7 +2,7 @@
 import rospy
 import cv2 as cv
 from cv_bridge import CvBridge
-from sensor_msgs.msg import Image, CameraInfo
+from sensor_msgs.msg import Image
 from stereo_msgs.msg import DisparityImage
 import message_filters
 import os
@@ -16,14 +16,12 @@ def read_cameras():
     ros_namespace = os.getenv('ROS_NAMESPACE') if os.getenv('ROS_NAMESPACE') else 'stereo'
     imageL = message_filters.Subscriber("/" + ros_namespace + "/left/image_rect_color", Image)
     disparity = message_filters.Subscriber("/" + ros_namespace + "/disparity", DisparityImage)
-    camera_info_left = message_filters.Subscriber("/" + ros_namespace + "/left/camera_info", CameraInfo)
-    camera_info_right = message_filters.Subscriber("/" + ros_namespace + "/right/camera_info", CameraInfo)
 
     # Use ApproximateTimeSynchronizer instead of TimeSynchronizer
-    ts = message_filters.TimeSynchronizer([imageL, disparity, camera_info_left, camera_info_right], queue_size=20)
+    ts = message_filters.TimeSynchronizer([imageL, disparity], queue_size=20)
     ts.registerCallback(image_callback)
 
-def image_callback(imageL, disparity, camera_info_left, camera_info_right):
+def image_callback(imageL, disparity):
     br = CvBridge()
     rospy.loginfo("receiving Image")
 
