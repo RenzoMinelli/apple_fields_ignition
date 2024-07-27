@@ -3,7 +3,7 @@
   <arg name="bag_file_path" default="/home/renzo/catkin_ws/bag_mas_lento.bag"/>
   <arg name="folder_path" default="/home/renzo/catkin_ws"/>
   <arg name="post_procesamiento" default="true"/>
-  <arg name="metodo" default="kmeans"/>
+  <arg name="config" default="$(arg folder_path)/src/apple_fields_ignition/fields_ignition/nodes/config.ini"/>
 
   <!-- Camera image left topic -->
   <arg name="left_camera_image_topic" default="/zed_lateral/zed_lateral/left/image_rect_color"/>
@@ -32,7 +32,7 @@
   <!-- Run script to save the images -->
   <!-- use remap instead of the namespace -->
   <env name="ROS_NAMESPACE" value="stereo" />
-  <node pkg="fields_ignition" type="save_disparity_and_rgb.py" name="save_disparity_and_rgb" args="--working_directory=$(arg folder_path) --post_procesamiento=$(arg post_procesamiento) --metodo=$(arg metodo)" output="screen"/>
+  <node pkg="fields_ignition" type="save_disparity_and_rgb.py" name="save_disparity_and_rgb" args="--working_directory=$(arg folder_path) --post_procesamiento=$(arg post_procesamiento) --config=$(arg config)" output="screen"/>
 </launch>
 
 <!-- Ejemplo de ejecucion -->
