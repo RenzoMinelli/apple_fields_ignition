@@ -187,7 +187,7 @@ class TrackAndFilter:
             track_main(args=self.__configs_yolo())
 
         # obtener las bounding boxes del archivo generado por el tracker
-        bounding_boxes = self.__read_bounding_boxes()
+        bounding_boxes = self.read_bounding_boxes()
 
         # instanciar filtro
         filtro = self.filter_class(self.__configs_filtro())
