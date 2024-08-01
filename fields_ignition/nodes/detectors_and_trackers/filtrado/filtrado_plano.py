@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
-from . import filtrado_base
+from .filtrado_base import FiltradoBase
+from .filtrado_filas_posteriores import FiltradoFilasPosteriores
 from ultralytics import YOLO
 import cv2
 import numpy as np
@@ -15,13 +16,14 @@ class CantidadPuntosInsuficiente(Exception):
         return self.message
     
 
-class FiltradoPlano(filtrado_base.FiltradoBase):
+class FiltradoPlano(FiltradoBase):
     def __init__(self, config={}):
         super().__init__(config)
         self.modelo_tronco = YOLO(f"{CWD}/weights/{self.imported_config.get('FILTRADO_PLANO', 'modelo_tronco')}.pt")
         self.FiltradoPlano_OFFSET_HORIZONTAL = self.imported_config.getint('CONSTANTS', 'offset_horizontal')
         self.FiltradoPlano_MARGEN_PLANO = self.imported_config.getint('CONSTANTS', 'margen_plano')
         self.FiltradoPlano_GENERAR_IMAGEN_PLANO = self.imported_config.getboolean('FILTRADO_PLANO', 'generar_imagen_plano')
+        self.filtro_filas_posteriores = FiltradoFilasPosteriores(config)
         self.__preparar_carpetas()
 
     def filter(self, timestamp, bounding_boxes, img_original, mapa_profundidad):
@@ -172,37 +174,18 @@ class FiltradoPlano(filtrado_base.FiltradoBase):
         return puntos_arboles
 
     def __obtener_puntos_con_profunidad(self, puntos_arboles, mapa_profunidad):
-        puntos_con_profundidad = {}
-        for mask_id, puntos in puntos_arboles.items():
-            for [x,y] in puntos:
+        puntos_con_profundidad = []
+        for [x,y] in puntos_arboles:
 
-                if x <= self.FiltradoPlano_OFFSET_HORIZONTAL:
-                    continue
-                
-                if mask_id not in puntos_con_profundidad: puntos_con_profundidad[mask_id] = [] 
-
-                z = mapa_profunidad[y, x]
-                puntos_con_profundidad[mask_id].append([x,y,z])
+            if x <= self.FiltradoPlano_OFFSET_HORIZONTAL:
+                continue
+            
+            # vamos a correr el plano en z un margen para no contar 
+            # dos veces las manzanas del centro.
+            z = mapa_profunidad[y, x] + self.FiltradoPlano_MARGEN_PLANO
+            puntos_con_profundidad.append([x,y,z])
 
         return puntos_con_profundidad
-
-    def __filtrar_puntos_threshold(self, puntos_arboles):
-        puntos = []
-
-        # Tomar todos los puntos de los troncos encontrados.
-        for mask_id, puntos_de_arbol in puntos_arboles.items():
-            puntos += puntos_de_arbol
-        
-        threshold = int(self.__find_clusters([p[2] for p in puntos]))
-
-        puntos_filtrados = {}
-        for mask_id, puntos_de_arbol in puntos_arboles.items():
-            for p in puntos_de_arbol:
-                if p[2] < threshold:
-                    if mask_id not in puntos_filtrados: puntos_filtrados[mask_id] = []
-                    puntos_filtrados[mask_id].append(p)
-
-        return puntos_filtrados
 
     def __obtener_plano(self, puntos):
         if len(puntos) < 3:
@@ -256,32 +239,40 @@ class FiltradoPlano(filtrado_base.FiltradoBase):
 
         return img_with_plane
 
+    def __filtrar_puntos_filas_posteriores(self, puntos, mapa_profundidad):
+        return self.filtro_filas_posteriores.filter(None, puntos, None, mapa_profundidad)
+
     def __filtrar_puntos(self, timestamp, puntos_manzanas, img_original, mapa_profundidad):
         # se obtienen 3 puntos dentro de cada tronco detectado en la imagen    
         puntos_arboles = self.__obtener_puntos_arboles(img_original, timestamp)
 
-        # se obtiene la profunidad asociada aesos puntos
-        puntos_con_profundidad = self.__obtener_puntos_con_profunidad(puntos_arboles, mapa_profundidad)
+        print(f"antes filtrar - puntos_arboles: {puntos_arboles}")
+        # sacamos los puntos de arboles de filas posteriores
+        for mask_id, puntos in puntos_arboles.items():
+            puntos_filtrados = self.__filtrar_puntos_filas_posteriores(puntos, mapa_profundidad)
+            puntos_arboles[mask_id] = puntos_filtrados
 
-        # se utiliza la profundidad para filtrar los puntos de los troncos que
-        # corresponden a otras filas utilizando kmeans.
-        puntos_filtrados = self.__filtrar_puntos_threshold(puntos_con_profundidad)
+        print(f"luego filtrar - puntos_arboles: {puntos_arboles}")
 
-        numero_arboles = len(puntos_filtrados.keys())
+        # sacar las keys que tienen listas vacias
+        puntos_arboles = {k: v for k, v in puntos_arboles.items() if v}
+
+        # chequeamos la cantidad de troncos detectados
+        numero_arboles = len(puntos_arboles.keys())
 
         if numero_arboles < 2:
             # raise error porque con solo 1 tronco detectado el plano interpolado seria
             # muy poco preciso.
             raise CantidadPuntosInsuficiente("Luego de filtrado los puntos, no quedan 2 arboles")
-
+        
         total_puntos = []
-        for puntos_tronco in puntos_filtrados.values():
+        for puntos_tronco in puntos_arboles.values():
             total_puntos += puntos_tronco
 
-        # vamos a correr el plano en z un margen para no contar 
-        # dos veces las manzanas del centro.
-        total_puntos = [[x, y, z + self.FiltradoPlano_MARGEN_PLANO] for x, y, z in total_puntos]
+        # agregamos la profunidad de cada punto
+        total_puntos = self.__obtener_puntos_con_profunidad(total_puntos, mapa_profundidad)
 
+        # generamos el plano
         a, b, c, d = self.__obtener_plano(total_puntos)
 
         if self.config["verbose"]:

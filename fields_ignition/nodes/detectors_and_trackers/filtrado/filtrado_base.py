@@ -15,13 +15,13 @@ class FiltradoBase:
     
     def obtener_puntos_con_profunidad(self, puntos, mapa_profunidad):
         puntos_con_profundidad = []
-        for [x, y, bb_id, *rest] in puntos:
+        for [x, y, *rest] in puntos:
 
             if x <= self.FiltradoBase_OFFSET_HORIZONTAL:
                 continue
 
             z = mapa_profunidad[y, x]
-            puntos_con_profundidad.append([x,y,z,bb_id,*rest])
+            puntos_con_profundidad.append([x,y,z,*rest])
 
         # se retorna una lista de la forma
         # [<x, y, z(profundidad), id >,....]
