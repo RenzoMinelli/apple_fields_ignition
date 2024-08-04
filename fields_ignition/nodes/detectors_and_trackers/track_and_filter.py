@@ -41,7 +41,7 @@ class TrackAndFilter:
         self.world_name =               config.get('TRACK_AND_FILTER', 'world_name')
         self.track =                    config.getboolean('TRACK_AND_FILTER', 'track')
         self.gen_imagenes_tracker =     config.get('TRACK_AND_FILTER', 'gen_imagenes_tracker')
-        self.generar_imagen_plano =     config.get('TRACK_AND_FILTER', 'generar_imagen_plano')
+        self.generar_imagen_plano =     config.get('FILTRADO_PLANO', 'generar_imagen_plano')
         self.rotar_imagenes =           config.getboolean('TRACK_AND_FILTER', 'troncos_horizontales')
         self.verbose =                  config.getboolean('TRACK_AND_FILTER', 'verbose')
         self.debug_plano =              config.getboolean('FILTRADO_PLANO', 'debug_plano')

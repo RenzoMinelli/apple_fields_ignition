@@ -44,7 +44,7 @@ class Plotting:
 
         self.verbose = self.config.getboolean('TRACK_AND_FILTER', 'verbose')
         self.debug_plano = self.config.getboolean('FILTRADO_PLANO', 'debug_plano')
-        self.generar_imagen_plano = self.config.get('TRACK_AND_FILTER', 'generar_imagen_plano')
+        self.generar_imagen_plano = self.config.get('FILTRADO_PLANO', 'generar_imagen_plano')
 
     # Define a function to draw bounding boxes on an image and save the modified image
     def draw_boxes_and_save(self, timestamp, imagen_original, green_bboxs, red_bboxs, output_folder):
