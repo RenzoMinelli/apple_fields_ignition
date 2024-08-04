@@ -71,22 +71,24 @@ class Plotting:
         # bounding_boxes = {<timestamp1>: [[<x>, <y>, <id>], ...], ...}
         bounding_boxes = TrackAndFilter(self.config_path).read_bounding_boxes()
 
+        configs_filtros = {
+            "verbose": self.verbose,
+            "debug_plano": self.debug_plano,
+            "working_directory": CWD,
+            "generar_imagen_plano": self.generar_imagen_plano,
+            "rotar_imagenes": self.rotar_imagenes,
+            "config_path": self.config_path
+        }
+        
+        # instancio el filtro
+        filtro = self.filter_class(configs_filtros)
+        
         for timestamp in bounding_boxes:
             # leer numpy matriz 
             mapa_profundidad = np.load("depth_matrix/" + str(timestamp) + ".npy")
             imagen_original = cv2.imread("left_rgb_images/" + str(timestamp) + ".png")
 
-            configs_filtros = {
-                "verbose": self.verbose,
-                "debug_plano": self.debug_plano,
-                "working_directory": CWD,
-                "generar_imagen_plano": self.generar_imagen_plano,
-                "rotar_imagenes": self.rotar_imagenes,
-                "config_path": self.config_path
-            }
-            # instancio el filtro
-            filtro = self.filter_class(configs_filtros)
-
+            
             # Estas las imprimimos todas en rojo
             red_depths = filtro.obtener_puntos_con_profunidad(bounding_boxes[timestamp], mapa_profundidad)
             # Luego sobreescribimos las que no seran descartadas con color verde.
