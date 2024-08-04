@@ -242,14 +242,35 @@ class FiltradoPlano(FiltradoBase):
     def __filtrar_puntos_filas_posteriores(self, puntos, mapa_profundidad):
         return self.filtro_filas_posteriores.filter(None, puntos, None, mapa_profundidad)
 
+    def __pintar_negro_puntos_filtrados(self, timestamp, puntos_originales, puntos_filtrados, img):
+        # Crear una copia de la imagen para modificar
+        puntos_filtrados_set = set()
+        # Crear un conjunto de puntos filtrados para rápida búsqueda
+        for _, lista in puntos_filtrados.items():
+            for x,y in lista:
+                puntos_filtrados_set.add((x,y))
+
+        # Iterar sobre los puntos originales
+        for mask_id, puntos in puntos_originales.items():
+            for (x, y) in puntos:
+                # Si el punto no está en los puntos filtrados, pintarlo de negro
+                if (x, y) not in puntos_filtrados_set:
+                    cv2.circle(img, (x, y), 3, (0, 0, 0), -1)
+
+
     def __filtrar_puntos(self, timestamp, puntos_manzanas, img_original, mapa_profundidad):
         # se obtienen 3 puntos dentro de cada tronco detectado en la imagen    
-        puntos_arboles = self.__obtener_puntos_arboles(img_original, timestamp)
+        puntos_arboles_orig = self.__obtener_puntos_arboles(img_original, timestamp)
+        puntos_arboles = {}
 
         # sacamos los puntos de arboles de filas posteriores
-        for mask_id, puntos in puntos_arboles.items():
+        for mask_id, puntos in puntos_arboles_orig.items():
             puntos_filtrados = self.__filtrar_puntos_filas_posteriores(puntos, mapa_profundidad)
             puntos_arboles[mask_id] = puntos_filtrados
+
+        # pintar de negro los puntos de los arboles filtrados en la imagen 
+        if self.config["debug_plano"]:
+            self.__pintar_negro_puntos_filtrados(timestamp, puntos_arboles_orig, puntos_arboles, img_original)
 
         # sacar las keys que tienen listas vacias
         puntos_arboles = {k: v for k, v in puntos_arboles.items() if v}
