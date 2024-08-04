@@ -246,13 +246,10 @@ class FiltradoPlano(FiltradoBase):
         # se obtienen 3 puntos dentro de cada tronco detectado en la imagen    
         puntos_arboles = self.__obtener_puntos_arboles(img_original, timestamp)
 
-        print(f"antes filtrar - puntos_arboles: {puntos_arboles}")
         # sacamos los puntos de arboles de filas posteriores
         for mask_id, puntos in puntos_arboles.items():
             puntos_filtrados = self.__filtrar_puntos_filas_posteriores(puntos, mapa_profundidad)
             puntos_arboles[mask_id] = puntos_filtrados
-
-        print(f"luego filtrar - puntos_arboles: {puntos_arboles}")
 
         # sacar las keys que tienen listas vacias
         puntos_arboles = {k: v for k, v in puntos_arboles.items() if v}
