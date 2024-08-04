@@ -251,7 +251,7 @@ class FiltradoPlano(FiltradoBase):
                 puntos_filtrados_set.add((x,y))
 
         # Iterar sobre los puntos originales
-        for mask_id, puntos in puntos_originales.items():
+        for _, puntos in puntos_originales.items():
             for (x, y) in puntos:
                 # Si el punto no está en los puntos filtrados, pintarlo de negro
                 if (x, y) not in puntos_filtrados_set:
