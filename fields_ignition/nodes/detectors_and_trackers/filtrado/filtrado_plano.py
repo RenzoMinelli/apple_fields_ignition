@@ -37,26 +37,6 @@ class FiltradoPlano(FiltradoBase):
 
         return filtered_points
 
-    def __find_clusters(self, nums, threshold=10):
-        if not nums:
-            return 0
-
-        # Sort the list of numbers
-        sorted_nums = sorted(nums, reverse=True)
-        maximo = sorted_nums[0]
-
-        # Initialize the first group
-        puntos_incluidos = [maximo]
-
-        # Iterar a través de los números ordenados y formar grupos
-        for i in range(1, len(sorted_nums)):
-            if abs(maximo - sorted_nums[i]) > threshold:
-                break
-
-            puntos_incluidos.append(sorted_nums[i])
-        
-        return min(puntos_incluidos)
-
     # obtiene 3 puntos reales dentro del tronco, uno central, uno arriba y uno abajo
     # ademas permite la visualizacion de esos puntos mediante cv2
     def __obtener_puntos_arboles(self, img, timestamp):
@@ -256,7 +236,6 @@ class FiltradoPlano(FiltradoBase):
                 # Si el punto no está en los puntos filtrados, pintarlo de negro
                 if (x, y) not in puntos_filtrados_set:
                     cv2.circle(img, (x, y), 3, (0, 0, 0), -1)
-
 
     def __filtrar_puntos(self, timestamp, puntos_manzanas, img_original, mapa_profundidad):
         # se obtienen 3 puntos dentro de cada tronco detectado en la imagen    
