@@ -147,7 +147,7 @@ class TrackAndFilter:
             "--yolo-model", f"{CWD}/weights/{self.yolo_weights}",
             "--tracking-method", self.tracking_method,
             "--source", SOURCE,
-            "--save", "--save-txt",
+            "--save-txt",
             *extra_args
         ]
 
