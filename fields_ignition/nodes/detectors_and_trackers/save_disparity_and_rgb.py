@@ -3,7 +3,6 @@ import rospy
 import cv2 as cv
 from cv_bridge import CvBridge
 from sensor_msgs.msg import Image
-from stereo_msgs.msg import DisparityImage
 import message_filters
 import os
 import subprocess
@@ -15,32 +14,32 @@ FILTRO = None
 def read_cameras():
     ros_namespace = os.getenv('ROS_NAMESPACE') if os.getenv('ROS_NAMESPACE') else 'stereo'
     imageL = message_filters.Subscriber("/" + ros_namespace + "/left/image_rect_color", Image)
-    disparity = message_filters.Subscriber("/" + ros_namespace + "/disparity", DisparityImage)
+    depth_map = message_filters.Subscriber("/" + ros_namespace + "/depth_image", Image)
 
     # Use ApproximateTimeSynchronizer instead of TimeSynchronizer
-    ts = message_filters.TimeSynchronizer([imageL, disparity], queue_size=20)
+    ts = message_filters.TimeSynchronizer([imageL, depth_map], queue_size=20)
     ts.registerCallback(image_callback)
 
-def image_callback(imageL, disparity):
+def image_callback(imageL, depth_map):
     br = CvBridge()
     rospy.loginfo("receiving Image")
 
     # convert the images to cv2 format
     cv_image_left = br.imgmsg_to_cv2(imageL, 'bgr8')
-    cv_disparity = br.imgmsg_to_cv2(disparity.image)
+    # cv_disparity = br.imgmsg_to_cv2(disparity.image)
     
     # Retrieve camera parameters
-    focal_length = disparity.f  # Focal length
-    baseline = disparity.T  # Baseline
+    # focal_length = disparity.f  # Focal length
+    # baseline = disparity.T  # Baseline
 
-    if baseline == 0:
-        baseline = 0.12
+    #if baseline == 0:
+    #    baseline = 0.12
 
     # Compute the depth map
-    with np.errstate(divide='ignore', invalid='ignore'):  # Ignore division errors and invalid values
-        depth_map = (focal_length * baseline) / cv_disparity
+    # with np.errstate(divide='ignore', invalid='ignore'):  # Ignore division errors and invalid values
+    #    depth_map = (focal_length * baseline) / cv_disparity
         
-    depth_map = np.where(np.isinf(depth_map), 150, depth_map)
+    # depth_map = np.where(np.isinf(depth_map), 150, depth_map)
     timestamp = str(imageL.header.stamp)
 
     global FILTRO
@@ -50,11 +49,11 @@ def image_callback(imageL, disparity):
         print(f"conteo por ahora: {FILTRO.get_apple_count()}")
     else: # solo generar para post procesado
         # Normalize depth map to range 0-255 for visualization
-        depth_map_normalized = cv.normalize(depth_map, None, alpha=0, beta=255, norm_type=cv.NORM_MINMAX)
+        #depth_map_normalized = cv.normalize(depth_map, None, alpha=0, beta=255, norm_type=cv.NORM_MINMAX)
       
-        cv.imwrite('left_rgb_images/{}.png'.format(timestamp), cv_image_left)
-        cv.imwrite('depth_maps/{}.png'.format(timestamp), depth_map_normalized)
-        np.save(f"depth_matrix/{timestamp}.npy", depth_map)
+        #cv.imwrite('left_rgb_images/{}.png'.format(timestamp), cv_image_left)
+        #cv.imwrite('depth_maps/{}.png'.format(timestamp), depth_map_normalized)
+        cv.imwrite(f"depth_maps/{timestamp}.png", depth_map)
 
 def empty_folder(folder_path):
     # If the folder does not exist, create it

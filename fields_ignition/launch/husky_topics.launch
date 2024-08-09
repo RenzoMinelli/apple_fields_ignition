@@ -3,7 +3,7 @@
   <arg name="world_name" default="field" />
   <arg name="name" default="costar_husky_sensor_config_1" />
   <arg name="link_name" value="base_link" />
-  <arg name="sensor_prefix" value="/world/$(arg world_name)/model/$(arg name)/link/$(arg link_name)/sensor" />
+  <arg name="sensor_prefix" value="/world/$(arg world_name)/model/$(arg name)/link/$(arg link_name)/sensor/realsense_d435" />
 
   <node
     pkg="ros_ign_bridge"
@@ -48,33 +48,39 @@
     <node
       pkg="ros_ign_bridge"
       type="parameter_bridge"
-      name="ros_ign_bridge_camera_left"
-      args="$(arg sensor_prefix)/camera_left/camera_info@sensor_msgs/CameraInfo[ignition.msgs.CameraInfo">
-      <remap from="$(arg sensor_prefix)/camera_left/camera_info" to="left/camera_info" />
+      name="ros_ign_bridge_camera_medio"
+      args="$(arg sensor_prefix)/camera_info@sensor_msgs/CameraInfo[ignition.msgs.CameraInfo">
+      <remap from="$(arg sensor_prefix)/camera_info" to="medio/camera_info" />
     </node>
     <node
       pkg="ros_ign_image"
       type="image_bridge"
-      name="ros_ign_image_camera_left"
-      args="$(arg sensor_prefix)/camera_left/image"
+      name="ros_ign_image_camera_medio"
+      args="$(arg sensor_prefix)/image"
     >
-      <remap from="$(arg sensor_prefix)/camera_left/image" to="left/image_raw" />
+      <remap from="$(arg sensor_prefix)/image" to="medio/image_raw" />
+    </node>
+
+    <!--Depth camera -->
+    <node
+      pkg="ros_ign_image"
+      type="image_bridge"
+      name="ros_ign_depth_image_camera_medio"
+      args="$(arg sensor_prefix)/depth_image"
+    >
+      <remap from="$(arg sensor_prefix)/depth_image" to="medio/depth_image" />
     </node>
 
     <node
-      pkg="ros_ign_bridge"
-      type="parameter_bridge"
-      name="ros_ign_bridge_camera_right"
-      args="$(arg sensor_prefix)/camera_right/camera_info@sensor_msgs/CameraInfo[ignition.msgs.CameraInfo">
-      <remap from="$(arg sensor_prefix)/camera_right/camera_info" to="right/camera_info" />
-    </node>
-    <node
-      pkg="ros_ign_image"
-      type="image_bridge"
-      name="ros_ign_image_camera_right"
-      args="$(arg sensor_prefix)/camera_right/image"
+      pkg="ros_ign_point_cloud"
+      type="point_cloud_bridge"
+      name="ros_ign_point_cloud_bridge_medio"
+      args="$(arg sensor_prefix)/points"
     >
-      <remap from="$(arg sensor_prefix)/camera_right/image" to="right/image_raw" />
+        <remap from="$(arg sensor_prefix)/points" to="medio/points" />
     </node>
+
+
+
   </group>
 </launch>
