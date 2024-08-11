@@ -1,0 +1,33 @@
+<launch>
+  <!-- Launch file to run bag file -->
+  <arg name="bag_file_path" default="/home/paolo/catkin_ws/bag_mas_lento.bag"/>
+  <arg name="folder_path" default="/home/paolo/catkin_ws"/>
+  <arg name="post_procesamiento" default="true"/>
+  <arg name="config" default="$(arg folder_path)/src/apple_fields_ignition/fields_ignition/nodes/config.ini"/>
+
+  <!-- Camera image left topic -->
+  <arg name="camera_image_topic" default="/costar_husky_sensor_config_1/medio/image_raw"/>
+  <!-- Camera info left topic -->
+  <arg name="camera_info_topic" default="/costar_husky_sensor_config_1/medio/camera_info"/>
+  <!-- Camera depth_image topic -->
+  <arg name="camera_depth_image_topic" default="/costar_husky_sensor_config_1/medio/depth_image"/>
+
+  <!-- Play the rosbag and remap camera info topics -->
+  <node pkg="rosbag" type="play" name="rosbag_play" args="$(arg bag_file_path) $(arg camera_info_topic):=/depth/medio/camera_info" output="log"/>
+
+  <!-- Remap camera image topic -->
+  <node pkg="image_transport" type="republish" name="remap_image" output="screen" args="compressed in:=$(arg camera_image_topic) raw out:=/depth/medio/image_raw" />
+
+  <!-- Remap camera image depth topic -->
+  <node pkg="image_transport" type="republish" name="remap_depth_image" output="screen" args="in:=$(arg camera_depth_image_topic) raw out:=/depth/medio/depth_image" />
+
+  <!-- Run script to save the images -->
+  <!-- use remap instead of the namespace -->
+  <env name="ROS_NAMESPACE" value="depth" />
+  <node pkg="fields_ignition" type="save_disparity_and_rgb.py" name="save_disparity_and_rgb" args="--working_directory=$(arg folder_path) --post_procesamiento=$(arg post_procesamiento) --config=$(arg config)" output="screen"/>
+
+</launch>
+
+<!-- Ejemplo de ejecucion -->
+<!-- Parado en la carpeta de catkin_ws -->
+<!-- roslaunch fields_ignition stereo_sim_bag.launch bag_file_path:=/home/paolo/catkin_ws/s1_230228.bag folder_path:=/home/paolo/catkin_ws -->

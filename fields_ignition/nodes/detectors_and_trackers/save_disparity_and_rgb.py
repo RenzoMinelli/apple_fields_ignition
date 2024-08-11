@@ -12,20 +12,22 @@ import numpy as np
 FILTRO = None
 
 def read_cameras():
-    ros_namespace = os.getenv('ROS_NAMESPACE') if os.getenv('ROS_NAMESPACE') else 'stereo'
-    imageL = message_filters.Subscriber("/" + ros_namespace + "/left/image_rect_color", Image)
-    depth_map = message_filters.Subscriber("/" + ros_namespace + "/depth_image", Image)
+    ros_namespace = os.getenv('ROS_NAMESPACE') if os.getenv('ROS_NAMESPACE') else 'depth'
+    image = message_filters.Subscriber("/" + ros_namespace + "/medio/image_raw", Image)
+    depth_data = message_filters.Subscriber("/" + ros_namespace + "/medio/depth_image", Image)
 
     # Use ApproximateTimeSynchronizer instead of TimeSynchronizer
-    ts = message_filters.TimeSynchronizer([imageL, depth_map], queue_size=20)
+    ts = message_filters.TimeSynchronizer([image, depth_data], queue_size=20)
     ts.registerCallback(image_callback)
+    print('IMAGE CALLBACKKKKKKKKKKKKKKKKKKKKK')
 
-def image_callback(imageL, depth_map):
+def image_callback(image, depth_data):
+    breakpoint()
     br = CvBridge()
     rospy.loginfo("receiving Image")
 
     # convert the images to cv2 format
-    cv_image_left = br.imgmsg_to_cv2(imageL, 'bgr8')
+    cv_image_left = br.imgmsg_to_cv2(image, 'bgr8')
     # cv_disparity = br.imgmsg_to_cv2(disparity.image)
     
     # Retrieve camera parameters
@@ -40,7 +42,7 @@ def image_callback(imageL, depth_map):
     #    depth_map = (focal_length * baseline) / cv_disparity
         
     # depth_map = np.where(np.isinf(depth_map), 150, depth_map)
-    timestamp = str(imageL.header.stamp)
+    timestamp = str(image.header.stamp)
 
     global FILTRO
 
