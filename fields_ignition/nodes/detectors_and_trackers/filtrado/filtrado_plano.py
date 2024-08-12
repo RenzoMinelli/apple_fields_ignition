@@ -23,6 +23,7 @@ class FiltradoPlano(FiltradoBase):
         self.FiltradoPlano_OFFSET_HORIZONTAL = self.imported_config.getint('CONSTANTS', 'offset_horizontal')
         self.FiltradoPlano_MARGEN_PLANO = self.imported_config.getint('CONSTANTS', 'margen_plano')
         self.FiltradoPlano_GENERAR_IMAGEN_PLANO = self.imported_config.getboolean('FILTRADO_PLANO', 'generar_imagen_plano')
+        self.termino_independiente_del_plano = self.imported_config.getfloat('FILTRADO_PLANO', 'termino_independiente_del_plano')
         self.filtro_filas_posteriores = FiltradoFilasPosteriores(config)
         self.__preparar_carpetas()
 
@@ -180,7 +181,7 @@ class FiltradoPlano(FiltradoBase):
         coeffs, _, _, _ = np.linalg.lstsq(puntos_a_interpolar, b, rcond=None)
         
         a, b, c = coeffs
-        d = -0.68
+        d = self.termino_independiente_del_plano
         
         return a, b, c, d
 
