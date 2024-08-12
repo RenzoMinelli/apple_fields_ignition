@@ -180,7 +180,7 @@ class FiltradoPlano(FiltradoBase):
         coeffs, _, _, _ = np.linalg.lstsq(puntos_a_interpolar, b, rcond=None)
         
         a, b, c = coeffs
-        d = -1  
+        d = -0.68
         
         return a, b, c, d
 

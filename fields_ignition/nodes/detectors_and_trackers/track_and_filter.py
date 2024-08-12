@@ -193,8 +193,9 @@ class TrackAndFilter:
         filtro = self.filter_class(self.__configs_filtro())
 
         for timestamp in bounding_boxes:
+            print(f"timestamp: {timestamp}")
             img_original = cv2.imread("left_rgb_images/" + str(timestamp) + ".png")
-            mapa_profundidad = np.load("depth_matrix/" + str(timestamp) + ".npy")  
+            mapa_profundidad = np.load("depth_maps/" + str(timestamp) + ".npy")  
 
             filtered_bbs = filtro.filter(timestamp, bounding_boxes[timestamp], img_original, mapa_profundidad)
 

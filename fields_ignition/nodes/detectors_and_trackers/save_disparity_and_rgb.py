@@ -42,8 +42,12 @@ def image_callback(image, depth_data):
         FILTRO.track_filter_and_count_one_frame(timestamp, cv_image_left, depth_map)
         print(f"conteo por ahora: {FILTRO.get_apple_count()}")
     else: # solo generar para post procesado
+        # guardar la imagen y el mapa de profundidad
+        np.save(f"depth_maps/{timestamp}.npy", depth_map)
+
         normalised_depth = map_distance_for_image(depth_map)
-        cv.imwrite(f"depth_maps/{timestamp}.png", normalised_depth)
+        cv.imwrite(f"left_rgb_images/{timestamp}.png", cv_image_left)
+        cv.imwrite(f"depth_maps_visualizable/{timestamp}.png", normalised_depth)
 
 def empty_folder(folder_path):
     # If the folder does not exist, create it
@@ -94,6 +98,7 @@ if __name__ == '__main__':
         # Empty the folders
         empty_folder('left_rgb_images')
         empty_folder('depth_maps')
+        empty_folder('depth_maps_visualizable')
         empty_folder('depth_matrix')
         delete_folder('yolo_tracking/runs/track/exp')
 
