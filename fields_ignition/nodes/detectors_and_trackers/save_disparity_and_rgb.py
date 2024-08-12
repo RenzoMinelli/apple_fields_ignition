@@ -19,29 +19,21 @@ def read_cameras():
     # Use ApproximateTimeSynchronizer instead of TimeSynchronizer
     ts = message_filters.TimeSynchronizer([image, depth_data], queue_size=20)
     ts.registerCallback(image_callback)
-    print('IMAGE CALLBACKKKKKKKKKKKKKKKKKKKKK')
+
+def map_distance_for_image(depth_map):
+    return np.interp(depth_map, (1, 4), (0, 255))
 
 def image_callback(image, depth_data):
-    breakpoint()
     br = CvBridge()
     rospy.loginfo("receiving Image")
 
-    # convert the images to cv2 format
+    # Convertir la imagen y la profundidad a formato de OpenCV
     cv_image_left = br.imgmsg_to_cv2(image, 'bgr8')
-    # cv_disparity = br.imgmsg_to_cv2(disparity.image)
-    
-    # Retrieve camera parameters
-    # focal_length = disparity.f  # Focal length
-    # baseline = disparity.T  # Baseline
-
-    #if baseline == 0:
-    #    baseline = 0.12
-
-    # Compute the depth map
-    # with np.errstate(divide='ignore', invalid='ignore'):  # Ignore division errors and invalid values
-    #    depth_map = (focal_length * baseline) / cv_disparity
+    cv_depth_data = br.imgmsg_to_cv2(depth_data, '32FC1')
         
-    # depth_map = np.where(np.isinf(depth_map), 150, depth_map)
+    # Asignar 150 a los valores infinitos representados como 'inf'
+    depth_map = np.where(np.isinf(cv_depth_data), 255, cv_depth_data)
+
     timestamp = str(image.header.stamp)
 
     global FILTRO
@@ -50,12 +42,8 @@ def image_callback(image, depth_data):
         FILTRO.track_filter_and_count_one_frame(timestamp, cv_image_left, depth_map)
         print(f"conteo por ahora: {FILTRO.get_apple_count()}")
     else: # solo generar para post procesado
-        # Normalize depth map to range 0-255 for visualization
-        #depth_map_normalized = cv.normalize(depth_map, None, alpha=0, beta=255, norm_type=cv.NORM_MINMAX)
-      
-        #cv.imwrite('left_rgb_images/{}.png'.format(timestamp), cv_image_left)
-        #cv.imwrite('depth_maps/{}.png'.format(timestamp), depth_map_normalized)
-        cv.imwrite(f"depth_maps/{timestamp}.png", depth_map)
+        normalised_depth = map_distance_for_image(depth_map)
+        cv.imwrite(f"depth_maps/{timestamp}.png", normalised_depth)
 
 def empty_folder(folder_path):
     # If the folder does not exist, create it
