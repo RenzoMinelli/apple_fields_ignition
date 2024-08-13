@@ -24,7 +24,7 @@ def read_cameras():
 def image_callback(imageL, disparity):
     br = CvBridge()
     rospy.loginfo("receiving Image")
-
+    print("receiving Image")
     # convert the images to cv2 format
     cv_image_left = br.imgmsg_to_cv2(imageL, 'bgr8')
     cv_disparity = br.imgmsg_to_cv2(disparity.image)
