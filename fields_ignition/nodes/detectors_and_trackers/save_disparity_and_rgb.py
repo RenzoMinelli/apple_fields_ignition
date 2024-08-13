@@ -21,6 +21,9 @@ def read_cameras():
     ts = message_filters.TimeSynchronizer([imageL, disparity], queue_size=20)
     ts.registerCallback(image_callback)
 
+def map_distance_for_image(depth_map):
+    return np.interp(depth_map, (1, 4), (0, 255))
+
 def image_callback(imageL, disparity):
     br = CvBridge()
     rospy.loginfo("receiving Image")
@@ -40,7 +43,7 @@ def image_callback(imageL, disparity):
     with np.errstate(divide='ignore', invalid='ignore'):  # Ignore division errors and invalid values
         depth_map = (focal_length * baseline) / cv_disparity
         
-    depth_map = np.where(np.isinf(depth_map), 150, depth_map)
+    depth_map = np.where(np.isinf(depth_map), 255, depth_map)
     timestamp = str(imageL.header.stamp)
 
     global FILTRO
@@ -50,7 +53,7 @@ def image_callback(imageL, disparity):
         print(f"conteo por ahora: {FILTRO.get_apple_count()}")
     else: # solo generar para post procesado
         # Normalize depth map to range 0-255 for visualization
-        depth_map_normalized = cv.normalize(depth_map, None, alpha=0, beta=255, norm_type=cv.NORM_MINMAX)
+        depth_map_normalized = map_distance_for_image(depth_map)
       
         cv.imwrite('left_rgb_images/{}.png'.format(timestamp), cv_image_left)
         cv.imwrite('depth_maps/{}.png'.format(timestamp), depth_map_normalized)
