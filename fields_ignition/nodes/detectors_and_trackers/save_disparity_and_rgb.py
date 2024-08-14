@@ -16,7 +16,7 @@ def read_cameras():
     image = message_filters.Subscriber("/" + ros_namespace + "/medio/image_raw", Image)
     depth_data = message_filters.Subscriber("/" + ros_namespace + "/medio/depth_image", Image)
 
-    # Use ApproximateTimeSynchronizer instead of TimeSynchronizer
+    # Sincronizar la imagen y la profundidad    
     ts = message_filters.TimeSynchronizer([image, depth_data], queue_size=20)
     ts.registerCallback(image_callback)
 
@@ -41,8 +41,8 @@ def image_callback(image, depth_data):
     if FILTRO:
         FILTRO.track_filter_and_count_one_frame(timestamp, cv_image_left, depth_map)
         print(f"conteo por ahora: {FILTRO.get_apple_count()}")
-    else: # solo generar para post procesado
-        # guardar la imagen y el mapa de profundidad
+    else:
+        # Guardar los datos para post procesado
         np.save(f"depth_maps/{timestamp}.npy", depth_map)
 
         normalised_depth = map_distance_for_image(depth_map)
@@ -50,15 +50,11 @@ def image_callback(image, depth_data):
         cv.imwrite(f"depth_maps_visualizable/{timestamp}.png", normalised_depth)
 
 def empty_folder(folder_path):
-    # If the folder does not exist, create it
     if not os.path.exists(folder_path):
         os.makedirs(folder_path)
         return
-    
-    # Get all the file names in the folder
-    file_names = os.listdir(folder_path)
 
-    # Iterate over the file names and delete each file
+    file_names = os.listdir(folder_path)
     for file_name in file_names:
         file_path = os.path.join(folder_path, file_name)
         os.remove(file_path)
@@ -86,16 +82,16 @@ if __name__ == '__main__':
         if metodo is None:
             raise Exception("No se ha especificado un metodo de post procesamiento")
         
-        # need to delete foler runs/track/exp to avoid errors
+        # Borrar la carpeta exp previa para evitar errores
         delete_folder(f"{os.path.dirname(os.path.realpath(__file__))}/yolo_tracking/runs/track/exp")
 
         from track_and_filter import TrackAndFilter
         FILTRO = TrackAndFilter(args.config)
 
     try:
-        # Change the current directory to the one sent as argument
+        # Cambiar el directorio actual al que se envio como argumento
         os.chdir(working_directory)
-        # Empty the folders
+        # Vaciar las carpetas
         empty_folder('left_rgb_images')
         empty_folder('depth_maps')
         empty_folder('depth_maps_visualizable')
