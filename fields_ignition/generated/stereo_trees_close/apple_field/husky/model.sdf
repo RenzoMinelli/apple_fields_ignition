@@ -87,15 +87,6 @@
           </mesh>
         </geometry>
       </visual>
-      <visual name="base_link_fixed_joint_lump__cliff_sensor_link_visual_2">
-        <pose frame="">0.435 0 0.235 -2.35619 -0 1.5708</pose>
-        <geometry>
-          <cylinder>
-            <length>0.02</length>
-            <radius>0.005</radius>
-          </cylinder>
-        </geometry>
-      </visual>
       <visual name="base_link_fixed_joint_lump__top_chassis_link_visual_5">
         <pose frame="">0 0 0 0 -0 1.5708</pose>
         <geometry>
