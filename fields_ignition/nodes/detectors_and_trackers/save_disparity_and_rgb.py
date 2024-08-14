@@ -3,18 +3,30 @@ import rospy
 import cv2 as cv
 from cv_bridge import CvBridge
 from sensor_msgs.msg import Image
+from stereo_msgs.msg import DisparityImage
 import message_filters
 import os
 import subprocess
 import argparse
 import numpy as np
+import configparser
 
 FILTRO = None
 
-def read_cameras():
-    ros_namespace = os.getenv('ROS_NAMESPACE') if os.getenv('ROS_NAMESPACE') else 'depth'
-    image = message_filters.Subscriber("/" + ros_namespace + "/medio/image_raw", Image)
-    depth_data = message_filters.Subscriber("/" + ros_namespace + "/medio/depth_image", Image)
+def read_cameras(model):
+    ros_namespace = os.getenv('ROS_NAMESPACE') if os.getenv('ROS_NAMESPACE') else model
+    if model == 'depth':
+        image_topic = "/medio/image_raw"
+        depth_topic = "/medio/depth_image"
+        depth_type = Image
+    elif model == 'stereo':
+        image_topic = "/left/image_rect_color"
+        depth_topic = "/disparity"
+        depth_type = DisparityImage
+
+
+    image = message_filters.Subscriber("/" + ros_namespace + image_topic, Image)
+    depth_data = message_filters.Subscriber("/" + ros_namespace + depth_topic, depth_type)
 
     # Sincronizar la imagen y la profundidad    
     ts = message_filters.TimeSynchronizer([image, depth_data], queue_size=20)
@@ -88,6 +100,10 @@ if __name__ == '__main__':
         from track_and_filter import TrackAndFilter
         FILTRO = TrackAndFilter(args.config)
 
+        config = configparser.ConfigParser()
+        config.read(args.config)
+        model = config.get('MODELO', 'modelo')
+
     try:
         # Cambiar el directorio actual al que se envio como argumento
         os.chdir(working_directory)
@@ -98,7 +114,7 @@ if __name__ == '__main__':
         empty_folder('depth_matrix')
         delete_folder('yolo_tracking/runs/track/exp')
 
-        read_cameras()
+        read_cameras(model)
         rospy.spin()
 
         if FILTRO:
