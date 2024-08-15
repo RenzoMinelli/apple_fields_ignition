@@ -1,7 +1,10 @@
 import subprocess
 
 CONFIG_FILES = [
-    "config.ini"
+    "plano.ini",
+    "sin_filtro.ini",
+    "kmeans.ini",
+    "filas_posteriores.ini",
 ]
 
 if __name__ == "__main__":
