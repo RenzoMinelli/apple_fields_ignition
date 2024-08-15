@@ -41,7 +41,10 @@ def image_callback(image, depth_data):
 
     # Convertir la imagen y la profundidad a formato de OpenCV
     cv_image = br.imgmsg_to_cv2(image, 'bgr8')
-    cv_depth_data = br.imgmsg_to_cv2(depth_data)
+    if CAMERA_MODEL == 'depth':
+      cv_depth_data = br.imgmsg_to_cv2(depth_data)
+    else:
+      cv_depth_data = br.imgmsg_to_cv2(depth_data.image)
         
     # Asignar 255 a los valores infinitos representados como 'inf'
     depth_map = np.where(np.isinf(cv_depth_data), 255, cv_depth_data)
