@@ -10,6 +10,7 @@ import argparse
 import cv2
 import numpy as np
 from detectors_and_trackers.yolo_tracking.tracking.track import main as track_main
+import time 
 
 # importar configuraciones
 import configparser
@@ -45,16 +46,16 @@ class TrackAndFilter:
         self.rotar_imagenes =           config.getboolean('TRACK_AND_FILTER', 'troncos_horizontales')
         self.verbose =                  config.getboolean('TRACK_AND_FILTER', 'verbose')
         self.debug_plano =              config.getboolean('FILTRADO_PLANO', 'debug_plano')
-        method =                        config.get('TRACK_AND_FILTER', 'method')
+        self.method =                   config.get('TRACK_AND_FILTER', 'method')
 
         self.yolo_instance = None
         self.ids_filtrados = set()
 
-        if method not in METODOS_FILTRADO.keys():
+        if self.method not in METODOS_FILTRADO.keys():
             allowed_methods = ", ".join(METODOS_FILTRADO.keys())
-            raise ValueError(f"Method {method} not recognized, please use one of the following: {allowed_methods}")
+            raise ValueError(f"Method {self.method} not recognized, please use one of the following: {allowed_methods}")
         
-        self.filter_class = METODOS_FILTRADO[method]
+        self.filter_class = METODOS_FILTRADO[self.method]
 
     def __setup_env(self):
         # clone the repository
@@ -203,8 +204,7 @@ class TrackAndFilter:
         
         # Imprimir resultados
         print('Numero de manzanas detectado: ' + str(self.get_apple_count()))
-
-        # print(f"amount of apples exactly for trees id (5,6,7,8,9): { self.__total_amount_apples_for_trees_ids([5,6,7,8,9])}")
+        self.__save_results()
 
     def track_filter_and_count_one_frame(self, timestamp, img_original, mapa_profundidad):
         new_yolo_instance, bounding_boxes = track_main(args=self.__configs_yolo_one_frame(), image=img_original, yolo_model_instance=self.yolo_instance)
@@ -221,6 +221,21 @@ class TrackAndFilter:
     def get_apple_count(self):
         return len(self.ids_filtrados)
     
+    def __save_results(self):
+        # creo la carpeta results si no existe
+        if not os.path.exists(f"{CWD}/results"):
+            os.makedirs(f"{CWD}/results")
+
+        # genero un archivo con el content del config usado + el conteo en una nueva linea
+        conteo = self.get_apple_count()
+        results_path = f"{CWD}/results/{self.method}_{int(time.time())}.ini"
+
+        with open(self.config_path, "r") as config_file:
+            content = config_file.read()
+            with open(results_path, "w") as results_file:
+                results_file.write(content)
+                results_file.write(f"\napple_count = {conteo}\n")
+        
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", required=True)
