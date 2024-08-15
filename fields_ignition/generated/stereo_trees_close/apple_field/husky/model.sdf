@@ -87,6 +87,14 @@
           </mesh>
         </geometry>
       </visual>
+      <visual name="base_link_fixed_joint_lump__camera/camera_link_visual_1">
+        <pose frame="">0.0212 0 0.716 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>meshes/realsense.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
       <visual name="base_link_fixed_joint_lump__top_chassis_link_visual_5">
         <pose frame="">0 0 0 0 -0 1.5708</pose>
         <geometry>
@@ -129,16 +137,16 @@
       <velocity_decay />
 
       <sensor type="camera" name="right">
-        <update_rate>10.0</update_rate>
+        <update_rate>30</update_rate>
         <always_on>true</always_on>
         <ignition_frame_id>/world/field/model/costar_husky_sensor_config_1/link/base_link</ignition_frame_id>
-        <pose frame="">0.1212 0 0.716 0 0 0</pose>
+        <pose frame="">0.0212 0 0.716 0 0 0</pose>
         <topic>/world/field/model/costar_husky_sensor_config_1/link/base_link/stereo_camera/right/image_raw</topic>
         <camera name="right">
           <horizontal_fov>1.3962634</horizontal_fov>
           <image>
-              <width>1920</width>
-              <height>1080</height>
+              <width>1080</width>
+              <height>1380</height>
               <format>R8G8B8</format>
           </image>
           <clip>
@@ -150,15 +158,15 @@
 
       <sensor type="camera" name="left">
         <topic>/world/field/model/costar_husky_sensor_config_1/link/base_link/stereo_camera/left/image_raw</topic>
-        <update_rate>10.0</update_rate>
+        <update_rate>30</update_rate>
         <always_on>true</always_on>
         <ignition_frame_id>/world/field/model/costar_husky_sensor_config_1/link/base_link</ignition_frame_id>
-        <pose frame="">0.1212 0.12 0.716 0 0 0</pose>
+        <pose frame="">0.0212 0.12 0.716 0 0 0</pose>
         <camera name="left">
           <horizontal_fov>1.3962634</horizontal_fov>
           <image>
-              <width>1920</width>
-              <height>1080</height>
+              <width>1080</width>
+              <height>1380</height>
               <format>R8G8B8</format>
           </image>
           <clip>
