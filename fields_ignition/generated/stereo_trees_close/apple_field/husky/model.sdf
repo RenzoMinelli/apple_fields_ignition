@@ -258,14 +258,6 @@
       <inertial>
         <pose frame="">0 0 0 0 -0 1.5708</pose>
         <mass>2.637</mass>
-        <inertia>
-          <ixx>0.02467</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>0.04411</iyy>
-          <iyz>0</iyz>
-          <izz>0.02467</izz>
-        </inertia>
       </inertial>
       <collision name="front_left_wheel_link_collision">
         <pose frame="">0 0 0 1.5707963267948966 -0 1.5708</pose>
@@ -326,14 +318,6 @@
       <inertial>
         <pose frame="">0 0 0 0 -0 1.5708</pose>
         <mass>2.637</mass>
-        <inertia>
-          <ixx>0.02467</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>0.04411</iyy>
-          <iyz>0</iyz>
-          <izz>0.02467</izz>
-        </inertia>
       </inertial>
       <collision name="front_right_wheel_link_collision">
         <pose frame="">0 0 0 1.5707963267948966 -0 1.5708</pose>
@@ -394,14 +378,6 @@
       <inertial>
         <pose frame="">0 0 0 0 -0 1.5708</pose>
         <mass>2.637</mass>
-        <inertia>
-          <ixx>0.02467</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>0.04411</iyy>
-          <iyz>0</iyz>
-          <izz>0.02467</izz>
-        </inertia>
       </inertial>
       <collision name="rear_left_wheel_link_collision">
         <pose frame="">0 0 0 1.5707963267948966 -0 1.5708</pose>
@@ -462,14 +438,6 @@
       <inertial>
         <pose frame="">0 0 0 0 -0 1.5708</pose>
         <mass>2.637</mass>
-        <inertia>
-          <ixx>0.02467</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>0.04411</iyy>
-          <iyz>0</iyz>
-          <izz>0.02467</izz>
-        </inertia>
       </inertial>
       <collision name="rear_right_wheel_link_collision">
         <pose frame="">0 0 0 1.5707963267948966 -0 1.5708</pose>
