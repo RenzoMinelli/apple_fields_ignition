@@ -42,10 +42,20 @@ def image_callback(image, depth_data):
     # Convertir la imagen y la profundidad a formato de OpenCV
     cv_image = br.imgmsg_to_cv2(image, 'bgr8')
     if CAMERA_MODEL == 'depth':
-      cv_depth_data = br.imgmsg_to_cv2(depth_data)
+        cv_depth_data = br.imgmsg_to_cv2(depth_data)
     else:
-      cv_depth_data = br.imgmsg_to_cv2(depth_data.image)
-        
+        cv_depth_data_aux = br.imgmsg_to_cv2(depth_data.image)
+        # Obtener los parametros de la camara
+        focal_length = depth_data.f  # Focal length
+        baseline = depth_data.T  # Baseline
+
+        if baseline == 0:
+           baseline = 0.12
+
+        # Computar el mapa de profundidad
+        with np.errstate(divide='ignore', invalid='ignore'):  # Ignorar errores de division y valores invalidos
+           cv_depth_data = (focal_length * baseline) / cv_depth_data_aux
+
     # Asignar 255 a los valores infinitos representados como 'inf'
     depth_map = np.where(np.isinf(cv_depth_data), 255, cv_depth_data)
 
