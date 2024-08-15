@@ -12,23 +12,23 @@ import numpy as np
 import configparser
 
 FILTRO = None
+CAMERA_MODEL = None
 
-def read_cameras(model):
-    ros_namespace = os.getenv('ROS_NAMESPACE') if os.getenv('ROS_NAMESPACE') else model
-    if model == 'depth':
+def read_cameras():
+    ros_namespace = os.getenv('ROS_NAMESPACE') if os.getenv('ROS_NAMESPACE') else MODEL
+    if CAMERA_MODEL == 'depth':
         image_topic = "/medio/image_raw"
         depth_topic = "/medio/depth_image"
         depth_type = Image
-    elif model == 'stereo':
+    else:
         image_topic = "/left/image_rect_color"
         depth_topic = "/disparity"
         depth_type = DisparityImage
 
-
     image = message_filters.Subscriber("/" + ros_namespace + image_topic, Image)
     depth_data = message_filters.Subscriber("/" + ros_namespace + depth_topic, depth_type)
 
-    # Sincronizar la imagen y la profundidad    
+    # Sincronizar la imagen y la profundidad
     ts = message_filters.TimeSynchronizer([image, depth_data], queue_size=20)
     ts.registerCallback(image_callback)
 
@@ -40,10 +40,10 @@ def image_callback(image, depth_data):
     rospy.loginfo("receiving Image")
 
     # Convertir la imagen y la profundidad a formato de OpenCV
-    cv_image_left = br.imgmsg_to_cv2(image, 'bgr8')
-    cv_depth_data = br.imgmsg_to_cv2(depth_data, '32FC1')
+    cv_image = br.imgmsg_to_cv2(image, 'bgr8')
+    cv_depth_data = br.imgmsg_to_cv2(depth_data)
         
-    # Asignar 150 a los valores infinitos representados como 'inf'
+    # Asignar 255 a los valores infinitos representados como 'inf'
     depth_map = np.where(np.isinf(cv_depth_data), 255, cv_depth_data)
 
     timestamp = str(image.header.stamp)
@@ -51,15 +51,16 @@ def image_callback(image, depth_data):
     global FILTRO
 
     if FILTRO:
-        FILTRO.track_filter_and_count_one_frame(timestamp, cv_image_left, depth_map)
+        FILTRO.track_filter_and_count_one_frame(timestamp, cv_image, depth_map)
         print(f"conteo por ahora: {FILTRO.get_apple_count()}")
     else:
         # Guardar los datos para post procesado
         np.save(f"depth_maps/{timestamp}.npy", depth_map)
 
+        # Guardar las imagenes para visualizacion
         normalised_depth = map_distance_for_image(depth_map)
-        cv.imwrite(f"left_rgb_images/{timestamp}.png", cv_image_left)
         cv.imwrite(f"depth_maps_visualizable/{timestamp}.png", normalised_depth)
+        cv.imwrite(f"rgb_images/{timestamp}.png", cv_image)
 
 def empty_folder(folder_path):
     if not os.path.exists(folder_path):
@@ -78,11 +79,18 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--working_directory", required=True)
     parser.add_argument("--post_procesamiento", default='True', type=lambda x: (str(x).lower() == 'true'))
+    parser.add_argument("--camera_model", type=str)
     parser.add_argument("--config", type=str)
     parser.add_argument("__name", type=str)
     parser.add_argument("__log", type=str)
 
     args = parser.parse_args()
+
+    CAMERA_MODEL = args.camera_model
+    if CAMERA_MODEL == 'stereo':
+        print('Using stereo camera model, the saved rgb images are the ones from the left camera')
+    elif CAMERA_MODEL:
+        print('Using depth camera model')
 
     rospy.init_node('save_disparity_and_rgb')
 
@@ -100,21 +108,18 @@ if __name__ == '__main__':
         from track_and_filter import TrackAndFilter
         FILTRO = TrackAndFilter(args.config)
 
-        config = configparser.ConfigParser()
-        config.read(args.config)
-        model = config.get('MODELO', 'modelo')
-
     try:
         # Cambiar el directorio actual al que se envio como argumento
         os.chdir(working_directory)
         # Vaciar las carpetas
-        empty_folder('left_rgb_images')
+        empty_folder('rgb_images')
         empty_folder('depth_maps')
         empty_folder('depth_maps_visualizable')
         empty_folder('depth_matrix')
         delete_folder('yolo_tracking/runs/track/exp')
 
-        read_cameras(model)
+        
+        read_cameras()
         rospy.spin()
 
         if FILTRO:
