@@ -38,12 +38,11 @@ if __name__ == "__main__":
     parser.add_argument("--carpeta_bags_simulador_depth", required=True)
     args = parser.parse_args()
 
-    # primero corremos los experimentos con los bags de simulacion stereo
-    # obtenemos los bags en la carpeta correspondiente
+    # seteamos la variable de entorno PYTHONPATH para que las clses de python puedan ser importadas
     my_env = os.environ.copy()
     my_env["PYTHONPATH"] = f"{CWD}/src/apple_fields_ignition/fields_ignition/nodes"
     
-
+    # corremos los experimentos por cada bag
     for bag in os.listdir(args.carpeta_bags_simulador_stereo):
         bag_path = f"{args.carpeta_bags_simulador_stereo}/{bag}"
         launch_and_run(bag_path, "stereo_sim_bag.launch")
