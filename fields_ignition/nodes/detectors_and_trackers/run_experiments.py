@@ -50,7 +50,7 @@ if __name__ == "__main__":
 
     for bag in os.listdir(args.carpeta_bags_simulador_depth):
         bag_path = f"{args.carpeta_bags_simulador_depth}/{bag}"
-        launch_and_run(bag_path, "stereo_sim_bag_depth.launch")
+        launch_and_run(bag_path, "depth_sim_bag.launch")
 
     for bag in os.listdir(args.carpeta_bags_reales):
         bag_path = f"{args.carpeta_bags_reales}/{bag}"
