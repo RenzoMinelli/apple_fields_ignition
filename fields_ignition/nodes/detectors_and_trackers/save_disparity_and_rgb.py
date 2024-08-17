@@ -42,7 +42,7 @@ def image_callback(imageL, disparity):
             bag_max_running_rate = round(processing_rate/30, 3)
             print(f"ADVERTENCIA: para que el sistema pueda procesar el porcentaje minimo \
 de fotogramas, actualmente: {MIN_PROCESSING_RATE} se debe correr \
-el bag con la flag fps '--rate {bag_max_running_rate}'")
+el bag con la flag '--rate {bag_max_running_rate}'")
             
     T1 = rospy.Time.now()
 
