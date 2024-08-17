@@ -13,8 +13,12 @@ import configparser
 
 FILTRO = None
 last_msg_time = None
+TIME_OF_LAST_MESSAGE = None
+MIN_PROCESSING_RATE = None
 
 def read_cameras():
+    rospy.Timer(rospy.Duration(5), check_last_message)  # Check every 5 seconds
+
     ros_namespace = os.getenv('ROS_NAMESPACE') if os.getenv('ROS_NAMESPACE') else 'stereo'
     imageL = message_filters.Subscriber("/" + ros_namespace + "/left/image_rect_color", Image)
     disparity = message_filters.Subscriber("/" + ros_namespace + "/disparity", DisparityImage)
@@ -23,35 +27,33 @@ def read_cameras():
     ts = message_filters.TimeSynchronizer([imageL, disparity], queue_size=20)
     ts.registerCallback(image_callback)
 
-    rospy.Timer(rospy.Duration(5), check_last_message)  # Check every 5 seconds
-
 def map_distance_for_image(depth_map):
     return np.interp(depth_map, (1, 4), (0, 255))
 
-T1 = None
-MIN_PROCESSING_RATE = None
 def image_callback(imageL, disparity):
-    global T1
+    global TIME_OF_LAST_MESSAGE
     global MIN_PROCESSING_RATE
-    if not T1 is None:
-        time_diff = (rospy.Time.now() - T1).to_sec() * 1000
+
+    if not TIME_OF_LAST_MESSAGE is None:
+        time_diff = (rospy.Time.now() - TIME_OF_LAST_MESSAGE).to_sec() * 1000
         print("Tiempo entre imagenes: ", time_diff, "ms")
         fotogramas_procesados_por_segundo = 1000/time_diff
         print("se esta procesando a un rate de: ", fotogramas_procesados_por_segundo, "fps")
+
+
         if MIN_PROCESSING_RATE and fotogramas_procesados_por_segundo < MIN_PROCESSING_RATE:
             bag_max_running_rate = round(fotogramas_procesados_por_segundo/30, 3)
-            print(f"ADVERTENCIA: para que el sistema pueda procesar el porcentaje minimo \
-de fotogramas, actualmente: {MIN_PROCESSING_RATE} se debe correr \
-el bag con la flag '--rate {bag_max_running_rate}'")
+            print(f"""
+                ADVERTENCIA: para que el sistema pueda procesar el porcentaje minimo
+                de fotogramas, actualmente: {MIN_PROCESSING_RATE} se debe correr
+                el bag con la flag '--rate {bag_max_running_rate}'
+            """)
             
-    T1 = rospy.Time.now()
-
-    global last_msg_time
-    last_msg_time = rospy.Time.now()
+    TIME_OF_LAST_MESSAGE = rospy.Time.now()
 
     br = CvBridge()
     rospy.loginfo("receiving Image")
-    print("receiving Image")
+    
     # convert the images to cv2 format
     cv_image_left = br.imgmsg_to_cv2(imageL, 'bgr8')
     cv_disparity = br.imgmsg_to_cv2(disparity.image)
@@ -98,9 +100,12 @@ def delete_folder(folder_path):
     subprocess.run(['rm', '-rf', folder_path])
 
 def check_last_message(event):
-    global last_msg_time
-    if last_msg_time and (rospy.Time.now() - last_msg_time).to_sec() > 3:  # 3 seconds without messages
-        rospy.loginfo("No messages received for 10 seconds, shutting down.")
+    print("Checking last message")
+    global TIME_OF_LAST_MESSAGE
+
+    # checkeamos si pasaron 3 segundos sin recibir mensajes
+    if TIME_OF_LAST_MESSAGE and (rospy.Time.now() - TIME_OF_LAST_MESSAGE).to_sec() > 3:
+        rospy.loginfo("No messages received for 3 seconds, shutting down.")
         rospy.signal_shutdown("Finished processing bag")
 
 if __name__ == '__main__':
