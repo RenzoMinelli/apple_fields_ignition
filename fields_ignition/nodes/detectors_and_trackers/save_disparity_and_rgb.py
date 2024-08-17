@@ -9,6 +9,7 @@ import os
 import subprocess
 import argparse
 import numpy as np
+import configparser
 
 FILTRO = None
 last_msg_time = None
@@ -27,7 +28,24 @@ def read_cameras():
 def map_distance_for_image(depth_map):
     return np.interp(depth_map, (1, 4), (0, 255))
 
+T1 = None
+MIN_PROCESSING_RATE = None
 def image_callback(imageL, disparity):
+    global T1
+    global MIN_PROCESSING_RATE
+    if not T1 is None:
+        time_diff = (rospy.Time.now() - T1).to_sec() * 1000
+        print("Tiempo entre imagenes: ", time_diff, "ms")
+        processing_rate = 1000/time_diff
+        print("se esta procesando a un rate de: ", processing_rate, "fps")
+        if MIN_PROCESSING_RATE and processing_rate < MIN_PROCESSING_RATE:
+            bag_max_running_rate = round(processing_rate/30, 3)
+            print(f"ADVERTENCIA: para que el sistema pueda procesar el porcentaje minimo \
+de fotogramas, actualmente: {MIN_PROCESSING_RATE} se debe correr \
+el bag con la flag fps '--rate {bag_max_running_rate}'")
+            
+    T1 = rospy.Time.now()
+
     global last_msg_time
     last_msg_time = rospy.Time.now()
 
@@ -112,6 +130,11 @@ if __name__ == '__main__':
         FILTRO = TrackAndFilter(args.config)
 
     try:
+        config = configparser.ConfigParser()
+        config.read(args.config)
+
+        MIN_PROCESSING_RATE = config.getfloat('SAVE_DISPARITY_AND_RGB', 'porcentaje_minimo_de_fotogramas_a_procesar')*30
+
         # Change the current directory to the one sent as argument
         os.chdir(working_directory)
         # Empty the folders
