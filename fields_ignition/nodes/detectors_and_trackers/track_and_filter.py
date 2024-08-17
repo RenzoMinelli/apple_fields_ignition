@@ -28,7 +28,7 @@ METODOS_FILTRADO = {
 }
 
 class TrackAndFilter:
-    def __init__(self, config_path):
+    def __init__(self, config_path, bag_name="unknown"):
         
         config = configparser.ConfigParser()
         config.read(config_path)
@@ -47,6 +47,7 @@ class TrackAndFilter:
         self.verbose =                  config.getboolean('TRACK_AND_FILTER', 'verbose')
         self.debug_plano =              config.getboolean('FILTRADO_PLANO', 'debug_plano')
         self.method =                   config.get('TRACK_AND_FILTER', 'method')
+        self.bag_name =                 bag_name
 
         self.yolo_instance = None
         self.ids_filtrados = set()
@@ -228,7 +229,7 @@ class TrackAndFilter:
 
         # genero un archivo con el content del config usado + el conteo en una nueva linea
         conteo = self.get_apple_count()
-        results_path = f"{CWD}/results/{self.method}_{int(time.time())}.ini"
+        results_path = f"{CWD}/results/{self.method}_{self.bag_name}_{int(time.time())}.ini"
 
         with open(self.config_path, "r") as config_file:
             content = config_file.read()
@@ -239,9 +240,10 @@ class TrackAndFilter:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", required=True)
+    parser.add_argument("--bag_name", required=False, default="unknown")
     args = parser.parse_args()
 
-    track_filter = TrackAndFilter(args.config)
+    track_filter = TrackAndFilter(args.config, args.bag_name)
     track_filter.track_filter_and_count()
 
 # 'poetry shell' dentro de /home/<user>/catkin_ws/yolo_tracking

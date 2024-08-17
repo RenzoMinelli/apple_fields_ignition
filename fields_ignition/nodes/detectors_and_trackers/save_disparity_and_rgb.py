@@ -11,6 +11,7 @@ import argparse
 import numpy as np
 
 FILTRO = None
+last_msg_time = None
 
 def read_cameras():
     ros_namespace = os.getenv('ROS_NAMESPACE') if os.getenv('ROS_NAMESPACE') else 'stereo'
@@ -21,10 +22,15 @@ def read_cameras():
     ts = message_filters.TimeSynchronizer([imageL, disparity], queue_size=20)
     ts.registerCallback(image_callback)
 
+    rospy.Timer(rospy.Duration(5), check_last_message)  # Check every 5 seconds
+
 def map_distance_for_image(depth_map):
     return np.interp(depth_map, (1, 4), (0, 255))
 
 def image_callback(imageL, disparity):
+    global last_msg_time
+    last_msg_time = rospy.Time.now()
+
     br = CvBridge()
     rospy.loginfo("receiving Image")
     print("receiving Image")
@@ -72,6 +78,12 @@ def empty_folder(folder_path):
 
 def delete_folder(folder_path):
     subprocess.run(['rm', '-rf', folder_path])
+
+def check_last_message(event):
+    global last_msg_time
+    if last_msg_time and (rospy.Time.now() - last_msg_time).to_sec() > 3:  # 3 seconds without messages
+        rospy.loginfo("No messages received for 10 seconds, shutting down.")
+        rospy.signal_shutdown("Finished processing bag")
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

@@ -32,7 +32,7 @@
   <!-- Run script to save the images -->
   <!-- use remap instead of the namespace -->
   <env name="ROS_NAMESPACE" value="stereo" />
-  <node pkg="fields_ignition" type="save_disparity_and_rgb.py" name="save_disparity_and_rgb" args="--working_directory=$(arg folder_path) --post_procesamiento=$(arg post_procesamiento) --config=$(arg config)" output="screen"/>
+  <node pkg="fields_ignition" type="save_disparity_and_rgb.py" name="save_disparity_and_rgb" args="--working_directory=$(arg folder_path) --post_procesamiento=$(arg post_procesamiento) --config=$(arg config)" output="screen" required="true"/>
 </launch>
 
 <!-- Ejemplo de ejecucion -->
