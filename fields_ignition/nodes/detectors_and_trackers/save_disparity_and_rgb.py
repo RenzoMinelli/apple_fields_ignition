@@ -12,7 +12,6 @@ import numpy as np
 import configparser
 
 FILTRO = None
-last_msg_time = None
 TIME_OF_LAST_MESSAGE = None
 MIN_PROCESSING_RATE = None
 
