@@ -36,9 +36,6 @@ def image_callback(imageL, disparity):
     focal_length = disparity.f  # Focal length
     baseline = disparity.T  # Baseline
 
-    if baseline == 0:
-        baseline = 0.12
-
     # Compute the depth map
     with np.errstate(divide='ignore', invalid='ignore'):  # Ignore division errors and invalid values
         depth_map = (focal_length * baseline) / cv_disparity
