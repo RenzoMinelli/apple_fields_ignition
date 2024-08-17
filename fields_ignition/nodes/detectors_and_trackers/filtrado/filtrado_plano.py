@@ -21,7 +21,7 @@ class FiltradoPlano(FiltradoBase):
         super().__init__(config)
         self.modelo_tronco = YOLO(f"{CWD}/weights/{self.imported_config.get('FILTRADO_PLANO', 'modelo_tronco')}.pt")
         self.FiltradoPlano_OFFSET_HORIZONTAL = self.imported_config.getint('CONSTANTS', 'offset_horizontal')
-        self.FiltradoPlano_MARGEN_PLANO = self.imported_config.getint('CONSTANTS', 'margen_plano')
+        self.FiltradoPlano_MARGEN_PLANO = self.imported_config.getfloat('FILTRADO_PLANO', 'margen_plano')
         self.FiltradoPlano_GENERAR_IMAGEN_PLANO = self.imported_config.getboolean('FILTRADO_PLANO', 'generar_imagen_plano')
         self.filtro_filas_posteriores = FiltradoFilasPosteriores(config)
         self.__preparar_carpetas()
@@ -149,7 +149,7 @@ class FiltradoPlano(FiltradoBase):
             puntos_arboles[mask_id].append(below_point)               
 
             if self.config["debug_plano"]:
-                cv2.imwrite(f"{CWD}/planos/marcado_{timestamp}.png", img)
+                cv2.imwrite(f"{CWD}/puntos_para_plano/{timestamp}.png", img)
 
         return puntos_arboles
 
@@ -162,7 +162,7 @@ class FiltradoPlano(FiltradoBase):
             
             # vamos a correr el plano en z un margen para no contar 
             # dos veces las manzanas del centro.
-            z = mapa_profunidad[y, x] + self.FiltradoPlano_MARGEN_PLANO
+            z = mapa_profunidad[y, x]
             puntos_con_profundidad.append([x,y,z])
 
         return puntos_con_profundidad
@@ -172,22 +172,19 @@ class FiltradoPlano(FiltradoBase):
             raise CantidadPuntosInsuficiente("Hay menos de 3 puntos, no se puede definir el plano")
         
         puntos_a_interpolar = np.array(puntos)
-        b = np.ones(len(puntos))
 
-        # La ecuación normal es (A.T * A) * x = A.T * b
-        # Usamos np.linalg.lstsq para resolver esta ecuación que minimiza ||Ax - b||
-        # Donde x corresponde a los coeficientes [a, b, c]
-        coeffs, _, _, _ = np.linalg.lstsq(puntos_a_interpolar, b, rcond=None)
-        
+        A = np.c_[puntos_a_interpolar[:, 0], puntos_a_interpolar[:, 1], np.ones(puntos_a_interpolar.shape[0])]
+        Z = puntos_a_interpolar[:, 2]
+
+        coeffs, _, _, _ = np.linalg.lstsq(A, Z, rcond=None)
         a, b, c = coeffs
-        d = -1  
         
-        return a, b, c, d
+        return a, b, c
 
-    def __delante_de_plano(self, x, y, z, a, b, c, d):
-        return a * x + b * y + c * z + d < 0
+    def __delante_de_plano(self, x, y, z, a, b, c):
+        return a * x + b * y + c + self.FiltradoPlano_MARGEN_PLANO > z
 
-    def __visualizar_plano_en_imagen(self, img, puntos_manzanas, depth_map, a, b, c, d):
+    def __visualizar_plano_en_imagen(self, img, puntos_manzanas, depth_map, a, b, c):
         # Crear una copia de la imagen para dibujar el plano
         img_with_plane = img.copy()
 
@@ -197,7 +194,7 @@ class FiltradoPlano(FiltradoBase):
                 z = depth_map[y, x]
 
                 # Comprobar si el punto está delante del plano.
-                esta_delante = self.__delante_de_plano(x, y, z, a, b, c, d)
+                esta_delante = self.__delante_de_plano(x, y, z, a, b, c)
 
                 current_color = img_with_plane[y, x]
 
@@ -210,7 +207,7 @@ class FiltradoPlano(FiltradoBase):
             z = depth_map[y, x]
 
             # Comprobar si el punto está delante del plano
-            esta_delante = self.__delante_de_plano(x, y, z, a, b, c, d)
+            esta_delante = self.__delante_de_plano(x, y, z, a, b, c)
 
             if esta_delante:
                 cv2.circle(img_with_plane, (x, y), 3, (0, 255, 0), -1)
@@ -270,14 +267,14 @@ class FiltradoPlano(FiltradoBase):
         total_puntos = self.__obtener_puntos_con_profunidad(total_puntos, mapa_profundidad)
 
         # generamos el plano
-        a, b, c, d = self.__obtener_plano(total_puntos)
+        a, b, c = self.__obtener_plano(total_puntos)
 
         if self.config["verbose"]:
             print('plano generado: ')
-            print(f"a: {a}, b: {b}, c: {c}, d: {d}")
+            print(f"a: {a}, b: {b}, c: {c}")
 
         if self.FiltradoPlano_GENERAR_IMAGEN_PLANO:
-            img_with_plane = self.__visualizar_plano_en_imagen(img_original, puntos_manzanas, mapa_profundidad, a, b, c, d)
+            img_with_plane = self.__visualizar_plano_en_imagen(img_original, puntos_manzanas, mapa_profundidad, a, b, c)
             cv2.imwrite(f"{CWD}/planos/pixeles_filtrados_{timestamp}.png", img_with_plane)
 
         puntos_filtrados = []
@@ -291,7 +288,7 @@ class FiltradoPlano(FiltradoBase):
             z = mapa_profundidad[y, x]
 
             # Comprobar si el punto está delante del plano
-            esta_delante = self.__delante_de_plano(x, y, z, a, b, c, d)
+            esta_delante = self.__delante_de_plano(x, y, z, a, b, c)
 
             if esta_delante:
                 puntos_filtrados.append([x, y, *rest])
@@ -305,5 +302,11 @@ class FiltradoPlano(FiltradoBase):
         else:
             for file in os.listdir(f"{CWD}/planos"):
                 os.remove(f"{CWD}/planos/{file}")
+
+        if not os.path.exists(f"{CWD}/puntos_para_plano"):
+            os.makedirs(f"{CWD}/puntos_para_plano")
+        else:
+            for file in os.listdir(f"{CWD}/puntos_para_plano"):
+                os.remove(f"{CWD}/puntos_para_plano/{file}")
 
         return CWD

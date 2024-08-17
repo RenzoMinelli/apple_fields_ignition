@@ -4,6 +4,7 @@
   <arg name="name" default="costar_husky_sensor_config_1" />
   <arg name="link_name" value="base_link" />
   <arg name="sensor_prefix" value="/world/$(arg world_name)/model/$(arg name)/link/$(arg link_name)/stereo_camera" />
+  <arg name="sensor_prefix_depth" value="/world/$(arg world_name)/model/$(arg name)/link/$(arg link_name)/sensor/realsense_d435" />
 
   <node
     pkg="ros_ign_bridge"
@@ -53,6 +54,14 @@
       <remap from="$(arg sensor_prefix)/left/camera_info" to="left/camera_info" />
     </node>
     <node
+      pkg="ros_ign_bridge"
+      type="parameter_bridge"
+      name="ros_ign_bridge_camera_medio"
+      args="$(arg sensor_prefix_depth)/camera_info@sensor_msgs/CameraInfo[ignition.msgs.CameraInfo">
+      <remap from="$(arg sensor_prefix_depth)/camera_info" to="medio/camera_info" />
+    </node>
+
+    <node
       pkg="ros_ign_image"
       type="image_bridge"
       name="ros_ign_image_camera_left"
@@ -76,5 +85,36 @@
     >
       <remap from="$(arg sensor_prefix)/right/image_raw" to="right/image_raw" />
     </node>
+
+    <node
+      pkg="ros_ign_image"
+      type="image_bridge"
+      name="ros_ign_image_camera_medio"
+      args="$(arg sensor_prefix_depth)/image"
+    >
+      <remap from="$(arg sensor_prefix_depth)/image" to="medio/image_raw" />
+    </node>
+
+    <!--Depth camera -->
+    <node
+      pkg="ros_ign_image"
+      type="image_bridge"
+      name="ros_ign_depth_image_camera_medio"
+      args="$(arg sensor_prefix_depth)/depth_image"
+    >
+      <remap from="$(arg sensor_prefix_depth)/depth_image" to="medio/depth_image" />
+    </node>
+
+    <node
+      pkg="ros_ign_point_cloud"
+      type="point_cloud_bridge"
+      name="ros_ign_point_cloud_bridge_medio"
+      args="$(arg sensor_prefix_depth)/points"
+    >
+        <remap from="$(arg sensor_prefix_depth)/points" to="medio/points" />
+    </node>
+
+
+
   </group>
 </launch>

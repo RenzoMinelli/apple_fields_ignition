@@ -13,14 +13,24 @@ import configparser
 
 FILTRO = None
 last_msg_time = None
+CAMERA_MODEL = None
 
 def read_cameras():
-    ros_namespace = os.getenv('ROS_NAMESPACE') if os.getenv('ROS_NAMESPACE') else 'stereo'
-    imageL = message_filters.Subscriber("/" + ros_namespace + "/left/image_rect_color", Image)
-    disparity = message_filters.Subscriber("/" + ros_namespace + "/disparity", DisparityImage)
+    ros_namespace = os.getenv('ROS_NAMESPACE') if os.getenv('ROS_NAMESPACE') else MODEL
+    if CAMERA_MODEL == 'depth':
+        image_topic = "/medio/image_raw"
+        depth_topic = "/medio/depth_image"
+        depth_type = Image
+    else:
+        image_topic = "/left/image_rect_color"
+        depth_topic = "/disparity"
+        depth_type = DisparityImage
 
-    # Use ApproximateTimeSynchronizer instead of TimeSynchronizer
-    ts = message_filters.TimeSynchronizer([imageL, disparity], queue_size=20)
+    image = message_filters.Subscriber("/" + ros_namespace + image_topic, Image)
+    depth_data = message_filters.Subscriber("/" + ros_namespace + depth_topic, depth_type)
+
+    # Sincronizar la imagen y la profundidad
+    ts = message_filters.TimeSynchronizer([image, depth_data], queue_size=20)
     ts.registerCallback(image_callback)
 
     rospy.Timer(rospy.Duration(5), check_last_message)  # Check every 5 seconds
@@ -30,7 +40,7 @@ def map_distance_for_image(depth_map):
 
 T1 = None
 MIN_PROCESSING_RATE = None
-def image_callback(imageL, disparity):
+def image_callback(image, depth_data):
     global T1
     global MIN_PROCESSING_RATE
     if not T1 is None:
@@ -52,44 +62,46 @@ el bag con la flag '--rate {bag_max_running_rate}'")
     br = CvBridge()
     rospy.loginfo("receiving Image")
     print("receiving Image")
-    # convert the images to cv2 format
-    cv_image_left = br.imgmsg_to_cv2(imageL, 'bgr8')
-    cv_disparity = br.imgmsg_to_cv2(disparity.image)
-    
-    # Retrieve camera parameters
-    focal_length = disparity.f  # Focal length
-    baseline = disparity.T  # Baseline
 
-    # Compute the depth map
-    with np.errstate(divide='ignore', invalid='ignore'):  # Ignore division errors and invalid values
-        depth_map = (focal_length * baseline) / cv_disparity
-        
-    depth_map = np.where(np.isinf(depth_map), 255, depth_map)
-    timestamp = str(imageL.header.stamp)
+    # Convertir la imagen y la profundidad a formato de OpenCV
+    cv_image = br.imgmsg_to_cv2(image, 'bgr8')
+    if CAMERA_MODEL == 'depth':
+        cv_depth_data = br.imgmsg_to_cv2(depth_data)
+    else:
+        cv_depth_data_aux = br.imgmsg_to_cv2(depth_data.image)
+        # Obtener los parametros de la camara
+        focal_length = depth_data.f  # Focal length
+        baseline = depth_data.T  # Baseline
+
+        # Computar el mapa de profundidad
+        with np.errstate(divide='ignore', invalid='ignore'):  # Ignorar errores de division y valores invalidos
+           cv_depth_data = (focal_length * baseline) / cv_depth_data_aux
+
+    # Asignar 255 a los valores infinitos representados como 'inf'
+    depth_map = np.where(np.isinf(cv_depth_data), 255, cv_depth_data)
+
+    timestamp = str(image.header.stamp)
 
     global FILTRO
-
+    
     if FILTRO:
-        FILTRO.track_filter_and_count_one_frame(timestamp, cv_image_left, depth_map)
+        FILTRO.track_filter_and_count_one_frame(timestamp, cv_image, depth_map)
         print(f"conteo por ahora: {FILTRO.get_apple_count()}")
-    else: # solo generar para post procesado
-        # Normalize depth map to range 0-255 for visualization
-        depth_map_normalized = map_distance_for_image(depth_map)
-      
-        cv.imwrite('left_rgb_images/{}.png'.format(timestamp), cv_image_left)
-        cv.imwrite('depth_maps/{}.png'.format(timestamp), depth_map_normalized)
-        np.save(f"depth_matrix/{timestamp}.npy", depth_map)
+    else:
+        # Guardar los datos para post procesado
+        np.save(f"depth_maps/{timestamp}.npy", depth_map)
+
+        # Guardar las imagenes para visualizacion
+        normalised_depth = map_distance_for_image(depth_map)
+        cv.imwrite(f"depth_maps_visualizable/{timestamp}.png", normalised_depth)
+        cv.imwrite(f"rgb_images/{timestamp}.png", cv_image)
 
 def empty_folder(folder_path):
-    # If the folder does not exist, create it
     if not os.path.exists(folder_path):
         os.makedirs(folder_path)
         return
-    
-    # Get all the file names in the folder
-    file_names = os.listdir(folder_path)
 
-    # Iterate over the file names and delete each file
+    file_names = os.listdir(folder_path)
     for file_name in file_names:
         file_path = os.path.join(folder_path, file_name)
         os.remove(file_path)
@@ -107,11 +119,18 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--working_directory", required=True)
     parser.add_argument("--post_procesamiento", default='True', type=lambda x: (str(x).lower() == 'true'))
+    parser.add_argument("--camera_model", type=str)
     parser.add_argument("--config", type=str)
     parser.add_argument("__name", type=str)
     parser.add_argument("__log", type=str)
 
     args = parser.parse_args()
+
+    CAMERA_MODEL = args.camera_model
+    if CAMERA_MODEL == 'stereo':
+        print('Using stereo camera model, the saved rgb images are the ones from the left camera')
+    elif CAMERA_MODEL:
+        print('Using depth camera model')
 
     rospy.init_node('save_disparity_and_rgb')
 
@@ -123,7 +142,7 @@ if __name__ == '__main__':
         if metodo is None:
             raise Exception("No se ha especificado un metodo de post procesamiento")
         
-        # need to delete foler runs/track/exp to avoid errors
+        # Borrar la carpeta exp previa para evitar errores
         delete_folder(f"{os.path.dirname(os.path.realpath(__file__))}/yolo_tracking/runs/track/exp")
 
         from track_and_filter import TrackAndFilter
@@ -137,12 +156,14 @@ if __name__ == '__main__':
 
         # Change the current directory to the one sent as argument
         os.chdir(working_directory)
-        # Empty the folders
-        empty_folder('left_rgb_images')
+        # Vaciar las carpetas
+        empty_folder('rgb_images')
         empty_folder('depth_maps')
+        empty_folder('depth_maps_visualizable')
         empty_folder('depth_matrix')
         delete_folder('yolo_tracking/runs/track/exp')
 
+        
         read_cameras()
         rospy.spin()
 
