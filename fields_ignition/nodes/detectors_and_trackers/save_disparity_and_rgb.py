@@ -36,10 +36,10 @@ def image_callback(imageL, disparity):
     if not T1 is None:
         time_diff = (rospy.Time.now() - T1).to_sec() * 1000
         print("Tiempo entre imagenes: ", time_diff, "ms")
-        processing_rate = 1000/time_diff
-        print("se esta procesando a un rate de: ", processing_rate, "fps")
-        if MIN_PROCESSING_RATE and processing_rate < MIN_PROCESSING_RATE:
-            bag_max_running_rate = round(processing_rate/30, 3)
+        fotogramas_procesados_por_segundo = 1000/time_diff
+        print("se esta procesando a un rate de: ", fotogramas_procesados_por_segundo, "fps")
+        if MIN_PROCESSING_RATE and fotogramas_procesados_por_segundo < MIN_PROCESSING_RATE:
+            bag_max_running_rate = round(fotogramas_procesados_por_segundo/30, 3)
             print(f"ADVERTENCIA: para que el sistema pueda procesar el porcentaje minimo \
 de fotogramas, actualmente: {MIN_PROCESSING_RATE} se debe correr \
 el bag con la flag '--rate {bag_max_running_rate}'")
