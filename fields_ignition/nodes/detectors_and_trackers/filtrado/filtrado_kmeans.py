@@ -15,7 +15,7 @@ class FiltradoKMeans(filtrado_base.FiltradoBase):
         bounding_boxes_with_depth = self.obtener_puntos_con_profunidad(bounding_boxes, mapa_profundidad)
 
         # Calcula el threshold con KMeans.
-        self.__find_clusters([bb[2] for bb in bounding_boxes_with_depth])
+        threshold = self.__find_clusters([bb[2] for bb in bounding_boxes_with_depth])
 
         # se aplica un margen que evita que se cuenten
         # dos veces las manzanas del centro de la fila.
