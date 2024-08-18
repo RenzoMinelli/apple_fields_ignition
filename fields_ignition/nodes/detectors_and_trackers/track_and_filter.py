@@ -179,8 +179,11 @@ class TrackAndFilter:
         # instanciar filtro
         filtro = self.filter_class(self.__configs_filtro())
 
+        total = len(bounding_boxes)
+        count = 0
         for timestamp in bounding_boxes:
-            print(f"timestamp: {timestamp}")
+            count += 1
+            print(f"timestamp: {timestamp}, {count}/{total}")
             img_original = cv2.imread("rgb_images/" + str(timestamp) + ".png")
             mapa_profundidad = np.load("depth_maps/" + str(timestamp) + ".npy")  
 
