@@ -16,7 +16,7 @@
   <arg name="right_camera_info_topic" default="/costar_husky_sensor_config_1/right/camera_info"/>
 
   <!-- Play the rosbag and remap camera info topics -->
-  <node pkg="rosbag" type="play" name="rosbag_play" args="-r 0.1 $(arg bag_file_path) $(arg left_camera_info_topic):=/stereo/left/camera_info $(arg right_camera_info_topic):=/stereo/right/camera_info" output="log"/>
+  <node pkg="rosbag" type="play" name="rosbag_play" args="-r 0.05 $(arg bag_file_path) $(arg left_camera_info_topic):=/stereo/left/camera_info $(arg right_camera_info_topic):=/stereo/right/camera_info" output="log"/>
 
   <!-- Remap left camera image topic -->
   <node pkg="image_transport" type="republish" name="remap_left_image" output="screen" args="compressed in:=$(arg left_camera_image_topic) raw out:=/stereo/left/image_raw" />
@@ -33,7 +33,7 @@
   <!-- Run script to save the images -->
   <!-- use remap instead of the namespace -->
   <env name="ROS_NAMESPACE" value="stereo" />
-  <node pkg="fields_ignition" type="save_disparity_and_rgb.py" name="save_disparity_and_rgb" args="--working_directory=$(arg folder_path) --post_procesamiento=$(arg post_procesamiento) --camera_model=$(arg camera_model) --config=$(arg config)" output="screen"/>
+  <node pkg="fields_ignition" type="save_disparity_and_rgb.py" name="save_disparity_and_rgb" args="--working_directory=$(arg folder_path) --post_procesamiento=$(arg post_procesamiento) --camera_model=$(arg camera_model) --config=$(arg config)" output="screen" required="true"/>
 </launch>
 
 <!-- Ejemplo de ejecucion -->
