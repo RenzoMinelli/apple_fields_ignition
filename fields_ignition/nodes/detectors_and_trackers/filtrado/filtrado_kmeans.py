@@ -20,7 +20,9 @@ class FiltradoKMeans(filtrado_base.FiltradoBase):
         # se aplica un margen que evita que se cuenten
         # dos veces las manzanas del centro de la fila.
         threshold -= self.FiltradoKMeans_THRESHOLD_MARGIN
-        print(f"Threshold luego de aplicar el margen central: {threshold}")
+
+        if self.config["verbose"]:
+            print(f"Threshold luego de aplicar el margen central: {threshold}")
 
         filtered_bounding_boxes = []
 
