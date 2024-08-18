@@ -39,7 +39,6 @@ class TrackAndFilter:
         self.image_width =              config.getint('TRACK_AND_FILTER', 'image_width')
         self.tracking_method =          config.get('TRACK_AND_FILTER', 'tracking_method')
         self.yolo_weights =             config.get('TRACK_AND_FILTER', 'yolo_weights')
-        self.world_name =               config.get('TRACK_AND_FILTER', 'world_name')
         self.track =                    config.getboolean('TRACK_AND_FILTER', 'track')
         self.gen_imagenes_tracker =     config.get('TRACK_AND_FILTER', 'gen_imagenes_tracker')
         self.generar_imagen_plano =     config.get('FILTRADO_PLANO', 'generar_imagen_plano')
@@ -113,20 +112,6 @@ class TrackAndFilter:
 
         # El valor de retorno es un diccionario con el timestamp como key y un array con los centros de las bounding boxes del frame correspondiente como valor, y como tercer valor, el id de la bounding box.
         return bounding_boxes
-
-    # when the node ends track the apples and evaluate the tracking
-    # def __total_amount_apples_for_trees_ids(self, ids):
-    #     dir_path = f"{CWD}/src/apple_fields_ignition/fields_ignition/generated/{self.world_name}/apple_field/"
-    #     apple_amount = 0
-    #     dir_names_wanted = [f"apple_{x}" for x in ids]
-    #     for root, dirs, files in os.walk(dir_path):
-    #         for dir_name in dir_names_wanted:
-    #             data_file = os.path.join(root, dir_name, 'markers.json')
-    #             if os.path.exists(data_file):
-    #                 with open(data_file, 'r') as f:
-    #                     data = json.load(f)
-    #                     apple_amount += data["count_apples"]
-    #     return apple_amount
 
     def __delete_folder(self, folder_path):
         subprocess.run(['rm', '-rf', folder_path])

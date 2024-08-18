@@ -7,7 +7,6 @@ from sklearn.cluster import KMeans
 class FiltradoKMeans(filtrado_base.FiltradoBase):
     def __init__(self, config={}):
         super().__init__(config)
-        self.FiltradoKMeans_FIXED_THRESHOLD = self.imported_config.getboolean('CONSTANTS', 'fixed_threshold')
         self.FiltradoKMeans_THRESHOLD_MARGIN = self.imported_config.getint('CONSTANTS', 'threshold_margin')
         
     def filter(self, _1, bounding_boxes, _2, mapa_profundidad):
@@ -15,12 +14,8 @@ class FiltradoKMeans(filtrado_base.FiltradoBase):
         # [<x, y, z(profundidad), id >,....]
         bounding_boxes_with_depth = self.obtener_puntos_con_profunidad(bounding_boxes, mapa_profundidad)
 
-        # se obtiene el threshold
-        # si FIXED_THRESHOLD es True, se usa un threshold fijo,
-        # sino, se calcula el threshold con KMeans.
-        # usualmente no es una buena idea utilizar un threshold fijo,
-        # de todas formas damos la opcion como forma de experimentación.
-        threshold = 57 if self.FiltradoKMeans_FIXED_THRESHOLD else self.__find_clusters([bb[2] for bb in bounding_boxes_with_depth])
+        # Calcula el threshold con KMeans.
+        self.__find_clusters([bb[2] for bb in bounding_boxes_with_depth])
 
         # se aplica un margen que evita que se cuenten
         # dos veces las manzanas del centro de la fila.
