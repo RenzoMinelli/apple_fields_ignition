@@ -182,13 +182,13 @@ class TrackAndFilter:
         total = len(bounding_boxes)
         count = 0
         time_start = time.time()
-        
+
         for timestamp in bounding_boxes:
             count += 1
             time_elapsed = time.time() - time_start
             amount_missing = total - count
             average_time = time_elapsed / count
-            time_remaining = (average_time * amount_missing) / 1000
+            time_remaining = (average_time * amount_missing)
             print(f"timestamp: {timestamp}, {count}/{total}, time remaining: {time_remaining} seconds")
 
             img_original = cv2.imread("rgb_images/" + str(timestamp) + ".png")
