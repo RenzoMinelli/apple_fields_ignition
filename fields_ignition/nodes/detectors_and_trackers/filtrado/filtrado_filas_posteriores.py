@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 
 from . import filtrado_base
-import numpy as np
-from sklearn.cluster import KMeans
 
 class FiltradoFilasPosteriores(filtrado_base.FiltradoBase):
     def __init__(self, config={}):
