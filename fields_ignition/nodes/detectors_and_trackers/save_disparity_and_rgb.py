@@ -17,9 +17,9 @@ TIME_OF_LAST_MESSAGE = None
 MIN_PROCESSING_RATE = None
 
 def read_cameras():
-    rospy.Timer(rospy.Duration(5), check_last_message)  # Check every 5 seconds
+    rospy.Timer(rospy.Duration(120), check_last_message)  # Check every 20 seconds
 
-    ros_namespace = os.getenv('ROS_NAMESPACE') if os.getenv('ROS_NAMESPACE') else MODEL
+    ros_namespace = os.getenv('ROS_NAMESPACE')
     if CAMERA_MODEL == 'depth':
         image_topic = "/medio/image_raw"
         depth_topic = "/medio/depth_image"
@@ -114,7 +114,7 @@ def check_last_message(event):
     global TIME_OF_LAST_MESSAGE
 
     # checkeamos si pasaron 3 segundos sin recibir mensajes
-    if TIME_OF_LAST_MESSAGE and (rospy.Time.now() - TIME_OF_LAST_MESSAGE).to_sec() > 3:
+    if TIME_OF_LAST_MESSAGE and (rospy.Time.now() - TIME_OF_LAST_MESSAGE).to_sec() > 20:
         rospy.loginfo("No messages received for 3 seconds, shutting down.")
         rospy.signal_shutdown("Finished processing bag")
 
