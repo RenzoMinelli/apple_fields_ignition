@@ -43,6 +43,14 @@ class FiltradoKMeans(filtrado_base.FiltradoBase):
     def __find_clusters(self, lista):
         data = numpy.array(lista).reshape(-1, 1)
 
+        # casos en donde se rompe kmeans con 2 clusters
+        largo = len(data)
+        if largo == 0:
+            # si data esta vacio no se va a usar el threshold asi que no importa
+            return 0 
+        elif largo == 1:
+            return data[0]
+
         # Inicializar KMeans para 1 cluster y obtener la inercia, que
         # es una medida de que tan bien se ajustan los datos a los clusters.
         kmeans_1 = KMeans(n_clusters=1, n_init=10)
