@@ -90,13 +90,17 @@ def run(args, image=None, yolo_model_instance=None):
 
     # arreglo de (x,y,bb_id)
     bbs = []
+    
     for r in results:   
-        # por cada bounding box
-        for i in range(r.boxes.shape[0]):
-            id = r.boxes[i].id[0].item()
-            x, y, *_ = r.boxes[i].xywh[0].cpu().numpy()
+        try:
+            # por cada bounding box
+            for i in range(r.boxes.shape[0]):
+                id = r.boxes[i].id[0].item()
+                x, y, *_ = r.boxes[i].xywh[0].cpu().numpy()
 
-            bbs.append([x, y, int(id)])
+                bbs.append([x, y, int(id)])
+        except:
+            pass
     
     return yolo, bbs
 
