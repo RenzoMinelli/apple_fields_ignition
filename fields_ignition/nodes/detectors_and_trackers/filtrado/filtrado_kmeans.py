@@ -29,9 +29,9 @@ class FiltradoKMeans(filtrado_base.FiltradoBase):
         # nos quedamos con las bounding boxes que tienen una
         # profundidad mayor al threshold. Lo que implica 
         # que son las manzanas que están más cerca de la cámara.
-        for bb in bounding_boxes_with_depth:
-            if bb[2] < threshold:
-                filtered_bounding_boxes.append(bb)
+        for [x,y,z,*rest] in bounding_boxes_with_depth:
+            if z < threshold:
+                filtered_bounding_boxes.append([x,y,*rest])
 
         return filtered_bounding_boxes
 
