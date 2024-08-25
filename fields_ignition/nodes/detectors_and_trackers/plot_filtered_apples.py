@@ -86,8 +86,7 @@ class Plotting:
         for timestamp in bounding_boxes:
             # leer numpy matriz 
             mapa_profundidad = np.load("depth_maps/" + str(timestamp) + ".npy")
-            imagen_original = cv2.imread("left_rgb_images/" + str(timestamp) + ".png")
-
+            imagen_original = cv2.imread("rgb_images/" + str(timestamp) + ".png")
             
             # Estas las imprimimos todas en rojo
             red_depths = filtro.obtener_puntos_con_profunidad(bounding_boxes[timestamp], mapa_profundidad)
