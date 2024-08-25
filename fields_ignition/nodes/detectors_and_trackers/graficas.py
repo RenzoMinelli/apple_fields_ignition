@@ -1,28 +1,117 @@
+import os
+import configparser
 import matplotlib.pyplot as plt
+import argparse
 
-# Actualización de los datos con las cantidades reales
-mundos = {
-    "Mundo Depth 1x5": {"sin_filtro": 399, "filas_posteriores": 398, "kmeans": 178, "plano": 0, "real": 350},
-    "Mundo Depth 3x5 Mitad": {"sin_filtro": 508, "filas_posteriores": 374, "kmeans": 299, "plano": 290, "real": 170},
-    "Mundo Depth 3x5 Completo": {"sin_filtro": 1269, "filas_posteriores": 794, "kmeans": 613, "plano": 718, "real": 340},
-    "Mundo Stereo 1x5": {"sin_filtro": 357, "filas_posteriores": 348, "kmeans": 253, "plano": 320, "real": 350},
-    "Mundo Stereo 3x5 Mitad": {"sin_filtro": 402, "filas_posteriores": 334, "kmeans": 290, "plano": 286, "real": 170},
-    "Mundo Stereo 3x5 Completo": {"sin_filtro": 1101, "filas_posteriores": 804, "kmeans": 590, "plano": 670, "real": 340},
-    "Mundo Real Mitad": {"sin_filtro": 4082, "filas_posteriores": 3852, "kmeans": 3387, "plano": 1938, "real": 2554},
-    "Mundo Real Completo": {"sin_filtro": 8049, "filas_posteriores": 7376, "kmeans": 6449, "plano": 4192, "real": 5109},
-}
+# Función para identificar el filtro y el mundo a partir del nombre del archivo
+def identificar_filtro_y_mundo(nombre_archivo):
+    filtros = ["sin_filtrado", "filas_posteriores", "kmeans", "plano"]
+    
+    # Buscar el filtro en el nombre del archivo
+    filtro = next((filtro for filtro in filtros if filtro in nombre_archivo), None)
+    
+    if not filtro:
+        return None, None
 
-# Crear gráficos
-fig, axs = plt.subplots(4, 2, figsize=(15, 20))
-fig.subplots_adjust(hspace=0.4)
+    # Remover el filtro del nombre para identificar el mundo
+    nombre_restante = nombre_archivo.replace(f"{filtro}_", "")
 
-for ax, (mundo, datos) in zip(axs.flat, mundos.items()):
-    ax.bar(list(datos.keys())[:-1], list(datos.values())[:-1], color=['blue', 'orange', 'green', 'red'])
-    ax.axhline(y=datos["real"], color='purple', linestyle='--', label=f"Real: {datos['real']}")
-    ax.set_title(mundo)
-    ax.set_ylabel("Valor")
-    ax.set_xlabel("Filtro")
-    ax.legend()
+    # Mapear el nombre restante al mundo correspondiente
+    if "3x5_completo_stereo" in nombre_restante:
+        return filtro, "Mundo Stereo 3x5 Completo"
+    elif "3x5_mitad_stereo" in nombre_restante:
+        return filtro, "Mundo Stereo 3x5 Mitad"
+    elif "1x5_completo_stereo" in nombre_restante:
+        return filtro, "Mundo Stereo 1x5 Completo"
+    elif "3x5_completo_depth" in nombre_restante:
+        return filtro, "Mundo Depth 3x5 Completo"
+    elif "3x5_mitad_depth" in nombre_restante:
+        return filtro, "Mundo Depth 3x5 Mitad"
+    elif "1x5_completo_depth" in nombre_restante:
+        return filtro, "Mundo Depth 1x5 Completo"
+    elif "completo_real" in nombre_restante:
+        return filtro, "Mundo Real Completo"
+    elif "mitad_real" in nombre_restante:
+        return filtro, "Mundo Real Mitad"
+    else:
+        return None, None
 
-plt.tight_layout()
-plt.show()
+# Función para obtener el apple_count desde un archivo .ini
+def obtener_apple_count(ruta_archivo):
+    config = configparser.ConfigParser()
+    config.read(ruta_archivo)
+    try:
+        return int(config['FILTRADO_FILAS_POSTERIORES']['apple_count'])
+    except KeyError:
+        print(f"apple_count no encontrado en {ruta_archivo}")
+        return None
+
+# Función para procesar la carpeta y generar los datos
+def procesar_carpeta(carpeta):
+    mundos = {
+        "Mundo Depth 1x5 Completo": {},
+        "Mundo Depth 3x5 Mitad": {},
+        "Mundo Depth 3x5 Completo": {},
+        "Mundo Stereo 1x5 Completo": {},
+        "Mundo Stereo 3x5 Mitad": {},
+        "Mundo Stereo 3x5 Completo": {},
+        "Mundo Real Mitad": {},
+        "Mundo Real Completo": {},
+    }
+
+    for archivo in os.listdir(carpeta):
+        if archivo.endswith(".ini"):
+            filtro, mundo = identificar_filtro_y_mundo(archivo)
+            if mundo and filtro:
+                ruta_archivo = os.path.join(carpeta, archivo)
+                apple_count = obtener_apple_count(ruta_archivo)
+                if apple_count is not None:
+                    mundos[mundo][filtro] = apple_count
+    
+    return mundos
+
+# Función principal para generar gráficos
+def generar_graficos(carpeta, mundos_reales):
+    mundos = procesar_carpeta(carpeta)
+
+    # Agregar valores reales a los datos
+    for mundo, datos in mundos.items():
+        if mundo in mundos_reales:
+            datos["real"] = mundos_reales[mundo]
+
+    # Crear gráficos
+    fig, axs = plt.subplots(4, 2, figsize=(15, 20))
+    fig.subplots_adjust(hspace=0.4)
+
+    for ax, (mundo, datos) in zip(axs.flat, mundos.items()):
+        if datos:  # Si hay datos para este mundo
+            ax.bar(list(datos.keys())[:-1], list(datos.values())[:-1], color=['blue', 'orange', 'green', 'red'])
+            if "real" in datos:
+                ax.axhline(y=datos["real"], color='purple', linestyle='--', label=f"Real: {datos['real']}")
+            ax.set_title(mundo)
+            ax.set_ylabel("Valor")
+            ax.set_xlabel("Filtro")
+            ax.legend()
+
+    plt.tight_layout()
+    plt.show()
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Generar gráficos desde archivos .ini en una carpeta.")
+    parser.add_argument("--carpeta", type=str, help="Ruta a la carpeta que contiene los archivos .ini")
+
+    args = parser.parse_args()
+
+    # Cantidades reales para cada mundo
+    mundos_reales = {
+        "Mundo Depth 1x5 Completo": 350,
+        "Mundo Depth 3x5 Mitad": 170,
+        "Mundo Depth 3x5 Completo": 340,
+        "Mundo Stereo 1x5 Completo": 350,
+        "Mundo Stereo 3x5 Mitad": 170,
+        "Mundo Stereo 3x5 Completo": 340,
+        "Mundo Real Mitad": 2554,
+        "Mundo Real Completo": 5109,
+    }
+
+    generar_graficos(args.carpeta, mundos_reales)
