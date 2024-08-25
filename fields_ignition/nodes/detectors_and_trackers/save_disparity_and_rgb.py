@@ -163,7 +163,6 @@ if __name__ == '__main__':
         empty_folder('rgb_images')
         empty_folder('depth_maps')
         empty_folder('depth_maps_visualizable')
-        empty_folder('depth_matrix')
         delete_folder('yolo_tracking/runs/track/exp')
 
         
