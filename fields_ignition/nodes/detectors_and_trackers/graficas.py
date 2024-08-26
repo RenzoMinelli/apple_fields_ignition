@@ -105,10 +105,10 @@ if __name__ == "__main__":
     # Cantidades reales para cada mundo
     mundos_reales = {
         "Mundo Depth 1x5 Completo": 350,
-        "Mundo Depth 3x5 Mitad": 170,
+        "Mundo Depth 3x5 Mitad": 340,
         "Mundo Depth 3x5 Completo": 340,
         "Mundo Stereo 1x5 Completo": 350,
-        "Mundo Stereo 3x5 Mitad": 170,
+        "Mundo Stereo 3x5 Mitad": 340,
         "Mundo Stereo 3x5 Completo": 340,
         "Mundo Real Mitad": 2554,
         "Mundo Real Completo": 5109,
