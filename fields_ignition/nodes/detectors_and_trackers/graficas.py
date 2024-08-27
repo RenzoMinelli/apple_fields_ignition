@@ -3,12 +3,12 @@ import configparser
 import matplotlib.pyplot as plt
 import argparse
 
+FILTROS = ["sin_filtrado", "filas_posteriores", "kmeans", "plano"]
+
 # Función para identificar el filtro y el mundo a partir del nombre del archivo
 def identificar_filtro_y_mundo(nombre_archivo):
-    filtros = ["sin_filtrado", "filas_posteriores", "kmeans", "plano"]
-    
     # Buscar el filtro en el nombre del archivo
-    filtro = next((filtro for filtro in filtros if filtro in nombre_archivo), None)
+    filtro = next((filtro for filtro in FILTROS if filtro in nombre_archivo), None)
     
     if not filtro:
         return None, None
@@ -85,7 +85,8 @@ def generar_graficos(carpeta, mundos_reales):
 
     for ax, (mundo, datos) in zip(axs.flat, mundos.items()):
         if datos:  # Si hay datos para este mundo
-            ax.bar(list(datos.keys())[:-1], list(datos.values())[:-1], color=['blue', 'orange', 'green', 'red'])
+            valores = [datos[key] for key in FILTROS]
+            ax.bar(FILTROS, valores, color=['blue', 'orange', 'green', 'red'])
             if "real" in datos:
                 ax.axhline(y=datos["real"], color='purple', linestyle='--', label=f"Real: {datos['real']}")
             ax.set_title(mundo)
