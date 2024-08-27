@@ -66,8 +66,18 @@ class FiltradoPlano(FiltradoBase):
             mask_binaria = np.zeros(img.shape[:2], dtype=np.uint8)
 
             # tuplas de los bordes de la mascara
+            points_in_image = []
             data_points = [tuple(elem) for elem in mask]
-            data_points = np.array([data_points], dtype=np.int32) # Convertir a matriz numpy de tipo int32
+
+            # remover puntos que estan fuera de la imagen (bug de yolo)
+            for pair in data_points:
+                if pair[0] < img.shape[:2][1] and pair[1] < img.shape[:2][0]:
+                    points_in_image.append(pair)
+
+            if len(points_in_image) == 0:
+                continue
+
+            data_points = np.array([points_in_image], dtype=np.int32) # Convertir a matriz numpy de tipo int32
 
             # Pinta la máscara binaria
             cv2.fillPoly(mask_binaria, data_points, 1)
@@ -84,7 +94,7 @@ class FiltradoPlano(FiltradoBase):
 
                 if abs(point_x - x_center) + abs(point_y - y_center) < abs(closest_x - x_center) + abs(closest_y - y_center):
                     closest_point = point
-                
+
             # find the furthest point above and below the center
             above_point = closest_point
             below_point = closest_point
@@ -133,7 +143,6 @@ class FiltradoPlano(FiltradoBase):
 
                 if abs(point_x - above_center_x) + abs(point_y - above_center_y) <= abs(above_x - above_center_x) + abs(above_y - above_center_y):
                     above_point = point
-
 
             cv2.circle(img, (int(above_point[0]), int(above_point[1])), 3, (0, 155, 0), -1)
             cv2.circle(img, (int(below_point[0]), int(below_point[1])), 3, (155, 0, 0), -1)
