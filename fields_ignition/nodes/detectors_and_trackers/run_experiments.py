@@ -37,7 +37,7 @@ def launchfile_por_nombre(nombre):
     elif "depth" in nombre:
         return "depth_sim_bag.launch"
     elif "real" in nombre:
-        return "stereo_sim_bag.launch"
+        return "stereo_real_bag.launch"
     else:
         return None
     
