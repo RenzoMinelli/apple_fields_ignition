@@ -31,26 +31,37 @@ def launch_and_run(bag_file_path, launch_file, tipo):
     bag_name = bag_file_path.split("/")[-1].split(".")[0]
     correr_experimentos(my_env, bag_name, tipo)
 
+def launchfile_por_nombre(nombre):
+    if "stereo" in nombre:
+        return "stereo_sim_bag.launch"
+    elif "depth" in nombre:
+        return "depth_sim_bag.launch"
+    elif "real" in nombre:
+        return "stereo_sim_bag.launch"
+    else:
+        return None
+    
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--carpeta_bags_reales", required=True)
-    parser.add_argument("--carpeta_bags_simulador_stereo", required=True)
-    parser.add_argument("--carpeta_bags_simulador_depth", required=True)
+    parser.add_argument("--carpetas", nargs='+', default=[])
     args = parser.parse_args()
 
     # seteamos la variable de entorno PYTHONPATH para que las clses de python puedan ser importadas
     my_env = os.environ.copy()
     my_env["PYTHONPATH"] = f"{CWD}/src/apple_fields_ignition/fields_ignition/nodes"
-    
-    # corremos los experimentos por cada bag
-    for bag in os.listdir(args.carpeta_bags_simulador_stereo):
-        bag_path = f"{args.carpeta_bags_simulador_stereo}/{bag}"
-        launch_and_run(bag_path, "stereo_sim_bag.launch", "stereo")
 
-    for bag in os.listdir(args.carpeta_bags_simulador_depth):
-        bag_path = f"{args.carpeta_bags_simulador_depth}/{bag}"
-        launch_and_run(bag_path, "depth_sim_bag.launch", "depth")
-
-    for bag in os.listdir(args.carpeta_bags_reales):
-        bag_path = f"{args.carpeta_bags_reales}/{bag}"
-        launch_and_run(bag_path, "stereo_real_bag.launch", "real")
+    print("carpetas a procesar: ", args.carpetas)
+    for carpeta in args.carpetas:
+        for bag in os.listdir(carpeta):
+            bag_path = f"{carpeta}/{bag}"
+            launchfile = launchfile_por_nombre(bag)
+            mundo = carpeta.split("/")[-1]
+            if launchfile:
+                launch_and_run(bag_path, launchfile, mundo)
+            else:
+                print(f"Tipo de mundo no identificado para {bag}")
+                           
+# python3 -m detectors_and_trackers.run_experiments 
+# --carpetas /home/renzo/catkin_ws/3x5_stereo /home/renzo/catkin_ws/1x5_stereo 
+#            /home/renzo/catkin_ws/3x5_depth  /home/renzo/catkin_ws/1x5_depth
+#            /home/renzo/catkin_ws/real
