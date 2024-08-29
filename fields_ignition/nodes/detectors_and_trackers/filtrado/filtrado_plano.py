@@ -14,7 +14,6 @@ class CantidadPuntosInsuficiente(Exception):
         self.message = m
     def __str__(self):
         return self.message
-    
 
 class FiltradoPlano(FiltradoBase):
     def __init__(self, config={}):
@@ -39,11 +38,13 @@ class FiltradoPlano(FiltradoBase):
 
     # obtiene 3 puntos reales dentro del tronco, uno central, uno arriba y uno abajo
     # ademas permite la visualizacion de esos puntos mediante cv2
-    def __obtener_puntos_arboles(self, img, timestamp):
+    def __obtener_puntos_arboles(self, img_orig, timestamp):
         puntos_arboles = {}
 
         if self.config["rotar_imagenes"]:
-            img = cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
+            img = cv2.rotate(img_orig, cv2.ROTATE_90_CLOCKWISE)
+        else:
+            img = img_orig
 
         results = self.modelo_tronco([img], iou=0.1, conf=0.35,show_conf=True,show_labels=False,show=False,verbose=self.config["verbose"])
 
@@ -152,6 +153,11 @@ class FiltradoPlano(FiltradoBase):
                 closest_point = (closest_point[1], img.shape[1] - closest_point[0])
                 above_point = (above_point[1], img.shape[1] - above_point[0])
                 below_point = (below_point[1], img.shape[1] - below_point[0])
+
+                # pintar circulos en imagen original
+                cv2.circle(img_orig, (int(closest_point[0]), int(closest_point[1])), 3, (0, 0, 255), -1)
+                cv2.circle(img_orig, (int(above_point[0]), int(above_point[1])), 3, (0, 255, 0), -1)
+                cv2.circle(img_orig, (int(below_point[0]), int(below_point[1])), 3, (255, 0, 0), -1)
 
             puntos_arboles[mask_id].append(closest_point)
             puntos_arboles[mask_id].append(above_point)
