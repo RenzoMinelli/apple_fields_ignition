@@ -45,6 +45,10 @@ def image_callback(image, depth_data):
 
     if not TIME_OF_LAST_MESSAGE is None:
         time_diff = (rospy.Time.now() - TIME_OF_LAST_MESSAGE).to_sec() * 1000
+        
+        if time_diff <= 0:
+            return # No procesar si el tiempo es cero
+        
         print("Tiempo entre imagenes: ", time_diff, "ms")
         fotogramas_procesados_por_segundo = 1000/time_diff
         print("se esta procesando a un rate de: ", fotogramas_procesados_por_segundo, "fps")
