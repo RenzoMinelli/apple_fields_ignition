@@ -195,61 +195,61 @@
         <include>
             <uri>apple_5</uri>
             <name>apple_5</name>
-            <pose>0.0 0.0 0 0 0 0</pose>
+            <pose>1.0 0.0 0 0 0 0</pose>
         </include>
         
         <include>
             <uri>apple_6</uri>
             <name>apple_6</name>
-            <pose>0.0 1.0 0 0 0 0</pose>
+            <pose>1.0 1.0 0 0 0 0</pose>
         </include>
         
         <include>
             <uri>apple_7</uri>
             <name>apple_7</name>
-            <pose>0.0 2.0 0 0 0 0</pose>
+            <pose>1.0 2.0 0 0 0 0</pose>
         </include>
         
         <include>
             <uri>apple_8</uri>
             <name>apple_8</name>
-            <pose>0.0 3.0 0 0 0 0</pose>
+            <pose>1.0 3.0 0 0 0 0</pose>
         </include>
         
         <include>
             <uri>apple_9</uri>
             <name>apple_9</name>
-            <pose>0.0 4.0 0 0 0 0</pose>
+            <pose>1.0 4.0 0 0 0 0</pose>
         </include>
         
         <include>
             <uri>apple_10</uri>
             <name>apple_10</name>
-            <pose>2.0 0.0 0 0 0 0</pose>
+            <pose>4.0 0.0 0 0 0 0</pose>
         </include>
         
         <include>
             <uri>apple_11</uri>
             <name>apple_11</name>
-            <pose>2.0 1.0 0 0 0 0</pose>
+            <pose>4.0 1.0 0 0 0 0</pose>
         </include>
         
         <include>
             <uri>apple_12</uri>
             <name>apple_12</name>
-            <pose>2.0 2.0 0 0 0 0</pose>
+            <pose>4.0 2.0 0 0 0 0</pose>
         </include>
         
         <include>
             <uri>apple_13</uri>
             <name>apple_13</name>
-            <pose>2.0 3.0 0 0 0 0</pose>
+            <pose>4.0 3.0 0 0 0 0</pose>
         </include>
         
         <include>
             <uri>apple_14</uri>
             <name>apple_14</name>
-            <pose>2.0 4.0 0 0 0 0</pose>
+            <pose>4.0 4.0 0 0 0 0</pose>
         </include>
         
         <include>
