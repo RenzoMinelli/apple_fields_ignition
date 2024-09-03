@@ -46,19 +46,21 @@ def image_callback(image, depth_data):
     if not TIME_OF_LAST_MESSAGE is None:
         time_diff = (rospy.Time.now() - TIME_OF_LAST_MESSAGE).to_sec() * 1000
         
-        if time_diff > 0:
-            print("Tiempo entre imagenes: ", time_diff, "ms")
-            fotogramas_procesados_por_segundo = 1000/time_diff
-            print("se esta procesando a un rate de: ", fotogramas_procesados_por_segundo, "fps")
+        if time_diff <= 0:
+            time_diff = 999999999
+        
+        print("Tiempo entre imagenes: ", time_diff, "ms")
+        fotogramas_procesados_por_segundo = 1000/time_diff
+        print("se esta procesando a un rate de: ", fotogramas_procesados_por_segundo, "fps")
 
 
-            if MIN_PROCESSING_RATE and fotogramas_procesados_por_segundo < MIN_PROCESSING_RATE:
-                bag_max_running_rate = round(fotogramas_procesados_por_segundo/30, 3)
-                print(f"""
-                    ADVERTENCIA: para que el sistema pueda procesar el porcentaje minimo
-                    de fotogramas, actualmente: {MIN_PROCESSING_RATE} se debe correr
-                    el bag con la flag '--rate {bag_max_running_rate}'
-                """)
+        if MIN_PROCESSING_RATE and fotogramas_procesados_por_segundo < MIN_PROCESSING_RATE:
+            bag_max_running_rate = round(fotogramas_procesados_por_segundo/30, 3)
+            print(f"""
+                ADVERTENCIA: para que el sistema pueda procesar el porcentaje minimo
+                de fotogramas, actualmente: {MIN_PROCESSING_RATE} se debe correr
+                el bag con la flag '--rate {bag_max_running_rate}'
+            """)
             
     TIME_OF_LAST_MESSAGE = rospy.Time.now()
 
