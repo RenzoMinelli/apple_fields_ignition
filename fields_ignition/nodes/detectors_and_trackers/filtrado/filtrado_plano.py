@@ -107,9 +107,9 @@ class FiltradoPlano(FiltradoBase):
                 if point[1] >= closest_y and point[1] >= below_point[1]:
                     below_point = point
 
-            cv2.circle(img, (int(closest_point[0]), int(closest_point[1])), 3, (0, 0, 255), -1)
-            cv2.circle(img, (int(above_point[0]), int(above_point[1])), 3, (0, 255, 0), -1)
-            cv2.circle(img, (int(below_point[0]), int(below_point[1])), 3, (255, 0, 0), -1)
+            cv2.circle(img, (int(closest_point[0]), int(closest_point[1])), 3, (255, 0, 0), -1)
+            cv2.circle(img, (int(above_point[0]), int(above_point[1])), 3, (242, 5, 211), -1)
+            cv2.circle(img, (int(below_point[0]), int(below_point[1])), 3, (3, 255, 251), -1)
 
             # ahora encuentra el punto en el medio del centro y arriba
             # esto es porque si usamos el punto más lejano arriba (o más lejano abajo),
@@ -129,9 +129,6 @@ class FiltradoPlano(FiltradoBase):
             below_center_x = below_point[0] + diff_x
             below_center_y = below_point[1] + diff_y
 
-            cv2.circle(img, (int(above_center_x), int(above_center_y)), 3, (0, 55, 0), -1)
-            cv2.circle(img, (int(below_center_x), int(below_center_y)), 3, (55, 0, 0), -1)
-
             # buscar los puntos reales del tronco que estan mas cerca
             # de los puntos calculados
             for point in pixeles_tronco_coords:
@@ -145,9 +142,6 @@ class FiltradoPlano(FiltradoBase):
                 if abs(point_x - above_center_x) + abs(point_y - above_center_y) <= abs(above_x - above_center_x) + abs(above_y - above_center_y):
                     above_point = point
 
-            cv2.circle(img, (int(above_point[0]), int(above_point[1])), 3, (0, 155, 0), -1)
-            cv2.circle(img, (int(below_point[0]), int(below_point[1])), 3, (155, 0, 0), -1)
-
             if self.config["rotar_imagenes"]:
                 # rotar anti horario
                 closest_point = (closest_point[1], img.shape[1] - closest_point[0])
@@ -155,9 +149,9 @@ class FiltradoPlano(FiltradoBase):
                 below_point = (below_point[1], img.shape[1] - below_point[0])
 
                 # pintar circulos en imagen original
-                cv2.circle(img_orig, (int(closest_point[0]), int(closest_point[1])), 3, (0, 0, 255), -1)
-                cv2.circle(img_orig, (int(above_point[0]), int(above_point[1])), 3, (0, 255, 0), -1)
-                cv2.circle(img_orig, (int(below_point[0]), int(below_point[1])), 3, (255, 0, 0), -1)
+                cv2.circle(img_orig, (int(closest_point[0]), int(closest_point[1])), 3, (255, 0, 0), -1)
+                cv2.circle(img_orig, (int(above_point[0]), int(above_point[1])), 3, (242, 5, 211), -1)
+                cv2.circle(img_orig, (int(below_point[0]), int(below_point[1])), 3, (3, 255, 251), -1)
 
             puntos_arboles[mask_id].append(closest_point)
             puntos_arboles[mask_id].append(above_point)
