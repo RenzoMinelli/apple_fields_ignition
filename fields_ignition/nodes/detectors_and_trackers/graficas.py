@@ -50,9 +50,9 @@ def obtener_apple_count(ruta_archivo):
 def procesar_carpeta(carpeta):
     mundos = {
         "Mundo Depth 1x5 Completo": {},
+        "Mundo Stereo 1x5 Completo": {},
         "Mundo Depth 3x5 Mitad": {},
         "Mundo Depth 3x5 Completo": {},
-        "Mundo Stereo 1x5 Completo": {},
         "Mundo Stereo 3x5 Mitad": {},
         "Mundo Stereo 3x5 Completo": {},
         "Mundo Real Mitad": {},
@@ -111,9 +111,9 @@ if __name__ == "__main__":
     # Cantidades reales para cada mundo
     mundos_reales = {
         "Mundo Depth 1x5 Completo": 350,
+        "Mundo Stereo 1x5 Completo": 350,
         "Mundo Depth 3x5 Mitad": 170,
         "Mundo Depth 3x5 Completo": 340,
-        "Mundo Stereo 1x5 Completo": 350,
         "Mundo Stereo 3x5 Mitad": 170,
         "Mundo Stereo 3x5 Completo": 340,
         "Mundo Real Mitad": 2554,
