@@ -107,9 +107,8 @@ class FiltradoPlano(FiltradoBase):
                 if point[1] >= closest_y and point[1] >= below_point[1]:
                     below_point = point
 
-            cv2.circle(img, (int(closest_point[0]), int(closest_point[1])), 3, (255, 0, 0), -1)
-            cv2.circle(img, (int(above_point[0]), int(above_point[1])), 3, (242, 5, 211), -1)
-            cv2.circle(img, (int(below_point[0]), int(below_point[1])), 3, (3, 255, 251), -1)
+            
+            
 
             # ahora encuentra el punto en el medio del centro y arriba
             # esto es porque si usamos el punto más lejano arriba (o más lejano abajo),
@@ -141,6 +140,41 @@ class FiltradoPlano(FiltradoBase):
 
                 if abs(point_x - above_center_x) + abs(point_y - above_center_y) <= abs(above_x - above_center_x) + abs(above_y - above_center_y):
                     above_point = point
+
+            # ahora que tenemos los puntos arriba centro abajo, vamos a agarrar el punto mas en el medio del tronco en cada fila
+            puntos_centrados_horizontal = []
+            for punto in [closest_point, above_point, below_point]:
+                x, y = punto
+                # obtener todos los puntos en la misma fila
+                puntos_misma_fila = [p for p in pixeles_tronco_coords if p[1] == y]
+
+                # encontrar el punto mas a la izquierda que es 1
+                # luego el punto mas a la derecha que es 1
+                # y sacar el punto en el medio
+                ind_inicio = min([p[0] for p in puntos_misma_fila])
+                ind_fin = max([p[0] for p in puntos_misma_fila])
+                diff = ind_fin - ind_inicio
+                ind_centro = int(ind_inicio + diff/2)
+
+                # ahora queremos el punto mas cercano a (ind_centro, y)
+                punto_en_mascara = None
+                for point in puntos_misma_fila:
+                    if not punto_en_mascara:
+                        punto_en_mascara = point
+                        continue
+
+                    if abs(point[0] - ind_centro) < abs(punto_en_mascara[0] - ind_centro):
+                        punto_en_mascara = point
+
+                puntos_centrados_horizontal.append(punto_en_mascara)
+
+            closest_point = puntos_centrados_horizontal[0]
+            above_point = puntos_centrados_horizontal[1]
+            below_point = puntos_centrados_horizontal[2]
+
+            cv2.circle(img, (int(closest_point[0]), int(closest_point[1])), 3, (255, 0, 0), -1)
+            cv2.circle(img, (int(above_point[0]), int(above_point[1])), 3, (242, 5, 211), -1)
+            cv2.circle(img, (int(below_point[0]), int(below_point[1])), 3, (3, 255, 251), -1)
 
             if self.config["rotar_imagenes"]:
                 # rotar anti horario
