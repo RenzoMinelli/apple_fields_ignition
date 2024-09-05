@@ -33,7 +33,7 @@ def launch_and_run(bag_file_path, launch_file, tipo):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--carpeta_simualdor", required=False, type=str, default=None)
+    parser.add_argument("--carpeta_simulador", required=False, type=str, default=None)
     parser.add_argument("--carpeta_real", required=False, type=str, default=None)
     args = parser.parse_args()
 
@@ -41,11 +41,11 @@ if __name__ == "__main__":
     my_env = os.environ.copy()
     my_env["PYTHONPATH"] = f"{CWD}/src/apple_fields_ignition/fields_ignition/nodes"
 
-    if args.carpeta_simualdor:
-        for bag in os.listdir(args.carpeta_simualdor):
-            bag_path = f"{args.carpeta_simualdor}/{bag}"
+    if args.carpeta_simulador:
+        for bag in os.listdir(args.carpeta_simulador):
+            bag_path = f"{args.carpeta_simulador}/{bag}"
             for launchfile in ["stereo_sim_bag.launch", "depth_sim_bag.launch"]:
-                mundo = args.carpeta_simualdor.split("/")[-1]
+                mundo = args.carpeta_simulador.split("/")[-1]
                 launch_and_run(bag_path, launchfile, mundo)
 
     if args.carpeta_real:
