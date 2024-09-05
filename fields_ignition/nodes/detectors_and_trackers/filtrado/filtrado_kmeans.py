@@ -22,7 +22,7 @@ class FiltradoKMeans(filtrado_base.FiltradoBase):
 
         # se aplica un margen que evita que se cuenten
         # dos veces las manzanas del centro de la fila.
-        threshold -= self.FiltradoKMeans_THRESHOLD_MARGIN
+        threshold += self.FiltradoKMeans_THRESHOLD_MARGIN
         
         print('threshold:', threshold)
 
