@@ -45,15 +45,17 @@ if __name__ == "__main__":
         for bag in os.listdir(args.carpeta_real):
             bag_path = f"{args.carpeta_real}/{bag}"
             launchfile = "stereo_real_bag.launch"
-            mundo = args.carpeta_real.split("/")[-1]
-            launch_and_run(bag_path, launchfile, mundo)
+            launch_and_run(bag_path, launchfile, "real")
 
     if args.carpeta_simulador:
         for bag in os.listdir(args.carpeta_simulador):
             bag_path = f"{args.carpeta_simulador}/{bag}"
-            for launchfile in ["stereo_sim_bag.launch", "depth_sim_bag.launch"]:
-                mundo = args.carpeta_simulador.split("/")[-1]
-                launch_and_run(bag_path, launchfile, mundo)
+            for tipo_camara in ["depth", "stereo"]:
+                bag_name = args.carpeta_simulador.split("/")[-1]
+                mundo = bag_name.split("_")[0]
+                tipo = f"{mundo}_{tipo_camara}"
+                launchfile = f"{tipo_camara}_sim_bag.launch"
+                launch_and_run(bag_path, launchfile, tipo)
                            
 # python3 -m detectors_and_trackers.run_experiments 
 # --carpetas /home/renzo/catkin_ws/3x5_stereo /home/renzo/catkin_ws/1x5_stereo 
