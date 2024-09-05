@@ -41,19 +41,19 @@ if __name__ == "__main__":
     my_env = os.environ.copy()
     my_env["PYTHONPATH"] = f"{CWD}/src/apple_fields_ignition/fields_ignition/nodes"
 
-    if args.carpeta_simulador:
-        for bag in os.listdir(args.carpeta_simulador):
-            bag_path = f"{args.carpeta_simulador}/{bag}"
-            for launchfile in ["stereo_sim_bag.launch", "depth_sim_bag.launch"]:
-                mundo = args.carpeta_simulador.split("/")[-1]
-                launch_and_run(bag_path, launchfile, mundo)
-
     if args.carpeta_real:
         for bag in os.listdir(args.carpeta_real):
             bag_path = f"{args.carpeta_real}/{bag}"
             launchfile = "stereo_real_bag.launch"
             mundo = args.carpeta_real.split("/")[-1]
             launch_and_run(bag_path, launchfile, mundo)
+
+    if args.carpeta_simulador:
+        for bag in os.listdir(args.carpeta_simulador):
+            bag_path = f"{args.carpeta_simulador}/{bag}"
+            for launchfile in ["stereo_sim_bag.launch", "depth_sim_bag.launch"]:
+                mundo = args.carpeta_simulador.split("/")[-1]
+                launch_and_run(bag_path, launchfile, mundo)
                            
 # python3 -m detectors_and_trackers.run_experiments 
 # --carpetas /home/renzo/catkin_ws/3x5_stereo /home/renzo/catkin_ws/1x5_stereo 
