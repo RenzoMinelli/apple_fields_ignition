@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from . import filtrado_base
+from .filtrado_filas_posteriores import FiltradoFilasPosteriores
 import numpy
 from sklearn.cluster import KMeans
 
@@ -8,11 +9,15 @@ class FiltradoKMeans(filtrado_base.FiltradoBase):
     def __init__(self, config={}):
         super().__init__(config)
         self.FiltradoKMeans_THRESHOLD_MARGIN = self.imported_config.getfloat('CONSTANTS', 'threshold_margin')
+        self.filtro_filas_posteriores = FiltradoFilasPosteriores(config)
         
     def filter(self, _1, bounding_boxes, _2, mapa_profundidad):
+        # sacamos los puntos de arboles de filas posteriores
+        puntos_filtrados = self.__filtrar_puntos_filas_posteriores(bounding_boxes, mapa_profundidad)
+
         # se obtienen las profundidades de los bounding boxes
         # [<x, y, z(profundidad), id >,....]
-        bounding_boxes_with_depth = self.obtener_puntos_con_profunidad(bounding_boxes, mapa_profundidad)
+        bounding_boxes_with_depth = self.obtener_puntos_con_profunidad(puntos_filtrados, mapa_profundidad)
 
         # Obtener las profundidades de las bounding boxes filtrando los valores de 255 donde en realidad no hay valor de distancia.
         bounding_boxes_with_depth_filtered = [bb[2] for bb in bounding_boxes_with_depth if bb[2] != 255]
@@ -40,6 +45,9 @@ class FiltradoKMeans(filtrado_base.FiltradoBase):
 
         return filtered_bounding_boxes
 
+    def __filtrar_puntos_filas_posteriores(self, puntos, mapa_profundidad):
+        return self.filtro_filas_posteriores.filter(None, puntos, None, mapa_profundidad)
+    
     def obtener_puntos_con_profunidad(self, bounding_boxes, mapa_profundidad):
         return super().obtener_puntos_con_profunidad(bounding_boxes, mapa_profundidad)
 
