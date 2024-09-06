@@ -6,7 +6,7 @@ import argparse
 FILTROS = { "sin_filtrado": "blue", "filas_posteriores": "orange", "kmeans":"green", "plano": "red" }
 
 # Función para identificar el filtro y el mundo a partir del nombre del archivo
-def identificar_filtro_y_mundo(nombre_archivo):
+def identificar_filtro_y_mundo(nombre_archivo, path):
     # Buscar el filtro en el nombre del archivo
     filtro = next((filtro for filtro in FILTROS if filtro in nombre_archivo), None)
     
@@ -15,20 +15,30 @@ def identificar_filtro_y_mundo(nombre_archivo):
 
     # Remover el filtro del nombre para identificar el mundo
     nombre_restante = nombre_archivo.replace(f"{filtro}_", "")
+    ruta_archivo = os.path.join(path, nombre_archivo)
+    depth_o_stereo = obtener_depth_o_stereo(ruta_archivo)
 
     # Mapear el nombre restante al mundo correspondiente
-    if "3x5_completo_stereo" in nombre_restante:
-        return filtro, "Mundo Stereo 3x5 Completo"
-    elif "3x5_mitad_stereo" in nombre_restante:
-        return filtro, "Mundo Stereo 3x5 Mitad"
-    elif "1x5_completo_stereo" in nombre_restante:
-        return filtro, "Mundo Stereo 1x5 Completo"
-    elif "3x5_completo_depth" in nombre_restante:
-        return filtro, "Mundo Depth 3x5 Completo"
-    elif "3x5_mitad_depth" in nombre_restante:
-        return filtro, "Mundo Depth 3x5 Mitad"
-    elif "1x5_completo_depth" in nombre_restante:
-        return filtro, "Mundo Depth 1x5 Completo"
+    if "3x5_completo" in nombre_restante:
+        if depth_o_stereo == "depth":
+            return filtro, "Mundo Depth 3x5 Completo"
+        else:
+            return filtro, "Mundo Stereo 3x5 Completo"
+    elif "3x5_mitad" in nombre_restante:
+        if depth_o_stereo == "depth":
+            return filtro, "Mundo Depth 3x5 Mitad"
+        else:
+            return filtro, "Mundo Stereo 3x5 Mitad"
+    elif "1x5_completo" in nombre_restante:
+        if depth_o_stereo == "depth":
+            return filtro, "Mundo Depth 1x5 Completo"
+        else:
+            return filtro, "Mundo Stereo 1x5 Completo"
+    elif "1x5_mitad" in nombre_restante:
+        if depth_o_stereo == "depth":
+            return filtro, "Mundo Depth 1x5 Mitad"
+        else:
+            return filtro, "Mundo Stereo 1x5 Mitad"
     elif "completo_real" in nombre_restante:
         return filtro, "Mundo Real Completo"
     elif "mitad_real" in nombre_restante:
@@ -45,11 +55,26 @@ def obtener_apple_count(ruta_archivo):
     except KeyError:
         print(f"apple_count no encontrado en {ruta_archivo}")
         return None
+    
+def obtener_depth_o_stereo(ruta_archivo):
+    config = configparser.ConfigParser()
+    config.read(ruta_archivo)
+    try:
+        offset = int(config['CONSTANTS']['offset_horizontal'])
+        if offset == -1:
+            return "depth"
+        else:
+            return "stereo" 
+    except KeyError:
+        print(f"depth o stereo no detectable {ruta_archivo}")
+        return None
 
 # Función para procesar la carpeta y generar los datos
 def procesar_carpeta(carpeta):
     mundos = {
+        "Mundo Depth 1x5 Mitad": {},
         "Mundo Depth 1x5 Completo": {},
+        "Mundo Stereo 1x5 Mitad": {},
         "Mundo Stereo 1x5 Completo": {},
         "Mundo Depth 3x5 Mitad": {},
         "Mundo Depth 3x5 Completo": {},
@@ -61,7 +86,7 @@ def procesar_carpeta(carpeta):
 
     for archivo in os.listdir(carpeta):
         if archivo.endswith(".ini"):
-            filtro, mundo = identificar_filtro_y_mundo(archivo)
+            filtro, mundo = identificar_filtro_y_mundo(archivo, carpeta)
             if mundo and filtro:
                 ruta_archivo = os.path.join(carpeta, archivo)
                 apple_count = obtener_apple_count(ruta_archivo)
@@ -80,7 +105,7 @@ def generar_graficos(carpeta, mundos_reales):
             datos["real"] = mundos_reales[mundo]
 
     # Crear gráficos
-    fig, axs = plt.subplots(4, 2, figsize=(15, 20))
+    fig, axs = plt.subplots(5, 2, figsize=(15, 20))
     fig.subplots_adjust(hspace=0.4)
 
     for ax, (mundo, datos) in zip(axs.flat, mundos.items()):
@@ -110,7 +135,9 @@ if __name__ == "__main__":
 
     # Cantidades reales para cada mundo
     mundos_reales = {
+        "Mundo Depth 1x5 Mitad": 175,
         "Mundo Depth 1x5 Completo": 350,
+        "Mundo Stereo 1x5 Mitad": 175,
         "Mundo Stereo 1x5 Completo": 350,
         "Mundo Depth 3x5 Mitad": 170,
         "Mundo Depth 3x5 Completo": 340,
