@@ -3,7 +3,7 @@ import configparser
 import matplotlib.pyplot as plt
 import argparse
 
-FILTROS = { "sin_filtrado": "blue", "filas_posteriores": "orange", "kmeans":"green", "plano": "red" }
+FILTROS = { "sin_filtrado": "blue", "filas_posteriores": "orange", "kmeans":"green", "plano": "red", "punto_medio": "pink" }
 
 # Función para identificar el filtro y el mundo a partir del nombre del archivo
 def identificar_filtro_y_mundo(nombre_archivo, path):

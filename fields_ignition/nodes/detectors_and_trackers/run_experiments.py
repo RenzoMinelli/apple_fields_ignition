@@ -9,6 +9,7 @@ CONFIG_FILES = [
     "sin_filtro.ini",
     "kmeans.ini",
     "filas_posteriores.ini",
+    "punto_medio.ini",
 ]
 
 def correr_experimentos(my_env, bag_name, tipo):
@@ -41,12 +42,6 @@ if __name__ == "__main__":
     my_env = os.environ.copy()
     my_env["PYTHONPATH"] = f"{CWD}/src/apple_fields_ignition/fields_ignition/nodes"
 
-    if args.carpeta_real:
-        for bag in os.listdir(args.carpeta_real):
-            bag_path = f"{args.carpeta_real}/{bag}"
-            launchfile = "stereo_real_bag.launch"
-            launch_and_run(bag_path, launchfile, "real")
-
     if args.carpeta_simulador:
         for bag in os.listdir(args.carpeta_simulador):
             bag_path = f"{args.carpeta_simulador}/{bag}"
@@ -55,6 +50,13 @@ if __name__ == "__main__":
                 tipo = f"{mundo}_{tipo_camara}"
                 launchfile = f"{tipo_camara}_sim_bag.launch"
                 launch_and_run(bag_path, launchfile, tipo)
+
+    if args.carpeta_real:
+        for bag in os.listdir(args.carpeta_real):
+            bag_path = f"{args.carpeta_real}/{bag}"
+            launchfile = "stereo_real_bag.launch"
+            launch_and_run(bag_path, launchfile, "real")
+
                            
 # python3 -m detectors_and_trackers.run_experiments 
 # --carpetas /home/renzo/catkin_ws/3x5_stereo /home/renzo/catkin_ws/1x5_stereo 
