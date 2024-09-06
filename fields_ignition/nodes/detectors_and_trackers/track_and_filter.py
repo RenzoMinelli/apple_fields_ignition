@@ -5,6 +5,7 @@ import subprocess
 from detectors_and_trackers.filtrado.filtrado_kmeans import FiltradoKMeans
 from detectors_and_trackers.filtrado.filtrado_plano import FiltradoPlano
 from detectors_and_trackers.filtrado.sin_filtrado import SinFiltrado
+from detectors_and_trackers.filtrado.filtrado_punto_medio import FiltradoPuntoMedio
 from detectors_and_trackers.filtrado.filtrado_filas_posteriores import FiltradoFilasPosteriores
 import argparse
 import cv2
@@ -24,7 +25,8 @@ METODOS_FILTRADO = {
     "kmeans": FiltradoKMeans, 
     "plano": FiltradoPlano, 
     "sin_filtrado": SinFiltrado, 
-    "filas_posteriores": FiltradoFilasPosteriores 
+    "filas_posteriores": FiltradoFilasPosteriores,
+    "punto_medio": FiltradoPuntoMedio
 }
 
 class TrackAndFilter:
