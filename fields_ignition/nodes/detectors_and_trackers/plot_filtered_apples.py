@@ -8,6 +8,7 @@ import argparse
 from detectors_and_trackers.filtrado.filtrado_kmeans import FiltradoKMeans
 from detectors_and_trackers.filtrado.filtrado_plano import FiltradoPlano
 from detectors_and_trackers.filtrado.sin_filtrado import SinFiltrado
+from detectors_and_trackers.filtrado.filtrado_punto_medio import FiltradoPuntoMedio
 from detectors_and_trackers.filtrado.filtrado_filas_posteriores import FiltradoFilasPosteriores
 import configparser
 from detectors_and_trackers.track_and_filter import TrackAndFilter
@@ -22,7 +23,8 @@ METODOS_FILTRADO = {
     "kmeans": FiltradoKMeans, 
     "plano": FiltradoPlano, 
     "sin_filtrado": SinFiltrado, 
-    "filas_posteriores": FiltradoFilasPosteriores 
+    "filas_posteriores": FiltradoFilasPosteriores,
+    "punto_medio": FiltradoPuntoMedio
 }
 
 class Plotting:
