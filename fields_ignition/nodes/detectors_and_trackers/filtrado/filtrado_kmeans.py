@@ -58,23 +58,10 @@ class FiltradoKMeans(filtrado_base.FiltradoBase):
 
         # Inicializar KMeans para 1 cluster y obtener la inercia, que
         # es una medida de que tan bien se ajustan los datos a los clusters.
-        kmeans_1 = KMeans(n_clusters=1, n_init=10)
-        kmeans_1.fit(data)
-        inertia_1 = kmeans_1.inertia_
+        kmeans_results = KMeans(n_clusters=1, n_init=10)
+        kmeans_results.fit(data)
 
-        # Inicializar KMeans para 2 clusters y obtener la inercia
-        kmeans_2 = KMeans(n_clusters=2, n_init=10)
-        kmeans_2.fit(data)
-        inertia_2 = kmeans_2.inertia_
-
-        # Se retorna el centro del cluster que tenga el valor de inercia más bajo.
-        if inertia_1 < inertia_2:
-            # Un cluster es mejor.
-            cluster_centers = kmeans_1.cluster_centers_
-            print('return 1 cluster: ', cluster_centers[0][0])
-            return cluster_centers[0][0]
-        else:
-            # Dos clusters es mejor.
-            cluster_centers = kmeans_2.cluster_centers_
-            print('return 2 clusters: ', cluster_centers[0][0], " | ", cluster_centers[1][0])
-            return cluster_centers[0][0] if cluster_centers[0][0] < cluster_centers[1][0] else cluster_centers[1][0]
+        # Un cluster es mejor.
+        cluster_centers = kmeans_results.cluster_centers_
+        print('return cluster: ', cluster_centers[0][0])
+        return cluster_centers[0][0]
