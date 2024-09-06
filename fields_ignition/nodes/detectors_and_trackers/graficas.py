@@ -102,7 +102,12 @@ def generar_graficos(carpeta, mundos_reales):
     # Agregar valores reales a los datos
     for mundo, datos in mundos.items():
         if mundo in mundos_reales:
-            datos["real"] = mundos_reales[mundo]
+            lista_reales = mundos_reales[mundo]
+            if len(lista_reales) == 1:
+                datos["real"] = lista_reales[0]
+            else:
+                datos["mitad real"] = lista_reales[0]
+                datos["real"] = lista_reales[1]
 
     # Crear gráficos
     fig, axs = plt.subplots(5, 2, figsize=(15, 20))
@@ -119,6 +124,8 @@ def generar_graficos(carpeta, mundos_reales):
             ax.bar(filtros_en_datos, valores, color=colores)
             if "real" in datos:
                 ax.axhline(y=datos["real"], color='purple', linestyle='--', label=f"Real: {datos['real']}")
+            if "mitad real" in datos:
+                ax.axhline(y=datos["mitad real"], color='yellow', linestyle='-.', label=f"Mitad Real: {datos['mitad real']}")
             ax.set_title(mundo)
             ax.set_ylabel("Valor")
             ax.set_xlabel("Filtro")
@@ -135,16 +142,16 @@ if __name__ == "__main__":
 
     # Cantidades reales para cada mundo
     mundos_reales = {
-        "Mundo Depth 1x5 Mitad": 175,
-        "Mundo Depth 1x5 Completo": 350,
-        "Mundo Stereo 1x5 Mitad": 175,
-        "Mundo Stereo 1x5 Completo": 350,
-        "Mundo Depth 3x5 Mitad": 170,
-        "Mundo Depth 3x5 Completo": 340,
-        "Mundo Stereo 3x5 Mitad": 170,
-        "Mundo Stereo 3x5 Completo": 340,
-        "Mundo Real Mitad": 2554,
-        "Mundo Real Completo": 5109,
+        "Mundo Depth 1x5 Mitad": [175, 350],
+        "Mundo Depth 1x5 Completo": [350],
+        "Mundo Stereo 1x5 Mitad": [175, 350],
+        "Mundo Stereo 1x5 Completo": [350],
+        "Mundo Depth 3x5 Mitad": [170, 340],
+        "Mundo Depth 3x5 Completo": [340],
+        "Mundo Stereo 3x5 Mitad": [170, 340],
+        "Mundo Stereo 3x5 Completo": [340],
+        "Mundo Real Mitad": [2554,5109],
+        "Mundo Real Completo": [5109],
     }
 
     generar_graficos(args.carpeta, mundos_reales)
