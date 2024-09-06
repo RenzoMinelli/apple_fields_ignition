@@ -31,35 +31,30 @@ def launch_and_run(bag_file_path, launch_file, tipo):
     bag_name = bag_file_path.split("/")[-1].split(".")[0]
     correr_experimentos(my_env, bag_name, tipo)
 
-def launchfile_por_nombre(nombre):
-    if "stereo" in nombre:
-        return "stereo_sim_bag.launch"
-    elif "depth" in nombre:
-        return "depth_sim_bag.launch"
-    elif "real" in nombre:
-        return "stereo_real_bag.launch"
-    else:
-        return None
-    
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--carpetas", nargs='+', default=[])
+    parser.add_argument("--carpeta_simulador", required=False, type=str, default=None)
+    parser.add_argument("--carpeta_real", required=False, type=str, default=None)
     args = parser.parse_args()
 
     # seteamos la variable de entorno PYTHONPATH para que las clses de python puedan ser importadas
     my_env = os.environ.copy()
     my_env["PYTHONPATH"] = f"{CWD}/src/apple_fields_ignition/fields_ignition/nodes"
 
-    print("carpetas a procesar: ", args.carpetas)
-    for carpeta in args.carpetas:
-        for bag in os.listdir(carpeta):
-            bag_path = f"{carpeta}/{bag}"
-            launchfile = launchfile_por_nombre(bag)
-            mundo = carpeta.split("/")[-1]
-            if launchfile:
-                launch_and_run(bag_path, launchfile, mundo)
-            else:
-                print(f"Tipo de mundo no identificado para {bag}")
+    if args.carpeta_real:
+        for bag in os.listdir(args.carpeta_real):
+            bag_path = f"{args.carpeta_real}/{bag}"
+            launchfile = "stereo_real_bag.launch"
+            launch_and_run(bag_path, launchfile, "real")
+
+    if args.carpeta_simulador:
+        for bag in os.listdir(args.carpeta_simulador):
+            bag_path = f"{args.carpeta_simulador}/{bag}"
+            for tipo_camara in ["depth", "stereo"]:
+                mundo = bag.split("_")[0]
+                tipo = f"{mundo}_{tipo_camara}"
+                launchfile = f"{tipo_camara}_sim_bag.launch"
+                launch_and_run(bag_path, launchfile, tipo)
                            
 # python3 -m detectors_and_trackers.run_experiments 
 # --carpetas /home/renzo/catkin_ws/3x5_stereo /home/renzo/catkin_ws/1x5_stereo 
