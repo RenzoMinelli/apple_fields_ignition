@@ -3,7 +3,7 @@ import configparser
 import matplotlib.pyplot as plt
 import argparse
 
-FILTROS = { "sin_filtrado": "blue", "filas_posteriores": "orange", "kmeans":"green", "plano": "red", "punto_medio": "pink" }
+FILTROS = { "sin_filtrado": "blue", "filas_posteriores": "orange", "kmeans":"green", "punto_medio": "pink", "plano": "red" }
 
 # Función para identificar el filtro y el mundo a partir del nombre del archivo
 def identificar_filtro_y_mundo(nombre_archivo, path):
@@ -51,7 +51,7 @@ def obtener_apple_count(ruta_archivo):
     config = configparser.ConfigParser()
     config.read(ruta_archivo)
     try:
-        return int(config['FILTRADO_FILAS_POSTERIORES']['apple_count'])
+        return int(config['RESULTS']['apple_count'])
     except KeyError:
         print(f"apple_count no encontrado en {ruta_archivo}")
         return None

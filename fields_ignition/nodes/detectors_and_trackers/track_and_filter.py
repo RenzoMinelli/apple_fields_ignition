@@ -233,7 +233,7 @@ class TrackAndFilter:
             content = config_file.read()
             with open(results_path, "w") as results_file:
                 results_file.write(content)
-                results_file.write(f"\napple_count = {conteo}\n")
+                results_file.write(f"[RESULTS]\napple_count = {conteo}\n")
         
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
