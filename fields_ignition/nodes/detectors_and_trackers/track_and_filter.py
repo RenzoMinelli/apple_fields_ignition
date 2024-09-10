@@ -39,6 +39,7 @@ class TrackAndFilter:
         # Lectura de configuraciones
         self.image_height =             config.getint('TRACK_AND_FILTER', 'image_height')
         self.image_width =              config.getint('TRACK_AND_FILTER', 'image_width')
+        self.count_threshold =          config.getint('TRACK_AND_FILTER', 'count_threshold')
         self.tracking_method =          config.get('TRACK_AND_FILTER', 'tracking_method')
         self.yolo_weights =             config.get('TRACK_AND_FILTER', 'yolo_weights')
         self.track =                    config.getboolean('TRACK_AND_FILTER', 'track')
@@ -51,7 +52,7 @@ class TrackAndFilter:
         self.bag_name =                 bag_name
 
         self.yolo_instance = None
-        self.ids_filtrados = set()
+        self.ids_filtrados = {}
 
         if self.method not in METODOS_FILTRADO.keys():
             allowed_methods = ", ".join(METODOS_FILTRADO.keys())
@@ -156,7 +157,14 @@ class TrackAndFilter:
             model_args.extend(["--verbose"])
 
         return model_args
-                
+    
+    def aumentar_conteo_de_id(self, id):
+        if id in self.ids_filtrados:
+            self.ids_filtrados[id] += 1
+
+        else:
+            self.ids_filtrados[id] = 1
+
     # cuando el nodo es detenido, corre el tracker y filtra los resultados
     def track_filter_and_count(self):
         self.__setup_env()
@@ -199,7 +207,7 @@ class TrackAndFilter:
             filtered_bbs = filtro.filter(timestamp, bounding_boxes[timestamp], img_original, mapa_profundidad)
 
             for bb in filtered_bbs:
-                self.ids_filtrados.add(bb[2])
+                self.aumentar_conteo_de_id(bb[2])
         
         # Imprimir resultados
         print('Numero de manzanas detectado: ' + str(self.get_apple_count()))
@@ -218,7 +226,12 @@ class TrackAndFilter:
             self.ids_filtrados.add(bb[2])
 
     def get_apple_count(self):
-        return len(self.ids_filtrados)
+        # count_threshold es el umbral de veces que un id debe aparecer para ser contado
+        count = 0
+        for id in self.ids_filtrados:
+            if self.ids_filtrados[id] >= self.count_threshold:
+                count += 1
+        return count
     
     def __save_results(self):
         # creo la carpeta results si no existe
