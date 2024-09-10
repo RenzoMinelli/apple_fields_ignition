@@ -119,7 +119,7 @@ def check_last_message(event):
 
     # checkeamos si pasaron 40 segundos sin recibir mensajes
     if TIME_OF_LAST_MESSAGE and (rospy.Time.now() - TIME_OF_LAST_MESSAGE).to_sec() > 40:
-        rospy.loginfo("No messages received for 3 seconds, shutting down.")
+        rospy.loginfo("No messages received for 40 seconds, shutting down.")
         rospy.signal_shutdown("Finished processing bag")
 
 if __name__ == '__main__':
