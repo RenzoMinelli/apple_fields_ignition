@@ -158,10 +158,9 @@ class TrackAndFilter:
 
         return model_args
     
-    def aumentar_conteo_de_id(self, id):
+    def __aumentar_conteo_de_id(self, id):
         if id in self.ids_filtrados:
             self.ids_filtrados[id] += 1
-
         else:
             self.ids_filtrados[id] = 1
 
@@ -207,7 +206,7 @@ class TrackAndFilter:
             filtered_bbs = filtro.filter(timestamp, bounding_boxes[timestamp], img_original, mapa_profundidad)
 
             for bb in filtered_bbs:
-                self.aumentar_conteo_de_id(bb[2])
+                self.__aumentar_conteo_de_id(bb[2])
         
         # Imprimir resultados
         print('Numero de manzanas detectado: ' + str(self.get_apple_count()))
@@ -223,7 +222,7 @@ class TrackAndFilter:
         filtered_bbs = filtro.filter(timestamp, bounding_boxes, img_original, mapa_profundidad)
 
         for bb in filtered_bbs:
-            self.ids_filtrados.add(bb[2])
+            self.__aumentar_conteo_de_id(bb[2])
 
     def get_apple_count(self):
         # count_threshold es el umbral de veces que un id debe aparecer para ser contado
