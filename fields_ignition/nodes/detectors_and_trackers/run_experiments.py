@@ -59,6 +59,6 @@ if __name__ == "__main__":
 
                            
 # python3 -m detectors_and_trackers.run_experiments 
-# --carpetas /home/renzo/catkin_ws/3x5_stereo /home/renzo/catkin_ws/1x5_stereo 
-#            /home/renzo/catkin_ws/3x5_depth  /home/renzo/catkin_ws/1x5_depth
-#            /home/renzo/catkin_ws/real
+# --carpeta_simulador /home/renzo/catkin_ws/bags_simulador --carpeta_real home/renzo/catkin_ws/bags_real 
+
+# Los nombres de los bags del simualdor deben tener el prefijo 3x5 o 1x5
