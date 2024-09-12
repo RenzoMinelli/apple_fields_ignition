@@ -102,8 +102,8 @@
         <camera name="right">
           <horizontal_fov>1.3962634</horizontal_fov>
           <image>
-              <width>1080</width>
-              <height>1920</height>
+              <width>720</width>
+              <height>1200</height>
               <format>R8G8B8</format>
           </image>
           <clip>
@@ -122,8 +122,8 @@
         <camera name="left">
           <horizontal_fov>1.3962634</horizontal_fov>
           <image>
-              <width>1080</width>
-              <height>1920</height>
+              <width>720</width>
+              <height>1200</height>
               <format>R8G8B8</format>
           </image>
           <clip>
