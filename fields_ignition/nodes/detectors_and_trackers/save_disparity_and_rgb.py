@@ -15,6 +15,7 @@ FILTRO = None
 CAMERA_MODEL = None
 TIME_OF_LAST_MESSAGE = None
 MIN_PROCESSING_RATE = None
+LAST_FRAME_SEQ_NUMB = None
 
 def read_cameras():
     rospy.Timer(rospy.Duration(10), check_last_message)  # Check cada 10 segundos
@@ -40,19 +41,24 @@ def map_distance_for_image(depth_map):
     return np.interp(depth_map, (1, 4), (0, 255))
 
 def image_callback(image, depth_data):
+    global LAST_FRAME_SEQ_NUMB
     global TIME_OF_LAST_MESSAGE
     global MIN_PROCESSING_RATE
 
-    if not TIME_OF_LAST_MESSAGE is None:
-        time_diff = (rospy.Time.now() - TIME_OF_LAST_MESSAGE).to_sec() * 1000
+    if not LAST_FRAME_SEQ_NUMB is None and not TIME_OF_LAST_MESSAGE is None:
         
+        time_diff = (rospy.Time.now() - TIME_OF_LAST_MESSAGE).to_sec() * 1000
         if time_diff <= 0:
             time_diff = 0.000000001
-        
-        print("Tiempo entre imagenes: ", time_diff, "ms")
-        fotogramas_procesados_por_segundo = 1000/time_diff
-        print("se esta procesando a un rate de: ", fotogramas_procesados_por_segundo, "fps")
 
+        print("Tiempo entre imagenes: ", time_diff, "ms")
+
+        fotogramas_perdidos = image.header.seq - LAST_FRAME_SEQ_NUMB - 1
+        if fotogramas_perdidos > 0:
+            print(f"!!!!!!!! Se perdieron {fotogramas_perdidos} fotogramas, se recomienda bajar el rate del bag !!!!!!!!!!")
+
+        fotogramas_procesados_por_segundo = 1000/time_diff 
+        print("se esta procesando a un rate de: ", fotogramas_procesados_por_segundo, "fps")
 
         if MIN_PROCESSING_RATE and fotogramas_procesados_por_segundo < MIN_PROCESSING_RATE:
             bag_max_running_rate = round(fotogramas_procesados_por_segundo/30, 3)
@@ -60,9 +66,10 @@ def image_callback(image, depth_data):
                 ADVERTENCIA: para que el sistema pueda procesar el porcentaje minimo
                 de fotogramas, actualmente: {MIN_PROCESSING_RATE} se debe correr
                 el bag con la flag '--rate {bag_max_running_rate}'
-            """)
-            
+            """)    
+
     TIME_OF_LAST_MESSAGE = rospy.Time.now()
+    LAST_FRAME_SEQ_NUMB = image.header.seq
 
     br = CvBridge()
     rospy.loginfo("receiving Image")
