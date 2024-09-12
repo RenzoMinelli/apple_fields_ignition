@@ -47,9 +47,8 @@ if __name__ == "__main__":
             bag_path = f"{args.carpeta_simulador}/{bag}"
             for tipo_camara in ["depth", "stereo"]:
                 mundo = bag.split("_")[0]
-                tipo = f"{mundo}_{tipo_camara}"
                 launchfile = f"{tipo_camara}_sim_bag.launch"
-                launch_and_run(bag_path, launchfile, tipo)
+                launch_and_run(bag_path, launchfile, tipo_camara)
 
     if args.carpeta_real:
         for bag in os.listdir(args.carpeta_real):
