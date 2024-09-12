@@ -25,7 +25,7 @@
   <!-- Run stereo_image_proc -->
   <group ns="stereo">
     <node pkg="stereo_image_proc" type="stereo_image_proc" name="stereo_image_proc" output="screen">
-      <rosparam command="load" file="$(arg folder_path)/src/apple_fields_ignition/fields_ignition/config/stereoConfigMercedezv3.yaml"/>
+      <rosparam command="load" file="$(arg folder_path)/src/apple_fields_ignition/fields_ignition/config/stereoConfigReal.yaml"/>
     </node>
   </group>
 
