@@ -60,6 +60,10 @@ class TrackAndFilter:
         
         self.filter_class = METODOS_FILTRADO[self.method]
 
+        # guardamos el tipo de camara para guardar los resultados con un nombre mas descriptivo
+        offset = config.getint('CONSTANTS', 'offset_horizontal')
+        self.camera_type = "depth" if offset == -1 else "stereo"
+
     def __setup_env(self):
         # clone the repository
         subprocess.run(['pip', 'install', 'boxmot'])
@@ -239,7 +243,7 @@ class TrackAndFilter:
 
         # genero un archivo con el content del config usado + el conteo en una nueva linea
         conteo = self.get_apple_count()
-        results_path = f"{CWD}/results/{self.method}_{self.bag_name}_{int(time.time())}.ini"
+        results_path = f"{CWD}/results/{self.camera_type}_{self.method}_{self.bag_name}_{int(time.time())}.ini"
 
         with open(self.config_path, "r") as config_file:
             content = config_file.read()

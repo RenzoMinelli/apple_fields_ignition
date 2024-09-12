@@ -14,9 +14,8 @@ def identificar_filtro_y_mundo(nombre_archivo, path):
         return None, None
 
     # Remover el filtro del nombre para identificar el mundo
-    nombre_restante = nombre_archivo.replace(f"{filtro}_", "")
-    ruta_archivo = os.path.join(path, nombre_archivo)
-    depth_o_stereo = obtener_depth_o_stereo(ruta_archivo)
+    depth_o_stereo = obtener_depth_o_stereo(nombre_archivo)
+    nombre_restante = nombre_archivo.replace(f"{depth_o_stereo}_{filtro}_", "")
 
     # Mapear el nombre restante al mundo correspondiente
     if "3x5_completo" in nombre_restante:
@@ -57,16 +56,11 @@ def obtener_apple_count(ruta_archivo):
         return None
     
 def obtener_depth_o_stereo(ruta_archivo):
-    config = configparser.ConfigParser()
-    config.read(ruta_archivo)
-    try:
-        offset = int(config['CONSTANTS']['offset_horizontal'])
-        if offset == -1:
-            return "depth"
-        else:
-            return "stereo" 
-    except KeyError:
-        print(f"depth o stereo no detectable {ruta_archivo}")
+    if "depth" in ruta_archivo:
+        return "depth"
+    elif "stereo" in ruta_archivo:
+        return "stereo"
+    else:
         return None
 
 # Función para procesar la carpeta y generar los datos
