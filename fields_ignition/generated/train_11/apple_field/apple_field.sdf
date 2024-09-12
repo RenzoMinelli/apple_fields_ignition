@@ -171,25 +171,25 @@
         <include>
             <uri>apple_1</uri>
             <name>apple_1</name>
-            <pose>-2.0 2.0 0 0 0 0</pose>
+            <pose>-2.0 1.0 0 0 0 0</pose>
         </include>
         
         <include>
             <uri>apple_2</uri>
             <name>apple_2</name>
-            <pose>-2.0 4.0 0 0 0 0</pose>
+            <pose>-2.0 2.0 0 0 0 0</pose>
         </include>
         
         <include>
             <uri>apple_3</uri>
             <name>apple_3</name>
-            <pose>-2.0 6.0 0 0 0 0</pose>
+            <pose>-2.0 3.0 0 0 0 0</pose>
         </include>
         
         <include>
             <uri>apple_4</uri>
             <name>apple_4</name>
-            <pose>-2.0 8.0 0 0 0 0</pose>
+            <pose>-2.0 4.0 0 0 0 0</pose>
         </include>
         
         <include>

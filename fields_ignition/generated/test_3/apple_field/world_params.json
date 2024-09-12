@@ -1,0 +1,15 @@
+{
+    "camera_position": "0.0012 0 1 0 -0.2618 1.57079632679",
+    "crop_dist": "2",
+    "file": "/home/renzo/catkin_ws/src/apple_fields_ignition/fields_ignition/one_leader_tree.json",
+    "husky_position": "-0.4 0 0 0 0 1.57",
+    "model_name_prefix": "apple",
+    "origin_coordinates": "-2 0",
+    "out_path": "/home/renzo/catkin_ws/src/apple_fields_ignition/fields_ignition/generated/test_3",
+    "row_count": "1",
+    "row_dist": "4",
+    "row_length": "5",
+    "seed": 1434,
+    "tree_properties": "eyJtYWluIjogeyJlbGVtZW50c19vZmZzZXRfcmFuZ2UiOiBbMC41LCAwLjZdLCAiaGVpZ2h0X3JhbmdlIjogWzIuMiwgMi4zXX0sICJicmFuY2hlcyI6IHsiY291bnQiOiAxLCAicmFkaXVzX3JhbmdlIjogWzAuMDUsIDAuMDddLCAicmFkaXVzX2RlY3JlYXNlIjogMC4yLCAiYnJpbmRpbGxhcyI6IHsib2Zmc2V0X3JhbmdlIjogWzAuNSwgMC42XSwgImxlbmd0aF9yYW5nZSI6IFswLjIsIDEuMF0sICJkaXN0YW5jZV9iZXR3ZWVuIjogWzAuMDIsIDAuMDNdLCAicmFkaXVzX3JhbmdlIjogWzAuMDA2LCAwLjAxXSwgInJhZGl1c19kZWNyZWFzZSI6IDAuMiwgImVsZW1lbnRfb2Zmc2V0IjogMC4xfX0sICJmcnVpdHMiOiB7ImNvdW50X3Byb3BvcnRpb24iOiAwLjIsICJzaXplX3JhbmdlIjogWzAuMDY1LCAwLjA3XX0sICJsZWF2ZXMiOiB7ImNvdW50X3Byb3BvcnRpb24iOiAwLjMsICJzaXplX3JhbmdlIjogWzAuMSwgMC4xNV19fQ==",
+    "world_name": "apple_field"
+}
