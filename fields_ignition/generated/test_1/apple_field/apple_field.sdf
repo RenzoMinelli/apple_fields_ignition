@@ -89,7 +89,7 @@
                     </anchors>
                 </ignition-gui>
                 <topic_picker>false</topic_picker>
-                <topic>/world/field/model/costar_husky_sensor_config_1/link/base_link/sensor/camera_left/image</topic>
+                <topic>/world/field/model/costar_husky_sensor_config_1/link/base_link/sensor/realsense_d435/image</topic>
             </plugin>
 
             <plugin filename="Teleop" name="Teleop">
