@@ -4,7 +4,7 @@ correlation_window_size: 5
 disp12MaxDiff: 0
 disparity_range: 80
 fullDP: true
-min_disparity: 0
+min_disparity: 1
 prefilter_cap: 63
 prefilter_size: 255
 speckle_range: 6
