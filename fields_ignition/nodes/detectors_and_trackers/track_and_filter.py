@@ -49,6 +49,7 @@ class TrackAndFilter:
         self.verbose =                  config.getboolean('TRACK_AND_FILTER', 'verbose')
         self.debug_plano =              config.getboolean('FILTRADO_PLANO', 'debug_plano')
         self.method =                   config.get('TRACK_AND_FILTER', 'method')
+        self.coeficiente_de_ajuste =    config.get('TRACK_AND_FILTER', 'coeficiente_de_ajuste')
         self.bag_name =                 bag_name
 
         self.yolo_instance = None
@@ -213,7 +214,8 @@ class TrackAndFilter:
                 self.__aumentar_conteo_de_id(bb[2])
         
         # Imprimir resultados
-        print('Numero de manzanas detectado: ' + str(self.get_apple_count()))
+        numero_de_manzanas_detectado = self.get_apple_count() * self.coeficiente_de_ajuste
+        print('Numero de manzanas detectado: ' + str(numero_de_manzanas_detectado))
         self.__save_results()
 
     def track_filter_and_count_one_frame(self, timestamp, img_original, mapa_profundidad):
