@@ -93,6 +93,9 @@ def image_callback(image, depth_data):
 
     timestamp = str(image.header.stamp)
 
+    # agregar 0 a la izquierda para que quede con 15 digitos
+    timestamp = timestamp.zfill(15)
+
     global FILTRO
     
     if FILTRO:
