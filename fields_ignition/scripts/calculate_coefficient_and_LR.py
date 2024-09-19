@@ -3,10 +3,10 @@ import configparser
 import argparse
 import os
 import numpy as np
-import os
 from sklearn.linear_model import LinearRegression
 import joblib
 import json
+import matplotlib.pyplot as plt
 
 cameras = [
   'depth',
@@ -101,6 +101,11 @@ def ajuste_por_regresion_lineal(results_path, config):
     models_dir = os.path.join(results_path, "modelos_regresion")
     if not os.path.exists(models_dir):
         os.makedirs(models_dir)
+    
+    # Crear una carpeta para guardar las gráficas si no existe
+    plots_dir = os.path.join(results_path, "graficas_regresion")
+    if not os.path.exists(plots_dir):
+        os.makedirs(plots_dir)
 
     # Recorrer las cámaras y los filtros para entrenar y guardar los modelos
     for c in cameras:
@@ -129,6 +134,21 @@ def ajuste_por_regresion_lineal(results_path, config):
             model_filename = os.path.join(models_dir, f"modelo_{c}_{f}.pkl")
             joblib.dump(model, model_filename)
             print(f"Modelo guardado: {model_filename}")
+            
+            # Graficar los datos y la recta de regresion
+            plt.figure()
+            plt.scatter(x_vals, y_vals, color='blue', label='Datos reales')
+            plt.plot(x_vals, model.predict(x_vals), color='red', label='Recta de regresión')
+            plt.title(f'Regresión Lineal - Cámara: {c}, Filtro: {f}')
+            plt.xlabel('Conteo Predicho')
+            plt.ylabel('Conteo Real')
+            plt.legend()
+
+            # Guardar la grafica
+            plot_filename = os.path.join(plots_dir, f"grafica_{c}_{f}.png")
+            plt.savefig(plot_filename)
+            plt.close()  # Cerrar la gráfica para no ocupar memoria
+            print(f"Gráfica guardada: {plot_filename}")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
