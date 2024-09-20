@@ -50,7 +50,7 @@ class TrackAndFilter:
         self.verbose =                  config.getboolean('TRACK_AND_FILTER', 'verbose')
         self.debug_plano =              config.getboolean('FILTRADO_PLANO', 'debug_plano')
         self.method =                   config.get('TRACK_AND_FILTER', 'method')
-        self.coeficiente_de_ajuste =    config.get('TRACK_AND_FILTER', 'coeficiente_de_ajuste')
+        self.coeficiente_de_ajuste =    config.getfloat('TRACK_AND_FILTER', 'coeficiente_de_ajuste')
         self.modelo_de_regresion = config.get('TRACK_AND_FILTER', 'modelo_de_regresion')
         self.bag_name =                 bag_name
 
