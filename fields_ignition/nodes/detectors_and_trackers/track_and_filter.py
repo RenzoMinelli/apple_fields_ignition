@@ -284,11 +284,22 @@ class TrackAndFilter:
         conteo = self.apple_count()
         results_path = f"{CWD}/results/{self.camera_type}_{self.method}_{self.bag_name}_{int(time.time())}.ini"
 
+        print('Guardando resultados de ejecucion en: \n' + results_path)
+
         with open(self.config_path, "r") as config_file:
             content = config_file.read()
             with open(results_path, "w") as results_file:
                 results_file.write(content)
+                # Escribo el resultado normal
                 results_file.write(f"[RESULTS]\napple_count = {conteo}\n")
+
+                # Escribo el resultado ajustando con modelo de regresion
+                ajuste_con_regresion = self.__predecir_con_regresion(self.apple_count())
+                results_file.write(f"[RESULTS_WITH_REGRESSION]\napple_count = {str(ajuste_con_regresion)}\n")
+
+                # Escribo el resultado ajustando por coeficiente
+                ajuste_con_coeficiente = self.__prediccion_con_coeficiente(self.apple_count())
+                results_file.write(f"[RESULTS_WITH_COEFFICIENT]\napple_count = {str(ajuste_con_coeficiente)}\n")
         
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
