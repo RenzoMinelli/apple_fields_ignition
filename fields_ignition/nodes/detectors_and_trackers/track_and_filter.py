@@ -12,6 +12,7 @@ import cv2
 import numpy as np
 from detectors_and_trackers.yolo_tracking.tracking.track import main as track_main
 import time 
+import joblib
 
 # importar configuraciones
 import configparser
@@ -50,6 +51,7 @@ class TrackAndFilter:
         self.debug_plano =              config.getboolean('FILTRADO_PLANO', 'debug_plano')
         self.method =                   config.get('TRACK_AND_FILTER', 'method')
         self.coeficiente_de_ajuste =    config.get('TRACK_AND_FILTER', 'coeficiente_de_ajuste')
+        self.modelo_de_regresion = config.get('TRACK_AND_FILTER', 'modelo_de_regresion')
         self.bag_name =                 bag_name
 
         self.yolo_instance = None
@@ -169,6 +171,16 @@ class TrackAndFilter:
         else:
             self.ids_filtrados[id] = 1
 
+    def __cargar_modelo_regresion(self, model_path):
+        # Verificar si el archivo existe
+        if os.path.exists(model_path):
+            # Cargar el modelo usando joblib
+            modelo = joblib.load(model_path)
+            return modelo
+        else:
+            print(f"El archivo {model_path} no existe.")
+            return None
+
     # cuando el nodo es detenido, corre el tracker y filtra los resultados
     def track_filter_and_count(self):
         self.__setup_env()
@@ -214,8 +226,21 @@ class TrackAndFilter:
                 self.__aumentar_conteo_de_id(bb[2])
         
         # Imprimir resultados
-        numero_de_manzanas_detectado = self.get_apple_count() * self.coeficiente_de_ajuste
+        numero_de_manzanas_detectado = self.get_apple_count()
         print('Numero de manzanas detectado: ' + str(numero_de_manzanas_detectado))
+        
+        # Predecir el valor real utilizando el ajuste de regresion lineal
+        modelos_de_regresion = '/src/apple_fields_ignition/fields_ignition/scripts/ejecuciones_coeficiente_y_RL/modelos_regresion/'
+        modelo_seleccionado = CWD + modelos_de_regresion + self.modelo_de_regresion + '.pkl'
+        modelo_regresion = self.__cargar_modelo_regresion(modelo_seleccionado)
+        
+        valor_x = np.array(numero_de_manzanas_detectado).reshape(-1, 1)
+        prediccion_de_regresion = modelo_regresion.predict(valor_x)
+        print('Numero de manzanas predicho por la regresion: ' + str(round(prediccion_de_regresion[0])))
+
+        # Predecir el valor real utilizando el ajuste por coeficiente
+        print('Numero de manzanas ajustando por coeficiente: ' + str(round(numero_de_manzanas_detectado * float(self.coeficiente_de_ajuste))))
+
         self.__save_results()
 
     def track_filter_and_count_one_frame(self, timestamp, img_original, mapa_profundidad):
