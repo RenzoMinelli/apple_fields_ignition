@@ -76,7 +76,7 @@ class TrackAndFilter:
         subprocess.run(['pip', 'install', 'boxmot'])
 
     def __obtener_nombre_modelo_de_regresion(self):
-        modelo = 'None'
+        modelo = None
         try:
           modelo = config.get('TRACK_AND_FILTER', 'modelo_de_regresion')
         except:
@@ -194,7 +194,7 @@ class TrackAndFilter:
             return None
 
     def __predecir_con_regresion(self, numero_de_manzanas_detectado):
-        if self.modelo_de_regresion != 'None':
+        if self.modelo_de_regresion != None:
           modelos_de_regresion = '/src/apple_fields_ignition/fields_ignition/scripts/ejecuciones_coeficiente_y_RL/modelos_regresion/'
           modelo_seleccionado = CWD + modelos_de_regresion + self.modelo_de_regresion + '.pkl'
           modelo_regresion = self.__cargar_modelo_regresion(modelo_seleccionado)
