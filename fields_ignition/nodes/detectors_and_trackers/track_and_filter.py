@@ -54,6 +54,8 @@ class TrackAndFilter:
         self.modelo_de_regresion = config.get('TRACK_AND_FILTER', 'modelo_de_regresion')
         self.bag_name =                 bag_name
 
+        self.count = None
+
         self.yolo_instance = None
         self.ids_filtrados = {}
 
@@ -237,15 +239,14 @@ class TrackAndFilter:
                 self.__aumentar_conteo_de_id(bb[2])
         
         # Imprimir resultados
-        numero_de_manzanas_detectado = self.get_apple_count()
-        print('Numero de manzanas detectado: ' + str(numero_de_manzanas_detectado))
+        print('Numero de manzanas detectado: ' + str(self.apple_count()))
         
         # Predecir el valor real utilizando el ajuste por regresion
-        prediccion_de_regresion = self.__predecir_con_regresion(numero_de_manzanas_detectado)
+        prediccion_de_regresion = self.__predecir_con_regresion(self.apple_count())
         print('Numero de manzanas predicho por la regresion: ' + str(prediccion_de_regresion))
 
         # Predecir el valor real utilizando el ajuste por coeficiente
-        prediccion_de_coeficiente = self.__prediccion_con_coeficiente(numero_de_manzanas_detectado)
+        prediccion_de_coeficiente = self.__prediccion_con_coeficiente(self.apple_count())
         print('Numero de manzanas ajustando por coeficiente: ' + str(prediccion_de_coeficiente))
 
         self.__save_results()
@@ -262,12 +263,16 @@ class TrackAndFilter:
         for bb in filtered_bbs:
             self.__aumentar_conteo_de_id(bb[2])
 
-    def get_apple_count(self):
+    def apple_count(self):
         # count_threshold es el umbral de veces que un id debe aparecer para ser contado
+        if self.count != None:
+          return self.count
+        
         count = 0
         for id in self.ids_filtrados:
             if self.ids_filtrados[id] >= self.count_threshold:
                 count += 1
+        self.count = count
         return count
     
     def __save_results(self):
@@ -276,7 +281,7 @@ class TrackAndFilter:
             os.makedirs(f"{CWD}/results")
 
         # genero un archivo con el content del config usado + el conteo en una nueva linea
-        conteo = self.get_apple_count()
+        conteo = self.apple_count()
         results_path = f"{CWD}/results/{self.camera_type}_{self.method}_{self.bag_name}_{int(time.time())}.ini"
 
         with open(self.config_path, "r") as config_file:
