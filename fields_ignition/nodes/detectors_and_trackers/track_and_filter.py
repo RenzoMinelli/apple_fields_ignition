@@ -181,6 +181,18 @@ class TrackAndFilter:
             print(f"El archivo {model_path} no existe.")
             return None
 
+    def __predecir_con_regresion(self, numero_de_manzanas_detectado):
+        # Predecir el valor real utilizando el ajuste de regresion lineal
+        modelos_de_regresion = '/src/apple_fields_ignition/fields_ignition/scripts/ejecuciones_coeficiente_y_RL/modelos_regresion/'
+        modelo_seleccionado = CWD + modelos_de_regresion + self.modelo_de_regresion + '.pkl'
+        modelo_regresion = self.__cargar_modelo_regresion(modelo_seleccionado)
+        
+        valor_x = np.array(numero_de_manzanas_detectado).reshape(-1, 1)
+        return round(modelo_regresion.predict(valor_x)[0])
+
+    def __prediccion_con_coeficiente(self, numero_de_manzanas_detectado):
+        return round(numero_de_manzanas_detectado * float(self.coeficiente_de_ajuste))
+
     # cuando el nodo es detenido, corre el tracker y filtra los resultados
     def track_filter_and_count(self):
         self.__setup_env()
@@ -229,17 +241,12 @@ class TrackAndFilter:
         numero_de_manzanas_detectado = self.get_apple_count()
         print('Numero de manzanas detectado: ' + str(numero_de_manzanas_detectado))
         
-        # Predecir el valor real utilizando el ajuste de regresion lineal
-        modelos_de_regresion = '/src/apple_fields_ignition/fields_ignition/scripts/ejecuciones_coeficiente_y_RL/modelos_regresion/'
-        modelo_seleccionado = CWD + modelos_de_regresion + self.modelo_de_regresion + '.pkl'
-        modelo_regresion = self.__cargar_modelo_regresion(modelo_seleccionado)
-        
-        valor_x = np.array(numero_de_manzanas_detectado).reshape(-1, 1)
-        prediccion_de_regresion = modelo_regresion.predict(valor_x)
-        print('Numero de manzanas predicho por la regresion: ' + str(round(prediccion_de_regresion[0])))
+        prediccion_de_regresion = self.__predecir_con_regresion(numero_de_manzanas_detectado)
+        print('Numero de manzanas predicho por la regresion: ' + str(prediccion_de_regresion))
 
         # Predecir el valor real utilizando el ajuste por coeficiente
-        print('Numero de manzanas ajustando por coeficiente: ' + str(round(numero_de_manzanas_detectado * float(self.coeficiente_de_ajuste))))
+        prediccion_de_coeficiente = self.__prediccion_con_coeficiente(numero_de_manzanas_detectado)
+        print('Numero de manzanas ajustando por coeficiente: ' + str(prediccion_de_coeficiente))
 
         self.__save_results()
 
