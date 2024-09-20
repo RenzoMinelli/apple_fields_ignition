@@ -30,10 +30,12 @@ METODOS_FILTRADO = {
     "punto_medio": FiltradoPuntoMedio
 }
 
+config = configparser.ConfigParser()
+
 class TrackAndFilter:
     def __init__(self, config_path, bag_name="unknown"):
         
-        config = configparser.ConfigParser()
+        
         config.read(config_path)
         self.config_path = config_path
 
@@ -50,15 +52,8 @@ class TrackAndFilter:
         self.verbose =                  config.getboolean('TRACK_AND_FILTER', 'verbose')
         self.debug_plano =              config.getboolean('FILTRADO_PLANO', 'debug_plano')
         self.method =                   config.get('TRACK_AND_FILTER', 'method')
-        
         self.coeficiente_de_ajuste =    config.getfloat('TRACK_AND_FILTER', 'coeficiente_de_ajuste')
-        
-        self.modelo_de_regresion = 'None'
-        try:
-          self.modelo_de_regresion = config.get('TRACK_AND_FILTER', 'modelo_de_regresion')
-        except:
-            print('No hay modelo de regresion seleccionado')
-        
+        self.modelo_de_regresion =      self.__obtener_nombre_modelo_de_regresion()
         self.bag_name =                 bag_name
 
         self.count = None
@@ -79,6 +74,14 @@ class TrackAndFilter:
     def __setup_env(self):
         # clone the repository
         subprocess.run(['pip', 'install', 'boxmot'])
+
+    def __obtener_nombre_modelo_de_regresion(self):
+        modelo = 'None'
+        try:
+          modelo = config.get('TRACK_AND_FILTER', 'modelo_de_regresion')
+        except:
+            print('No hay modelo de regresion seleccionado')
+        return modelo
 
     def __current_path(self):
         return os.path.dirname(os.path.realpath(__file__))
