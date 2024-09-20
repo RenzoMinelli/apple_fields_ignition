@@ -182,7 +182,6 @@ class TrackAndFilter:
             return None
 
     def __predecir_con_regresion(self, numero_de_manzanas_detectado):
-        # Predecir el valor real utilizando el ajuste de regresion lineal
         modelos_de_regresion = '/src/apple_fields_ignition/fields_ignition/scripts/ejecuciones_coeficiente_y_RL/modelos_regresion/'
         modelo_seleccionado = CWD + modelos_de_regresion + self.modelo_de_regresion + '.pkl'
         modelo_regresion = self.__cargar_modelo_regresion(modelo_seleccionado)
@@ -241,6 +240,7 @@ class TrackAndFilter:
         numero_de_manzanas_detectado = self.get_apple_count()
         print('Numero de manzanas detectado: ' + str(numero_de_manzanas_detectado))
         
+        # Predecir el valor real utilizando el ajuste por regresion
         prediccion_de_regresion = self.__predecir_con_regresion(numero_de_manzanas_detectado)
         print('Numero de manzanas predicho por la regresion: ' + str(prediccion_de_regresion))
 
