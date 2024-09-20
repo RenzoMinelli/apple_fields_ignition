@@ -50,8 +50,15 @@ class TrackAndFilter:
         self.verbose =                  config.getboolean('TRACK_AND_FILTER', 'verbose')
         self.debug_plano =              config.getboolean('FILTRADO_PLANO', 'debug_plano')
         self.method =                   config.get('TRACK_AND_FILTER', 'method')
+        
         self.coeficiente_de_ajuste =    config.getfloat('TRACK_AND_FILTER', 'coeficiente_de_ajuste')
-        self.modelo_de_regresion = config.get('TRACK_AND_FILTER', 'modelo_de_regresion')
+        
+        self.modelo_de_regresion = 'None'
+        try:
+          self.modelo_de_regresion = config.get('TRACK_AND_FILTER', 'modelo_de_regresion')
+        except:
+            print('No hay modelo de regresion seleccionado')
+        
         self.bag_name =                 bag_name
 
         self.count = None
@@ -184,13 +191,15 @@ class TrackAndFilter:
             return None
 
     def __predecir_con_regresion(self, numero_de_manzanas_detectado):
-        modelos_de_regresion = '/src/apple_fields_ignition/fields_ignition/scripts/ejecuciones_coeficiente_y_RL/modelos_regresion/'
-        modelo_seleccionado = CWD + modelos_de_regresion + self.modelo_de_regresion + '.pkl'
-        modelo_regresion = self.__cargar_modelo_regresion(modelo_seleccionado)
-        
-        valor_x = np.array(numero_de_manzanas_detectado).reshape(-1, 1)
-        return round(modelo_regresion.predict(valor_x)[0])
-
+        if self.modelo_de_regresion != 'None':
+          modelos_de_regresion = '/src/apple_fields_ignition/fields_ignition/scripts/ejecuciones_coeficiente_y_RL/modelos_regresion/'
+          modelo_seleccionado = CWD + modelos_de_regresion + self.modelo_de_regresion + '.pkl'
+          modelo_regresion = self.__cargar_modelo_regresion(modelo_seleccionado)
+          
+          valor_x = np.array(numero_de_manzanas_detectado).reshape(-1, 1)
+          return round(modelo_regresion.predict(valor_x)[0])
+        return numero_de_manzanas_detectado
+    
     def __prediccion_con_coeficiente(self, numero_de_manzanas_detectado):
         return round(numero_de_manzanas_detectado * float(self.coeficiente_de_ajuste))
 
