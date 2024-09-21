@@ -89,11 +89,9 @@ def generar_graficos(carpeta, mundos_reales):
             filtros_en_datos = [key for key in FILTROS if key in datos]
             num_filtros = len(filtros_en_datos)
 
-            # Crear una nueva figura con subplots para cada filtro
-            fig, axs = plt.subplots(1, num_filtros, figsize=(5 * num_filtros, 6))
-
-            if num_filtros == 1:  # Si solo hay un filtro, axs no es un array
-                axs = [axs]
+            # Configurar las filas y columnas: 2 filas, 3 columnas
+            fig, axs = plt.subplots(2, 3, figsize=(18, 10))
+            axs = axs.flatten()  # Aplana el array para que sea más fácil iterar sobre él
 
             for ax, filtro in zip(axs, filtros_en_datos):
                 apple_counts_para_filtro_hash = datos[filtro]
@@ -116,6 +114,10 @@ def generar_graficos(carpeta, mundos_reales):
                 ax.set_ylabel("Valor")
                 ax.set_xlabel("Tipo ajuste")
                 ax.legend()
+
+            # Eliminar cualquier subplot no utilizado (en caso de que haya menos de 6 filtros)
+            for i in range(num_filtros, len(axs)):
+                fig.delaxes(axs[i])
 
             plt.tight_layout()
             nombre_archivo = f"{CURRENT_PATH}/graficas_experimento/{mundo.replace(' ', '_')}.png"
