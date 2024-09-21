@@ -5,21 +5,19 @@ import argparse
 
 FILTROS = [ "sin_filtrado", "filas_posteriores", "kmeans", "punto_medio", "plano" ]
 AJUSTES = { "apple_count_original": "blue", "apple_count_coef": "orange", "apple_count_reg": "green" }
+CURRENT_PATH = os.path.dirname(os.path.realpath(__file__))
 
 # Función para identificar el filtro y el mundo a partir del nombre del archivo
 def identificar_filtro_y_mundo(nombre_archivo, path):
-    # Buscar el filtro en el nombre del archivo
     filtro = next((filtro for filtro in FILTROS if filtro in nombre_archivo), None)
     
     if not filtro:
         return None, None
 
-    # Remover el filtro del nombre para identificar el mundo
     depth_o_stereo = obtener_depth_o_stereo(nombre_archivo)
     nombre_restante = nombre_archivo.replace(f"{depth_o_stereo}_{filtro}_", "")
     nombre_restante = nombre_restante.split("_")[:-1]
     
-    # convertir a upper case primer letra de depth_o_stereo
     depth_o_stereo = depth_o_stereo[0].upper() + depth_o_stereo[1:]
 
     return filtro, f"Mundo {depth_o_stereo} {nombre_restante[0]} {nombre_restante[1]}"
@@ -85,27 +83,25 @@ def generar_graficos(carpeta, mundos_reales):
             lista_reales = mundos_reales[mundo]
             datos["real"] = lista_reales[0]
 
-    # Crear gráficos
-    fig, axs = plt.subplots(10, 5, figsize=(15, 20))
-    fig.subplots_adjust(hspace=0.4)
+    
 
-    secciones_graficas = axs.flat
-    contador = 0
-
-    for (mundo, datos) in mundos.items():
+    # Crear gráficos individuales para cada mundo
+    for mundo, datos in mundos.items():
         if datos:  # Si hay datos para este mundo
+
+            fig, axs = plt.subplots(1, 5, figsize=(15, 20))
+
+            plt.figure(figsize=(1, 5))  # Crear una nueva figura para cada mundo
             filtros_en_datos = [key for key in FILTROS if key in datos]
-            for filtro in filtros_en_datos:
+            
+            for ax, filtro in zip(axs.flat, filtros_en_datos):
                 apple_counts_para_filtro_hash = datos[filtro]
                 valores = [apple_counts_para_filtro_hash[key] for key in AJUSTES]
                 colores = [AJUSTES[key] for key in AJUSTES]
                 if len(valores) == 0:
                     continue
                 
-                ax = secciones_graficas[contador]
-                contador += 1
-
-                ax.bar(AJUSTES.keys(), valores, color=colores)
+                plt.bar(AJUSTES.keys(), valores, color=colores)
                 if "real" in datos:
                     ax.axhline(y=datos["real"], color='purple', linestyle='--', label=f"Real: {datos['real']}")
                     
@@ -114,8 +110,12 @@ def generar_graficos(carpeta, mundos_reales):
                 ax.set_xlabel("Tipo ajuste")
                 ax.legend()
 
-    plt.tight_layout()
-    plt.show()
+            plt.tight_layout()
+
+            nombre_archivo = f"{CURRENT_PATH}/graficas_experimento/{mundo.replace(' ', '_')}.png"
+            plt.savefig(nombre_archivo)
+            plt.close()  # Cerrar la figura después de guardarla
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generar gráficos desde archivos .ini en una carpeta.")
