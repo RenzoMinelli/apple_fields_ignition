@@ -49,18 +49,7 @@ def obtener_depth_o_stereo(ruta_archivo):
 
 # Función para procesar la carpeta y generar los datos
 def procesar_carpeta(carpeta):
-    mundos = {
-        "Mundo Depth test 1": {},
-        "Mundo Depth test 2": {},
-        "Mundo Depth test 3": {},
-        "Mundo Depth test 4": {},
-        "Mundo Depth test 5": {},
-        "Mundo Stereo test 1": {},
-        "Mundo Stereo test 2": {},
-        "Mundo Stereo test 3": {},
-        "Mundo Stereo test 4": {},
-        "Mundo Stereo test 5": {},
-    }
+    mundos = {}
 
     for archivo in os.listdir(carpeta):
         if archivo.endswith(".ini"):
@@ -69,6 +58,9 @@ def procesar_carpeta(carpeta):
                 ruta_archivo = os.path.join(carpeta, archivo)
                 apple_count_hash = obtener_apple_count(ruta_archivo)
                 if apple_count_hash is not None:
+                    if not mundo in mundos:
+                        mundos[mundo] = {}
+
                     mundos[mundo][filtro] = apple_count_hash
     
     return mundos
@@ -131,17 +123,10 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Cantidades reales para cada mundo
-    mundos_reales = {
-        "Mundo Depth test 1": [392],
-        "Mundo Depth test 2": [344],
-        "Mundo Depth test 3": [378],
-        "Mundo Depth test 4": [672],
-        "Mundo Depth test 5": [331],
-        "Mundo Stereo test 1": [392],
-        "Mundo Stereo test 2": [344],
-        "Mundo Stereo test 3": [378],
-        "Mundo Stereo test 4": [672],
-        "Mundo Stereo test 5": [331],
-    }
+    mundos_reales = {}
+    mundos_sim = { "test 1": [392], "test 2": [344], "test 3": [378], "test 4": [672], "test 5": [331], "test 6": [481] }
+    for nombre_mundo, valores in mundos_sim.items():
+        mundos_reales[f"Mundo Depth {nombre_mundo}"] = valores
+        mundos_reales[f"Mundo Stereo {nombre_mundo}"] = valores
 
     generar_graficos(args.carpeta, mundos_reales)
