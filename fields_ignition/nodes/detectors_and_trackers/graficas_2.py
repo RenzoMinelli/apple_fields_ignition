@@ -3,8 +3,8 @@ import configparser
 import matplotlib.pyplot as plt
 import argparse
 
-FILTROS = [ "sin_filtrado", "filas_posteriores", "kmeans", "punto_medio", "plano" ]
-AJUSTES = { "apple_count_original": "blue", "apple_count_coef": "orange", "apple_count_reg": "green" }
+FILTROS = ["sin_filtrado", "filas_posteriores", "kmeans", "punto_medio", "plano"]
+AJUSTES = {"apple_count_original": "blue", "apple_count_coef": "orange", "apple_count_reg": "green"}
 CURRENT_PATH = os.path.dirname(os.path.realpath(__file__))
 
 # Función para identificar el filtro y el mundo a partir del nombre del archivo
@@ -83,25 +83,32 @@ def generar_graficos(carpeta, mundos_reales):
             lista_reales = mundos_reales[mundo]
             datos["real"] = lista_reales[0]
 
-    
-
     # Crear gráficos individuales para cada mundo
     for mundo, datos in mundos.items():
         if datos:  # Si hay datos para este mundo
-
-            fig, axs = plt.subplots(1, 5, figsize=(15, 20))
-
-            plt.figure(figsize=(1, 5))  # Crear una nueva figura para cada mundo
             filtros_en_datos = [key for key in FILTROS if key in datos]
-            
-            for ax, filtro in zip(axs.flat, filtros_en_datos):
+            num_filtros = len(filtros_en_datos)
+
+            # Crear una nueva figura con subplots para cada filtro
+            fig, axs = plt.subplots(1, num_filtros, figsize=(5 * num_filtros, 6))
+
+            if num_filtros == 1:  # Si solo hay un filtro, axs no es un array
+                axs = [axs]
+
+            for ax, filtro in zip(axs, filtros_en_datos):
                 apple_counts_para_filtro_hash = datos[filtro]
                 valores = [apple_counts_para_filtro_hash[key] for key in AJUSTES]
                 colores = [AJUSTES[key] for key in AJUSTES]
-                if len(valores) == 0:
-                    continue
+
+                # Crear las barras
+                bars = ax.bar(AJUSTES.keys(), valores, color=colores)
                 
-                plt.bar(AJUSTES.keys(), valores, color=colores)
+                # Añadir etiquetas encima de cada barra
+                for bar in bars:
+                    yval = bar.get_height()
+                    ax.text(bar.get_x() + bar.get_width()/2, yval, round(yval, 2), 
+                            ha='center', va='bottom', fontsize=10)
+
                 if "real" in datos:
                     ax.axhline(y=datos["real"], color='purple', linestyle='--', label=f"Real: {datos['real']}")
                     
@@ -111,11 +118,9 @@ def generar_graficos(carpeta, mundos_reales):
                 ax.legend()
 
             plt.tight_layout()
-
             nombre_archivo = f"{CURRENT_PATH}/graficas_experimento/{mundo.replace(' ', '_')}.png"
-            plt.savefig(nombre_archivo)
+            plt.savefig(nombre_archivo)  # Guardar la gráfica
             plt.close()  # Cerrar la figura después de guardarla
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generar gráficos desde archivos .ini en una carpeta.")
