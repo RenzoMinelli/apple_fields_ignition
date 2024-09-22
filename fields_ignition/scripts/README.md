@@ -11,6 +11,10 @@ Este pipeline procesa archivos .bag, por lo que para ejecutarlo simplemente se n
 
 ### 1 - Extraccion de imagenes RGB y datos de profundidad del bag.
 
+### Recomendación
+
+Se **recomienda leer todo este README** antes de intentar ejecutar el proyecto. Esto te ayudará a entender los requisitos, la configuración adecuada y los pasos necesarios para evitar errores durante la ejecución.
+
 #### Caso de bag con datos reales (no simulados)
 
 Se hará uso del archivo fields_ignition/launch/stereo_real_bag.launch. 
@@ -28,13 +32,25 @@ Para la ejecucion de este archivo se tienen una serie de parametros con sus resp
   - **Valor por defecto**: `/home/user/catkin_ws`
 
 - **`post_procesamiento`**: 
-  - **Descripción**: Indica si se debe realizar o no post-procesamiento en las imágenes obtenidas. Este valor se pasa como argumento al script que guarda las imágenes.
+  - **Descripción**: Indica si se debe realizar o no post-procesamiento en las imágenes obtenidas además de simplemente guardarlas en disco. El post-procesamiento incluye la **detección**, **trackeo**, **filtrado** y **conteo de las manzanas**.
   - **Valor por defecto**: `true`
 
 - **`config`**: 
-  - **Descripción**: Ruta al archivo de configuración (`config.ini`) utilizado para el procesamiento posterior, que define ciertos parámetros relacionados con el procesamiento de las imágenes.
-  - **Valor por defecto**: `$(arg folder_path)/src/apple_fields_ignition/fields_ignition/nodes/config.ini`
+  - **Descripción**: Ruta al archivo de configuración (`config.ini`) utilizado para el procesamiento posterior, que define ciertos parámetros relacionados con el procesamiento de los datos.
+  - **Valor por defecto**: `$(folder_path)/src/apple_fields_ignition/fields_ignition/nodes/config.ini`
+
+- **`bag_playback_speed`**: 
+  - **Descripción**: Velocidad de reproducción del archivo `rosbag` durante la ejecución. Este parámetro controla qué tan rápido o lento se reproduce el archivo de datos. El valor adecuado dependerá del hardware. Creado con la intención de no perder datos durante la lectura del bag.
+  - **Valor por defecto**: `0.05`
 
 
+#### Ejemplo de ejecución
 
-roslaunch fields_ignition stereo_real_bag.launch bag_file_path:='/home/user/catkin_ws/mitad_real.bag'  folder_path:=/home/pincho/catkin_ws
+```
+roslaunch fields_ignition stereo_real_bag.launch \
+bag_file_path:=/home/usuario/catkin_ws/datos_apple.bag \
+folder_path:=/home/usuario/catkin_ws \
+post_procesamiento:=false \
+config:=/home/usuario/catkin_ws/src/apple_fields_ignition/fields_ignition/nodes/mi_config.ini \
+bag_playback_speed:=0.1
+```
