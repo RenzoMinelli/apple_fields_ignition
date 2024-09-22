@@ -9,15 +9,63 @@
 
 Este pipeline procesa archivos .bag, por lo que para ejecutarlo simplemente se necesitará un archivo con dicha estensión.
 
-### 1 - Extraccion de imagenes RGB y datos de profundidad del bag.
-
 ### Recomendación
 
 Se **recomienda leer todo este README** antes de intentar ejecutar el proyecto. Esto te ayudará a entender los requisitos, la configuración adecuada y los pasos necesarios para evitar errores durante la ejecución.
 
+### Remapeo de Tópicos
+
+Al utilizar este archivo `.launch`, es posible que necesites remapear los tópicos de tu archivo `rosbag` para que coincidan con los tópicos esperados por los nodos en el sistema. A continuación se describen los pasos para hacerlo:
+
+1. **Identifica los Tópicos en tu `rosbag`**:
+   - Utiliza el comando `rosbag info` para listar los tópicos disponibles en tu archivo `rosbag`. Por ejemplo:
+     ```bash
+     rosbag info /home/usuario/catkin_ws/datos_apple.bag
+     ```
+
+2. **Modifica el Archivo `.launch` a utilizar**:
+   - Dentro del archivo `.launch`, busca las líneas que definen los tópicos de entrada para las imágenes y la información de la cámara. Por defecto, se ven así:
+     ```xml
+     <arg name="left_camera_image_topic" default="/zed_lateral/zed_lateral/left/image_rect_color"/>
+     <arg name="right_camera_image_topic" default="/zed_lateral/zed_lateral/right/image_rect_color"/>
+     <arg name="left_camera_info_topic" default="/zed_lateral/zed_lateral/left/camera_info"/>
+     <arg name="right_camera_info_topic" default="/zed_lateral/zed_lateral/right/camera_info"/>
+     ```
+
+3. **Actualiza los Tópicos**:
+   - Cambia los valores de los parámetros para que correspondan a los tópicos en tu archivo `rosbag`. Por ejemplo:
+     ```xml
+     <arg name="left_camera_image_topic" default="/mi_camera/izquierda/image_raw"/>
+     <arg name="right_camera_image_topic" default="/mi_camera/derecha/image_raw"/>
+     <arg name="left_camera_info_topic" default="/mi_camera/izquierda/camera_info"/>
+     <arg name="right_camera_info_topic" default="/mi_camera/derecha/camera_info"/>
+     ```
+
+4. **Ejecuta el Archivo `.launch`**:
+   - Una vez que hayas actualizado los tópicos en el archivo `.launch`, ejecuta el archivo con el comando `roslaunch`, asegurándote de utilizar los parámetros adecuados. Seguir leyendo para saber cuales son.
+
+### Ejemplo de Remapeo
+
+Si tus tópicos son diferentes, por ejemplo:
+- Izquierda: `/mi_camera/izquierda/image_raw`
+- Derecha: `/mi_camera/derecha/image_raw`
+- Información de la cámara izquierda: `/mi_camera/izquierda/camera_info`
+- Información de la cámara derecha: `/mi_camera/derecha/camera_info`
+
+Tu archivo `.launch` se vería así:
+
+```xml
+<arg name="left_camera_image_topic" default="/mi_camera/izquierda/image_raw"/>
+<arg name="right_camera_image_topic" default="/mi_camera/derecha/image_raw"/>
+<arg name="left_camera_info_topic" default="/mi_camera/izquierda/camera_info"/>
+<arg name="right_camera_info_topic" default="/mi_camera/derecha/camera_info"/>
+```
+
+### 1 - Extraccion de imagenes RGB y datos de profundidad del bag.
+
 #### Caso de bag con datos reales (no simulados)
 
-Se hará uso del archivo fields_ignition/launch/stereo_real_bag.launch. 
+Se hará uso del archivo `fields_ignition/launch/stereo_real_bag.launch`. 
 Este archivo .launch ejecuta el flujo completo para reproducir datos grabados de cámaras estéreo desde un rosbag, remapear los tópicos de imágenes y cámara info, procesar las imágenes para generar mapas de disparidad usando stereo_image_proc, y finalmente, guardar los resultados en formato de imagen.
 
 Para la ejecucion de este archivo se tienen una serie de parametros con sus respectivos valores por defecto
@@ -54,3 +102,5 @@ post_procesamiento:=false \
 config:=/home/usuario/catkin_ws/src/apple_fields_ignition/fields_ignition/nodes/mi_config.ini \
 bag_playback_speed:=0.1
 ```
+
+
