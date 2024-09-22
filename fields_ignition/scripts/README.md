@@ -61,6 +61,9 @@ Tu archivo `.launch` se vería así:
 <arg name="right_camera_info_topic" default="/mi_camera/derecha/camera_info"/>
 ```
 
+---
+### 1 - Extraccion de imagenes RGB y datos de profundidad del bag.
+
 ## Extraccion y procesamiento de de datos RGB y profundidad del bag.
 
 ### Caso de bag con datos reales (no simulados)
@@ -149,4 +152,58 @@ config:=/home/usuario/catkin_ws/src/apple_fields_ignition/fields_ignition/nodes/
 bag_playback_speed:=0.1
 ```
 
+---
+
+### 2 - Post procesado de los datos
+
+Para llevar a cabo el post procesamiento de los datos, se debe ejecutar el archivo `fields_ignition/nodes/detectors_and_trackers/track_and_filter.py`. Este script se encarga de realizar las siguientes tareas:
+
+- **Detección y Trackeo**: Identifica las manzanas en las imágenes procesadas y sigue su movimiento a través de los cuadros de video.
+- **Filtrado**: Elimina las manzanas que no deberían ser contadas en determinado, frame, por ejemplo aquellas que estén demasiado lejos.
+- **Conteo**: Calcula la cantidad total de manzanas detectadas.
+
+El archivo lee un archivo de configuración en formato `.ini`, el cual describe cómo procesar los datos.
+
+Cuando se ejecute el archivo `track_and_filter.py`, se deben pasar dos parámetros:
+
+- **`--config`**: Este parámetro es obligatorio y debe especificar la ruta al archivo de configuración en formato `.ini`, que describe cómo procesar los datos.
+  
+- **`--bag_name`**: Este parámetro es opcional y tiene un valor por defecto de "unknown". Se puede usar para nombrar el archivo de datos que se está procesando, lo que puede ser útil para la organización y el seguimiento de los resultados.
+
+Dentro del archivo de configuracion cuyo path se pasa como parametro, irán definidas los siguientes parametros:
+
+Los parámetros del archivo de configuración son los siguientes:
+
+- **`image_height`**: Altura de las imagenes generadas por las cámaras en píxeles. Se utiliza para definir las dimensiones de las imágenes que se procesan.
+  
+- **`image_width`**: Ancho de las imagenes generadas por las cámaras en píxeles. Junto con `image_height`, establece el tamaño de las imágenes de entrada.
+
+- **`count_threshold`**: Umbral de conteo. Este valor se utiliza para determinar cuántas detecciones de una manzana particular deben estar presentes para considerarla para el conteo final.
+
+- **`tracking_method`**: Método de seguimiento. Define el algoritmo que se usará para el seguimiento de las manzanas a través de los frames.
+
+- **`yolo_weights`**: Nombre del archivo de modelo YOLO (You Only Look Once) utilizados para la detección de objetos. Esto es esencial para el rendimiento del modelo de detección. Es importante que este archivo se encuentre en el directorio `/home/user/catkin_ws/weights`
+
+- **`track`**: Bandera booleana que indica si se debe realizar el seguimiento de las manzanas. Si se establece en `true`, se activará el seguimiento. ⚠️ **Atención**: El tracking agrega un overhead importante, mientras se está experimentando con algún bag, no es necesario ejecutar el tracking en cada ejecución, luego de la primera con este parametro en `true`, se lo puede apagar, los datos de tracking quedarán guardados. En caso de que se ejecute con esta bandera en `true` nuevamente, los datos ya guardados del tracking anterior serán eliminados.
+
+- **`gen_imagenes_tracker`**: Bandera booleana que indica si se deben generar imágenes del seguimiento. Esto es útil para la visualización y el análisis.
+
+- **`generar_imagen_plano`**: Bandera booleana que indica si, al utilizar el filtrado por plano, se deben generar imágenes que representen el plano. Esto es útil para visualizar el proceso de filtrado.
+
+- **`rotar_imagenes`**: Bandera booleana que indica si las imágenes deben ser rotadas para alinearse correctamente. En el caso por ejemplo, de que la grabación de haya realizado con la camara en vertical.
+
+- **`verbose`**: Bandera booleana que, cuando se establece en `true`, habilita la salida de algunos logs para el seguimiento del proceso.
+
+- **`debug_plano`**: Bandera booleana que indica si se deben generar imágenes con los puntos utilizados para realizar la interpolación del plano. En estas imágenes, los puntos que aparezcan en negro corresponden a troncos que fueron descartados por estar demasiado lejos y no se utilizaron para generar el plano. Esto es útil para depurar y visualizar el proceso de creación del plano.
+
+- **`method`**: Indica el tipo de filtrado que se utilizará en el procesamiento de los datos. Los valores posibles para este parámetro son:
+  - `kmeans`: Utiliza un algoritmo basado en **K-Means** para realizar el filtrado.
+  - `plano`: Aplica un **filtrado por plano**.
+  - `sin_filtrado`: No se aplica ningún tipo de filtrado.
+  - `filas_posteriores`: Filtra unicamente aquellas manzanas pertencientes a **filas posteriores**.
+  - `punto_medio`: Realiza un filtrado basado en el **punto medio**.
+
+- **`coeficiente_de_ajuste`**: Es un coeficiente que se utiliza para multiplicar el resultado final del conteo de manzanas. Este coeficiente es generado a partir de cálculos matemáticos para ajustar el resultado del conteo.
+
+- **`modelo_de_regresion`**: En lugar de utilizar el `coeficiente_de_ajuste`, este parámetro emplea una recta obtenida a partir de una regresión lineal para ajustar el conteo final de manzanas.
 
