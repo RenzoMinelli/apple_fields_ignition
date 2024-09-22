@@ -1,7 +1,7 @@
 <launch>
   <!-- Launch file to run bag file -->
-  <arg name="bag_file_path" default="/home/paolo/catkin_ws/bag_mas_lento.bag"/>
-  <arg name="folder_path" default="/home/paolo/catkin_ws"/>
+  <arg name="bag_file_path" default="/home/user/catkin_ws/bag_simulado.bag"/>
+  <arg name="folder_path" default="/home/user/catkin_ws"/>
   <arg name="post_procesamiento" default="true"/>
   <arg name="camera_model" default="stereo"/>
   <arg name="config" default="$(arg folder_path)/src/apple_fields_ignition/fields_ignition/nodes/config.ini"/>
