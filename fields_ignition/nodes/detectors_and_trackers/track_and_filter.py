@@ -183,7 +183,13 @@ class TrackAndFilter:
         else:
             self.ids_filtrados[id] = 1
 
+    def __print_verbose(self, str):
+        if self.verbose:
+          print(str)
+
     def __cargar_modelo_regresion(self, model_path):
+        self.__print_verbose("Cargando modelo de regresión")
+
         # Verificar si el archivo existe
         if os.path.exists(model_path):
             # Cargar el modelo usando joblib
@@ -211,12 +217,10 @@ class TrackAndFilter:
         self.__setup_env()
 
         os.chdir(CWD)
-        if self.verbose:
-          print('Trabajando dentro de directorio ', CWD)
+        self.__print_verbose(f"Trabajando dentro de directorio {CWD}")
+      
+        self.__print_verbose('Running tracker and tracker evaluator...')
         
-        print('Running tracker and tracker evaluator...')
-        
-
         if self.track:
             # borrar runs/track/exp por si habia una corrida anterior guardada
             self.__delete_folder(f"{self.__current_path()}/yolo_tracking/runs/track/exp")
