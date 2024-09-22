@@ -18,11 +18,11 @@ class CantidadPuntosInsuficiente(Exception):
 class FiltradoPlano(FiltradoBase):
     def __init__(self, config={}):
         super().__init__(config)
-        self.modelo_tronco = YOLO(f"{CWD}/weights/{self.imported_config.get('FILTRADO_PLANO', 'modelo_tronco')}.pt")
-        self.FiltradoPlano_OFFSET_HORIZONTAL = self.imported_config.getint('CONSTANTS', 'offset_horizontal')
-        self.FiltradoPlano_MARGEN_PLANO = self.imported_config.getfloat('FILTRADO_PLANO', 'margen_plano')
-        self.FiltradoPlano_GENERAR_IMAGEN_PLANO = self.imported_config.getboolean('FILTRADO_PLANO', 'generar_imagen_plano')
-        self.filtro_filas_posteriores = FiltradoFilasPosteriores(config)
+        self.modelo_tronco =                        YOLO(f"{CWD}/weights/{self.imported_config.get('FILTRADO_PLANO', 'modelo_tronco')}.pt")
+        self.FiltradoPlano_OFFSET_HORIZONTAL =      self.imported_config.getint('CONSTANTS', 'offset_horizontal')
+        self.FiltradoPlano_MARGEN_PLANO =           self.imported_config.getfloat('FILTRADO_PLANO', 'margen_plano')
+        self.FiltradoPlano_GENERAR_IMAGEN_PLANO =   self.imported_config.getboolean('FILTRADO_PLANO', 'generar_imagen_plano')
+        self.filtro_filas_posteriores =             FiltradoFilasPosteriores(config)
         self.__preparar_carpetas()
 
     def filter(self, timestamp, bounding_boxes, img_original, mapa_profundidad):
