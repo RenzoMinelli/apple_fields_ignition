@@ -100,7 +100,7 @@ def image_callback(image, depth_data):
     
     if FILTRO:
         FILTRO.track_filter_and_count_one_frame(timestamp, cv_image, depth_map)
-        print(f"conteo por ahora: {FILTRO.get_apple_count()}")
+        print(f"conteo por ahora: {FILTRO.apple_count()}")
     else:
         # Guardar los datos para post procesado
         np.save(f"depth_maps/{timestamp}.npy", depth_map)
@@ -129,8 +129,8 @@ def check_last_message(event):
 
     # checkeamos si pasaron 40 segundos sin recibir mensajes
     if TIME_OF_LAST_MESSAGE and (rospy.Time.now() - TIME_OF_LAST_MESSAGE).to_sec() > 40:
-        rospy.loginfo("No messages received for 40 seconds, shutting down.")
-        rospy.signal_shutdown("Finished processing bag")
+        rospy.loginfo("No se recibieron mensajes por 40 segundos, terminando..")
+        rospy.signal_shutdown("Se ha terminado de procesar el bag")
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -154,7 +154,7 @@ if __name__ == '__main__':
     working_directory = args.working_directory
     print("working inside directory ", working_directory)
 
-    if args.post_procesamiento:
+    if not args.post_procesamiento:
         metodo = args.metodo
         if metodo is None:
             raise Exception("No se ha especificado un metodo de post procesamiento")
@@ -178,13 +178,12 @@ if __name__ == '__main__':
         empty_folder('depth_maps')
         empty_folder('depth_maps_visualizable')
         delete_folder('yolo_tracking/runs/track/exp')
-
         
         read_cameras()
         rospy.spin()
 
         if FILTRO:
-            print(f"Conteo final: {FILTRO.get_apple_count()}")
+            print(f"Conteo final: {FILTRO.apple_count()}")
 
     except rospy.ROSInterruptException:
         pass
