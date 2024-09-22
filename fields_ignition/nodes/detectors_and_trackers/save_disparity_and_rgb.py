@@ -145,9 +145,9 @@ if __name__ == '__main__':
 
     CAMERA_MODEL = args.camera_model
     if CAMERA_MODEL == 'stereo':
-        print('Using stereo camera model, the saved rgb images are the ones from the left camera')
+        print('Usando modelo de camara stereo (las imagenes rgb guardadas son la de la camara derecha)')
     elif CAMERA_MODEL:
-        print('Using depth camera model')
+        print('Usando modelo de camara depth (camara stereo sin ruido)')
 
     rospy.init_node('save_disparity_and_rgb')
 
