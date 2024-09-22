@@ -66,7 +66,7 @@ Tu archivo `.launch` se vería así:
 ### Caso de bag con datos reales (no simulados)
 
 Se hará uso del archivo `fields_ignition/launch/stereo_real_bag.launch`. 
-Este archivo ejecuta el flujo completo para reproducir datos grabados de cámaras estéreo desde un rosbag, remapear los tópicos de imágenes y cámara info, procesar las imágenes para generar mapas de disparidad usando stereo_image_proc, y finalmente, guardar los resultados en formato de imagen.
+Este archivo ejecuta el flujo completo para reproducir datos grabados de cámaras estéreo desde un rosbag, remapear los tópicos de imágenes y cámara info, procesar las imágenes para generar mapas de disparidad usando stereo_image_proc, y finalmente, guardar los resultados.
 
 Para la ejecucion de este archivo se tienen una serie de parametros con sus respectivos valores por defecto
 #### Parámetros del archivo `.launch` y sus valores por defecto:
@@ -80,7 +80,7 @@ Para la ejecucion de este archivo se tienen una serie de parametros con sus resp
   - **Valor por defecto**: `/home/user/catkin_ws`
 
 - **`post_procesamiento`**: 
-  - **Descripción**: Indica si se debe realizar o no post-procesamiento en las imágenes obtenidas además de simplemente guardarlas en disco. El post-procesamiento incluye la **detección**, **trackeo**, **filtrado** y **conteo de las manzanas**.
+  - **Descripción**: Indica si se debe realizar o no post-procesamiento en los datos obtenidos. El post-procesamiento incluye la **detección**, **trackeo**, **filtrado** y **conteo de las manzanas**.
   - **Valor por defecto**: `true`
 
 - **`config`**: 
@@ -98,14 +98,14 @@ Para la ejecucion de este archivo se tienen una serie de parametros con sus resp
 roslaunch fields_ignition stereo_real_bag.launch \
 bag_file_path:=/home/usuario/catkin_ws/datos_apple.bag \
 folder_path:=/home/usuario/catkin_ws \
-post_procesamiento:=false \
+post_procesamiento:=true \
 config:=/home/usuario/catkin_ws/src/apple_fields_ignition/fields_ignition/nodes/mi_config.ini \
 bag_playback_speed:=0.1
 ```
 
 ### Caso de bag con datos simulados
 
-Se hará uso del archivo `fields_ignition/launch/stereo_sim_bag.launch`. Este archivo ejecuta el flujo completo para reproducir datos generados por un simulador de cámaras estéreo desde un rosbag, remapear los tópicos de imágenes y cámara info, procesar las imágenes para generar mapas de disparidad usando `stereo_image_proc`, y finalmente, guardar los resultados en formato de imagen.
+Se hará uso del archivo `fields_ignition/launch/stereo_sim_bag.launch`. Este archivo ejecuta el flujo completo para reproducir datos generados por un simulador de cámaras estéreo desde un rosbag, remapear los tópicos de imágenes y cámara info, procesar las imágenes para generar mapas de disparidad usando `stereo_image_proc`, y finalmente, guardar los resultados.
 
 Para la ejecución de este archivo se tienen una serie de parámetros con sus respectivos valores por defecto.
 
@@ -120,7 +120,7 @@ Para la ejecución de este archivo se tienen una serie de parámetros con sus re
   - **Valor por defecto**: `/home/user/catkin_ws`
 
 - **`post_procesamiento`**: 
-  - **Descripción**: Indica si se debe realizar o no post-procesamiento en las imágenes obtenidas, además de simplemente guardarlas en disco. El post-procesamiento incluye la **detección**, **trackeo**, **filtrado** y **conteo de las manzanas**.
+  - **Descripción**: Indica si se debe realizar o no post-procesamiento en los datos obtenidos. El post-procesamiento incluye la **detección**, **trackeo**, **filtrado** y **conteo de las manzanas**.
   - **Valor por defecto**: `true`
 
 - **`camera_model`**: 
@@ -148,3 +148,5 @@ camera_model:=stereo \
 config:=/home/usuario/catkin_ws/src/apple_fields_ignition/fields_ignition/nodes/mi_config.ini \
 bag_playback_speed:=0.1
 ```
+
+
