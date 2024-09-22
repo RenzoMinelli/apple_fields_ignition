@@ -154,7 +154,7 @@ if __name__ == '__main__':
     working_directory = args.working_directory
     print("working inside directory ", working_directory)
 
-    if not args.post_procesamiento:
+    if args.post_procesamiento:
         metodo = args.metodo
         if metodo is None:
             raise Exception("No se ha especificado un metodo de post procesamiento")
