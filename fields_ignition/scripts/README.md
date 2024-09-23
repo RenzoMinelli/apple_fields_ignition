@@ -170,6 +170,8 @@ Cuando se ejecute el archivo `track_and_filter.py`, se deben pasar dos parámetr
   
 - **`--bag_name`**: Este parámetro es opcional y tiene un valor por defecto de "unknown". Se puede usar para nombrar el archivo de datos que se está procesando, lo que puede ser útil para la organización y el seguimiento de los resultados.
 
+#### Archivo de configuracion
+
 Dentro del archivo de configuracion cuyo path se pasa como parametro, irán definidas los siguientes parametros:
 
 Los parámetros del archivo de configuración son los siguientes:
