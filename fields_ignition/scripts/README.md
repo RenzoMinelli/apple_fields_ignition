@@ -64,8 +64,6 @@ Tu archivo `.launch` se vería así:
 ---
 ### 1 - Extraccion de imagenes RGB y datos de profundidad del bag.
 
-## Extraccion y procesamiento de de datos RGB y profundidad del bag.
-
 ### Caso de bag con datos reales (no simulados)
 
 Se hará uso del archivo `fields_ignition/launch/stereo_real_bag.launch`. 
