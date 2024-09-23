@@ -207,3 +207,14 @@ Los parámetros del archivo de configuración son los siguientes:
 
 - **`modelo_de_regresion`**: En lugar de utilizar el `coeficiente_de_ajuste`, este parámetro emplea una recta obtenida a partir de una regresión lineal para ajustar el conteo final de manzanas.
 
+- **`modelo_tronco`**: Nombre del achivo de modelo YOLO utilizado para detectar los troncos en las imágenes. El modelo se carga desde un archivo `.pt` que está ubicado en la carpeta de pesos (`weights`).
+
+- **`offset_horizontal`**: Valor entero que se utiliza para **ignorar una franja sin datos de profundidad** que aparece en el lado izquierdo de la imagen.
+
+- **`margen_plano`**: Parámetro que **mueve el plano hacia adelante o hacia atrás** para ajustarlo al centro del árbol. En esencia, permite refinar la posición del plano si no se está calculando correctamente en el centro de los troncos. Se recomienda utilizar un valor de `0` a menos que se detecte que el plano no está alineado con el centro de los troncos, en cuyo caso este valor puede ajustarse.
+
+- **`threshold_margin`**: Parámetro utilizado en el filtrado K-Means. Este margen permite ajustar la sensibilidad del filtro, ayudand a ajustar qué tan cerca deben estar los puntos para ser considerados para el conteo final. Es análogo al `margen_plano`, pero específico para los métodos de filtrado K-Means y punto medio.
+
+- **`FILTRADO_PUNTO_MEDIO.distancia_filtro`**: Analogo al anterior pero para el filtrado de punto medio.
+
+- **`FILTRADO_FILAS_POSTERIORES.distancia_filtro`**: Parámetro que define la **distancia máxima** permitida para los puntos a ser considerados válidos durante el filtrado en el filtrado de filas posteriores. Este parametro deberia ser configurado con una distancia mas lejanas que todas las manzanas de la fila inmediata al robot pero mas cercana a todas las manzanas de las filas posteriores.
