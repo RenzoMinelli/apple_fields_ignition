@@ -15,7 +15,10 @@ Se **recomienda leer todo este README** antes de intentar ejecutar el proyecto. 
 
 ### Remapeo de Tópicos
 
-Al utilizar este archivo `.launch`, es posible que necesites remapear los tópicos de tu archivo `rosbag` para que coincidan con los tópicos esperados por los nodos en el sistema. A continuación se describen los pasos para hacerlo:
+Se hará uso del archivo `fields_ignition/launch/stereo_real_bag.launch` y `fields_ignition/launch/stereo_sim_bag.launch`
+Estos archivos ejecutan el flujo completo para reproducir datos grabados de cámaras estéreo desde un rosbag, remapear los tópicos de imágenes y cámara info, procesar las imágenes para generar mapas de disparidad usando stereo_image_proc, y finalmente, guardar los resultados.
+
+Al utilizar estos archivos `.launch`, es posible que necesites remapear los tópicos de tu archivo `rosbag` para que coincidan con los tópicos esperados por los nodos en el sistema. A continuación se describen los pasos para hacerlo:
 
 1. **Identifica los Tópicos en tu `rosbag`**:
    - Utiliza el comando `rosbag info` para listar los tópicos disponibles en tu archivo `rosbag`. Por ejemplo:
@@ -35,10 +38,10 @@ Al utilizar este archivo `.launch`, es posible que necesites remapear los tópic
 3. **Actualiza los Tópicos**:
    - Cambia los valores de los parámetros para que correspondan a los tópicos en tu archivo `rosbag`. Por ejemplo:
      ```xml
-     <arg name="left_camera_image_topic" default="/mi_camera/izquierda/image_raw"/>
-     <arg name="right_camera_image_topic" default="/mi_camera/derecha/image_raw"/>
-     <arg name="left_camera_info_topic" default="/mi_camera/izquierda/camera_info"/>
-     <arg name="right_camera_info_topic" default="/mi_camera/derecha/camera_info"/>
+     <arg name="left_camera_image_topic" default="/mi_camara/izquierda/image_raw"/>
+     <arg name="right_camera_image_topic" default="/mi_camara/derecha/image_raw"/>
+     <arg name="left_camera_info_topic" default="/mi_camara/izquierda/camera_info"/>
+     <arg name="right_camera_info_topic" default="/mi_camara/derecha/camera_info"/>
      ```
 
 4. **Ejecuta el Archivo `.launch`**:
@@ -47,18 +50,18 @@ Al utilizar este archivo `.launch`, es posible que necesites remapear los tópic
 ### Ejemplo de Remapeo
 
 Si tus tópicos son diferentes, por ejemplo:
-- Izquierda: `/mi_camera/izquierda/image_raw`
-- Derecha: `/mi_camera/derecha/image_raw`
-- Información de la cámara izquierda: `/mi_camera/izquierda/camera_info`
-- Información de la cámara derecha: `/mi_camera/derecha/camera_info`
+- Izquierda: `/mi_camara/izquierda/image_raw`
+- Derecha: `/mi_camara/derecha/image_raw`
+- Información de la cámara izquierda: `/mi_camara/izquierda/camera_info`
+- Información de la cámara derecha: `/mi_camara/derecha/camera_info`
 
 Tu archivo `.launch` se vería así:
 
 ```xml
-<arg name="left_camera_image_topic" default="/mi_camera/izquierda/image_raw"/>
-<arg name="right_camera_image_topic" default="/mi_camera/derecha/image_raw"/>
-<arg name="left_camera_info_topic" default="/mi_camera/izquierda/camera_info"/>
-<arg name="right_camera_info_topic" default="/mi_camera/derecha/camera_info"/>
+<arg name="left_camera_image_topic" default="/mi_camara/izquierda/image_raw"/>
+<arg name="right_camera_image_topic" default="/mi_camara/derecha/image_raw"/>
+<arg name="left_camera_info_topic" default="/mi_camara/izquierda/camera_info"/>
+<arg name="right_camera_info_topic" default="/mi_camara/derecha/camera_info"/>
 ```
 
 ---
@@ -67,7 +70,6 @@ Tu archivo `.launch` se vería así:
 ### Caso de bag con datos reales (no simulados)
 
 Se hará uso del archivo `fields_ignition/launch/stereo_real_bag.launch`. 
-Este archivo ejecuta el flujo completo para reproducir datos grabados de cámaras estéreo desde un rosbag, remapear los tópicos de imágenes y cámara info, procesar las imágenes para generar mapas de disparidad usando stereo_image_proc, y finalmente, guardar los resultados.
 
 Para la ejecucion de este archivo se tienen una serie de parametros con sus respectivos valores por defecto
 #### Parámetros del archivo `.launch` y sus valores por defecto:
@@ -106,7 +108,7 @@ bag_playback_speed:=0.1
 
 ### Caso de bag con datos simulados
 
-Se hará uso del archivo `fields_ignition/launch/stereo_sim_bag.launch`. Este archivo ejecuta el flujo completo para reproducir datos generados por un simulador de cámaras estéreo desde un rosbag, remapear los tópicos de imágenes y cámara info, procesar las imágenes para generar mapas de disparidad usando `stereo_image_proc`, y finalmente, guardar los resultados.
+Se hará uso del archivo `fields_ignition/launch/stereo_sim_bag.launch`. 
 
 Para la ejecución de este archivo se tienen una serie de parámetros con sus respectivos valores por defecto.
 
