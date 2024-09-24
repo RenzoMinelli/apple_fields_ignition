@@ -238,3 +238,15 @@ Dentro del directorio `fields_ignition/nodes/detectors_and_trackers` hemos const
 - **`run_experiments.py`**:
   Este archivo tiene como objetivo correr experimentos de forma automática. Ejecuta el archivo `track_and_filter.py` para diferentes archivos de configuración definidos en `fields_ignition/nodes/detectors_and_trackers/experiments_configs`. El archivo `track_and_filter` se encarga de guardar los resultados correspondientes a cada experimento lanzado con un nombre adecuado y un timestamp.
 
+- **`calculate_coefficient_and_LR.py`**
+  tiene como objetivo procesar los resultados de los experimentos guardados previamente. Realiza dos tareas principales:
+
+  1. **Calcular coeficientes de ajuste**: Se calculan coeficientes para cada tipo de cámara y método de filtrado.
+  2. **Ajuste por regresión lineal**: Se generan rectas y gráficos para ajustar los conteos utilizando regresión lineal para cada tipo de cámara y método de filtrado.
+
+  Esto es realizado a partir de los resultados de los experimentos. En nuestro caso, los experimentos consistieron de corridas en 20 mundos para cada combinación de filtro/cámara.
+
+  El parámetro `--results_path` es requerido y debe apuntar a la carpeta donde se encuentran los archivos de resultados. Los coeficientes y modelos de regresión generados se crearán en el directorio especificado también por este parámetro.
+
+
+  
