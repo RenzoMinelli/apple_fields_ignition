@@ -153,7 +153,19 @@ Para llevar a cabo el post procesamiento de los datos, se debe ejecutar el archi
 
 - **Detección y Trackeo**: Identifica las manzanas en las imágenes procesadas y sigue su movimiento a través de los cuadros de video.
 - **Filtrado**: Elimina las manzanas que no deberían ser contadas en determinado, frame, por ejemplo aquellas que estén demasiado lejos.
-- **Conteo**: Calcula la cantidad total de manzanas detectadas.
+- **Conteo**: Calcula la cantidad total de manzanas detectadas y ademas guarda los resultados.
+
+Los resultados de cada ejecución se guardan en un archivo `.ini` en la carpeta `results` dentro de `carkin`. Si la carpeta no existe, se crea automáticamente. El archivo de resultados contiene el contenido del archivo de configuración utilizado, seguido de los resultados del conteo de manzanas.
+
+El formato del archivo `.ini` es el siguiente:
+
+- Se incluye el contenido del archivo de configuración original.
+- Se añaden tres secciones al final del archivo:
+  - `[RESULTS]`: Contiene el conteo de manzanas sin ajustes.
+  - `[RESULTS_WITH_REGRESSION]`: Contiene el conteo ajustado usando un modelo de regresión.
+  - `[RESULTS_WITH_COEFFICIENT]`: Contiene el conteo ajustado por un coeficiente.
+
+---
 
 El archivo lee un archivo de configuración en formato `.ini`, el cual describe cómo procesar los datos.
 
@@ -214,4 +226,15 @@ Los parámetros del archivo de configuración son los siguientes:
 
 - **`FILTRADO_FILAS_POSTERIORES.distancia_filtro`**: Parámetro que define la **distancia máxima** permitida para los puntos a ser considerados válidos durante el filtrado en el filtrado de filas posteriores. Este parametro deberia ser configurado con una distancia mas lejanas que todas las manzanas de la fila inmediata al robot pero mas cercana a todas las manzanas de las filas posteriores.
 
+## Archivos auxiliares
+
+Dentro del directorio `fields_ignition/nodes/detectors_and_trackers` hemos construido algunos archivos para ayudar a la depuración y a la generación de resultados.
+
+- **`plot_filtered_apples.py`**: 
+  El archivo `plot_filtered_apples.py` utiliza el filtro configurado en el archivo de configuración para generar copias de los frames, donde las manzanas que quedan fuera del conteo están señalizadas con un punto rojo y las que quedan dentro, con un punto verde.
+
+  El parámetro --config es requerido para ejecutar el script, y debe contener la ruta al archivo de configuración.
+
+- **`run_experiments.py`**:
+  Este archivo tiene como objetivo correr experimentos de forma automática. Ejecuta el archivo `track_and_filter.py` para diferentes archivos de configuración definidos en `fields_ignition/nodes/detectors_and_trackers/experiments_configs`. El archivo `track_and_filter` se encarga de guardar los resultados correspondientes a cada experimento lanzado con un nombre adecuado y un timestamp.
 
