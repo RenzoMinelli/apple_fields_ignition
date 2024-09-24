@@ -116,6 +116,15 @@ def generar_graficos(carpeta, mundos_reales):
                 continue
 
             ax.bar(filtros_en_datos, valores, color=colores)
+            # Crear las barras
+            bars = ax.bar(filtros_en_datos, valores, color=colores)
+            
+            # Añadir etiquetas encima de cada barra
+            for bar in bars:
+                yval = bar.get_height()
+                ax.text(bar.get_x() + bar.get_width()/2, yval, round(yval, 2), 
+                        ha='center', va='bottom', fontsize=10)
+                    
             if "real" in datos:
                 ax.axhline(y=datos["real"], color='purple', linestyle='--', label=f"Real: {datos['real']}")
             if "mitad real" in datos:
