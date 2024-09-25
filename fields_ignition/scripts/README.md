@@ -228,7 +228,7 @@ Los parámetros del archivo de configuración son los siguientes:
 
 ## Archivos auxiliares
 
-Dentro del directorio `fields_ignition/nodes/detectors_and_trackers` hemos construido algunos archivos para ayudar a la depuración y a la generación de resultados.
+Se han construido algunos archivos para ayudar a la depuración y a la generación de resultados.
 
 - **`plot_filtered_apples.py`**: 
   El archivo `plot_filtered_apples.py` utiliza el filtro configurado en el archivo de configuración para generar copias de los frames, donde las manzanas que quedan fuera del conteo están señalizadas con un punto rojo y las que quedan dentro, con un punto verde.
@@ -287,5 +287,3 @@ Dentro del directorio `fields_ignition/nodes/detectors_and_trackers` hemos const
   1 mundo 7x3
 
   El objetivo principal de esto es poder observar como se comportan los resultados finales luego de aplicar un ajuste ya sea por regresión lineal o por coeficientes.
-
-
