@@ -238,13 +238,44 @@ Dentro del directorio `fields_ignition/nodes/detectors_and_trackers` hemos const
 - **`run_experiments.py`**:
   Este archivo tiene como objetivo correr experimentos de forma automática. Ejecuta el archivo `track_and_filter.py` para diferentes archivos de configuración definidos en `fields_ignition/nodes/detectors_and_trackers/experiments_configs`. El archivo `track_and_filter` se encarga de guardar los resultados correspondientes a cada experimento lanzado con un nombre adecuado y un timestamp.
 
+- **`graficas.py`**:
+  Se basa en los resultados de los experimentos con las siguientes configuraciones:
+  - Mundo Depth 1x5 Mitad
+  - Mundo Depth 1x5 Completo
+  - Mundo Stereo 1x5 Mitad
+  - Mundo Stereo 1x5 Completo
+  - Mundo Depth 3x5 Mitad
+  - Mundo Depth 3x5 Completo
+  - Mundo Stereo 3x5 Mitad
+  - Mundo Stereo 3x5 Completo
+  - Mundo Real Mitad
+  - Mundo Real Completo
+  Para construir una serie de graficos que comparan los resultados de los experimentos en estos mundos con el ground truth:
+  - Mundo Depth 1x5 Mitad: [175, 350]
+  - Mundo Depth 1x5 Completo: [350]
+  - Mundo Stereo 1x5 Mitad: [175, 350]
+  - Mundo Stereo 1x5 Completo: [350]
+  - Mundo Depth 3x5 Mitad: [170, 340]
+  - Mundo Depth 3x5 Completo: [340]
+  - Mundo Stereo 3x5 Mitad: [170, 340]
+  - Mundo Stereo 3x5 Completo: [340]
+  - Mundo Real Mitad: [2554,5109]
+  - Mundo Real Completo: [5109]
+  Que corresponde a una serie de mundos desarrollados con intenciones de experimentación. De querer realizar este experimento con mundos distinos, se debe modificar estos valores para estar acordes a los mundos con los que se quiera experimentar. Observar que por ejemplo
+  en `Mundo Depth 1x5 Mitad: [175, 350]`, 175 representa la **mitad** del **total** que es 350.
+
+  Tiene un parametro requerido `--carpeta` donde se debe indicar el directorio de los resultados generados por `track_and_filter`, en formato .ini.
+
+- **`graficas_con_ajuste.py`**:
+  Analogo al archivo anterior, pero en este caso las gráficas generadas comparan los resultados de no utilizar ningun tipo de ajuste, utilizando un ajuste por coeficiente y utilizando un ajuste por modelo de regresión lineal.
+
 - **`calculate_coefficient_and_LR.py`**
   tiene como objetivo procesar los resultados de los experimentos guardados previamente. Realiza dos tareas principales:
 
   1. **Calcular coeficientes de ajuste**: Se calculan coeficientes para cada tipo de cámara y método de filtrado.
   2. **Ajuste por regresión lineal**: Se generan rectas y gráficos para ajustar los conteos utilizando regresión lineal para cada tipo de cámara y método de filtrado.
 
-  Esto es realizado a partir de los resultados de los experimentos. En nuestro caso, los experimentos consistieron de corridas en 20 mundos para cada combinación de filtro/cámara.
+  Esto es realizado a partir de resultados de experimentos. En nuestro caso, los experimentos consistieron de corridas en 20 mundos para cada combinación filtro/cámara.
 
   El parámetro `--results_path` es requerido y debe apuntar a la carpeta donde se encuentran los archivos de resultados. Los coeficientes y modelos de regresión generados se crearán en el directorio especificado también por este parámetro.
 
