@@ -67,12 +67,12 @@ class NombreDeBagIncorrecto(Exception):
 
 if args.path_variantes:
     for variant in ["con", "sin"]:
-        for bag in os.listdir(f"{args.path_variantes}/eeval_filtrado_{variant}_hojas"):
+        for bag in os.listdir(f"{args.path_variantes}/eval_filtrado_{variant}_hojas"):
             # index, side = parse_bag_filename(bag)
 
             print(f"processando bag {bag}")
 
-            bag_path = f"{args.path_variantes}/eeval_filtrado_{variant}_hojas/{bag}"
+            bag_path = f"{args.path_variantes}/eval_filtrado_{variant}_hojas/{bag}"
             launchfile = "depth_sim_bag.launch"
             tipo_camara = "depth"
             launch_and_run(bag_path, launchfile, tipo_camara)
