@@ -33,7 +33,7 @@ METODOS_FILTRADO = {
 config = configparser.ConfigParser()
 
 class TrackAndFilter:
-    def __init__(self, config_path, bag_name="unknown"):
+    def __init__(self, config_path, bag_name="unknown", additional_data=""):
         
         
         config.read(config_path)
@@ -55,6 +55,7 @@ class TrackAndFilter:
         self.coeficiente_de_ajuste =    config.getfloat('TRACK_AND_FILTER', 'coeficiente_de_ajuste')
         self.modelo_de_regresion =      self.__obtener_nombre_modelo_de_regresion()
         self.bag_name =                 bag_name
+        self.additional_data =          additional_data
 
         self.count = None
 
@@ -298,7 +299,7 @@ class TrackAndFilter:
 
         # genero un archivo con el content del config usado + el conteo en una nueva linea
         conteo = self.apple_count()
-        results_path = f"{CWD}/results/{self.camera_type}_{self.method}_{self.bag_name}_{int(time.time())}.ini"
+        results_path = f"{CWD}/results/{self.camera_type}_{self.method}_{self.bag_name}_{self.additional_data}{int(time.time())}.ini"
 
         print('Guardando resultados de ejecucion en: \n' + results_path)
 
@@ -321,9 +322,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", required=True)
     parser.add_argument("--bag_name", required=False, default="unknown")
+    parser.add_argument("--additional_data", required=False, default="")
     args = parser.parse_args()
 
-    track_filter = TrackAndFilter(args.config, args.bag_name)
+    track_filter = TrackAndFilter(args.config, args.bag_name, args.additional_data)
     track_filter.track_filter_and_count()
 
 # 'poetry shell' dentro de /home/<user>/catkin_ws/yolo_tracking
