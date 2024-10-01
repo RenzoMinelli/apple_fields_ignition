@@ -13,7 +13,7 @@ CONFIG_FILES = [
     "punto_medio.ini",
 ]
 
-def correr_evaluacion(my_env, bag_name, tipo):
+def correr_evaluacion(my_env, bag_name, tipo, variante):
     for config_file in CONFIG_FILES:
         print(f"||||||||||||||||||||||||||||| Evaluando con {config_file} |||||||||||||||||||||||||")
         subprocess.run([
@@ -22,18 +22,20 @@ def correr_evaluacion(my_env, bag_name, tipo):
             "detectors_and_trackers.track_and_filter", 
             "--config", 
             f"{CWD}/src/apple_fields_ignition/fields_ignition/nodes/detectors_and_trackers/experiments_configs/{tipo}/{config_file}",
+            f"--additional_data",
+            f"{variante}_hojas_",
             f"--bag_name",
             f"{bag_name}"
         ], env=my_env)
 
-def launch_and_run(bag_file_path, launch_file, tipo):
+def launch_and_run(bag_file_path, launch_file, tipo, variante):
     command = f"source {CWD}/devel/setup.bash && roslaunch fields_ignition {launch_file} bag_file_path:={bag_file_path} folder_path:={CWD}"
     print("||||||||||||||||||||||||||||||||||||||")
     print(f"Ejecutando comando: {command}")
     print("||||||||||||||||||||||||||||||||||||||")
     subprocess.run(["bash", "-c", command], env=my_env)  # Use bash to run the command
     bag_name = bag_file_path.split("/")[-1].split(".")[0]
-    correr_evaluacion(my_env, bag_name, tipo)
+    correr_evaluacion(my_env, bag_name, tipo, variante)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -75,4 +77,4 @@ if args.path_variantes:
             bag_path = f"{args.path_variantes}/eval_filtrado_{variant}_hojas/{bag}"
             launchfile = "depth_sim_bag.launch"
             tipo_camara = "depth"
-            launch_and_run(bag_path, launchfile, tipo_camara)
+            launch_and_run(bag_path, launchfile, tipo_camara, variant)
