@@ -51,29 +51,28 @@ class NombreDeBagIncorrecto(Exception):
 
 # Extraer indice y lado a partir del nombre del bag
 # Se retorna en orden <indice, lado>
-def parse_bag_filename(bagname):
-    pattern = r"filtrado(\d{1,2})_(der|izq)\.bag"
+# def parse_bag_filename(bagname):
+#     pattern = r"filtrado(\d{1,2})_(der|izq)\.bag"
     
-    # Buscamos coincidencias en el string
-    match = re.match(pattern, bagname)
+#     # Buscamos coincidencias en el string
+#     match = re.match(pattern, bagname)
     
-    if match:
-        # Extraemos el número y la dirección (der o izq)
-        number = int(match.group(1))
-        direction = match.group(2)
-        return number, direction
-    else:
-        raise NombreDeBagIncorrecto(f"El nombre del bag '{bagname}' no es correcto.")
+#     if match:
+#         # Extraemos el número y la dirección (der o izq)
+#         number = int(match.group(1))
+#         direction = match.group(2)
+#         return number, direction
+#     else:
+#         raise NombreDeBagIncorrecto(f"El nombre del bag '{bagname}' no es correcto.")
 
 if args.path_variantes:
     for variant in ["con", "sin"]:
-        for bag in os.listdir(f"{args.path_variantes}/eval_filtrado_{variant}_hojas"):
+        for bag in os.listdir(f"{args.path_variantes}/eeval_filtrado_{variant}_hojas"):
             # index, side = parse_bag_filename(bag)
 
             print(f"processando bag {bag}")
 
-            bag_path = f"{args.path_variantes}/{bag}"
+            bag_path = f"{args.path_variantes}/eeval_filtrado_{variant}_hojas/{bag}"
             launchfile = "depth_sim_bag.launch"
             tipo_camara = "depth"
-
             launch_and_run(bag_path, launchfile, tipo_camara)
