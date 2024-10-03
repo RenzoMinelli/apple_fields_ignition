@@ -20,7 +20,7 @@ CWD = os.getcwd()
 # Directorio donde se encuentran los archivos .ini
 # (asegurarse de que estan solo los resultados para la 
 # evaluacion de filtrado, es decir el output de eval_filtrado.py)
-directory = f"{CWD}/results"
+directory = f"{CWD}/src/apple_fields_ignition/fields_ignition/nodes/detectors_and_trackers/results_eval_filtrados/"
 
 # Diccionario para almacenar los resultados
 apple_counts = {}
