@@ -3,16 +3,16 @@ import configparser
 import re
 
 ground_truth_total = {
-    "1":151,
-    "2":123,
-    "3":126,
-    "4":137,
-    "5":135,
-    "6":150,
-    "7":139,
-    "8":140,
-    "9":130,
-    "10":145
+    "1":151, # test_4, apple_0, apple_1
+    "2":123, # test_4, apple_2, apple_3
+    "3":126, # test_4, apple_4, apple_5
+    "4":137, # test_4, apple_6, apple_7
+    "5":135, # test_4, apple_8, apple_9
+    "6":150, # test_5, apple_0, apple_1
+    "7":139, # test_5, apple_2, apple_3
+    "8":140, # test_5, apple_5, apple_6
+    "9":130, # test_5, apple_7, apple_8
+    "10":145 # test_5, apple_10, apple_11
 }
 
 CWD = os.getcwd()
@@ -80,23 +80,24 @@ print(apple_counts)
 
 conteo_calculado = {}
 
-# for camera in apple_counts:
-#     conteo_calculado[camera] = {}
-#     for filtrado in apple_counts[camera]:
-#         conteo_calculado[camera][filtrado] = {}
-#         for n in apple_counts[camera][filtrado]:
-#             conteo_calculado[camera][filtrado][n] = {}
-#             for variante in apple_counts[camera][filtrado][n]:
-#                 suma_lados = 0
-#                 for lado in apple_counts[camera][filtrado][n][variante]:
-#                     suma_lados+=apple_counts[camera][filtrado][n][variante][lado]
+for camera in apple_counts:
+    conteo_calculado[camera] = {}
+    for filtrado in apple_counts[camera]:
+        conteo_calculado[camera][filtrado] = {}
+        for n in apple_counts[camera][filtrado]:
+            conteo_calculado[camera][filtrado][n] = {}
+            for variante in apple_counts[camera][filtrado][n]:
+                suma_lados = 0
+                for lado in apple_counts[camera][filtrado][n][variante]:
+                    suma_lados+=apple_counts[camera][filtrado][n][variante][lado]
                   
-#                 conteo_calculado[camera][filtrado][n][variante] = suma_lados
+                conteo_calculado[camera][filtrado][n][variante] = suma_lados
 
-# print(conteo_calculado)
-# breakpoint()
+print('Con lados sumados:')
+print(conteo_calculado)
+
 # Guardar el diccionario en un archivo .json
 import json
 print(f"Guardando resultados en {CWD}/results/apple_counts.json")
 with open(f"{CWD}/results/apple_counts.json", "w") as f:
-    json.dump(apple_counts, f, indent=4)
+    json.dump(conteo_calculado, f, indent=4)
