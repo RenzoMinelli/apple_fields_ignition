@@ -65,6 +65,9 @@ for filename in os.listdir(directory):
                     apple_counts[tipo][filtrado][n][variante] = {}
                 if "total" not in apple_counts[tipo][filtrado][n][variante]:
                     apple_counts[tipo][filtrado][n][variante]["total"] = 0
+                    apple_counts[tipo][filtrado][n][variante]["izq"] = -1
+                    apple_counts[tipo][filtrado][n][variante]["der"] = -1
+
 
                 # Almacena el conteo de manzanas
                 apple_counts[tipo][filtrado][n][variante][lado] = apple_count
