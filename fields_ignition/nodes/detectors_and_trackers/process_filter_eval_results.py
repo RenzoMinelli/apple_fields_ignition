@@ -63,9 +63,12 @@ for filename in os.listdir(directory):
                     apple_counts[tipo][filtrado][n] = {}
                 if variante not in apple_counts[tipo][filtrado][n]:
                     apple_counts[tipo][filtrado][n][variante] = {}
+                if "total" not in apple_counts[tipo][filtrado][n][variante]:
+                    apple_counts[tipo][filtrado][n][variante]["total"] = 0
 
                 # Almacena el conteo de manzanas
                 apple_counts[tipo][filtrado][n][variante][lado] = apple_count
+                apple_counts[tipo][filtrado][n][variante]["total"] += apple_count
 
             except (configparser.NoSectionError, configparser.NoOptionError, ValueError) as e:
                 print(f"Error leyendo el archivo {filename}: {e}")
@@ -78,26 +81,9 @@ for filename in os.listdir(directory):
 print("Resultados:")
 print(apple_counts)
 
-conteo_calculado = {}
-
-for camera in apple_counts:
-    conteo_calculado[camera] = {}
-    for filtrado in apple_counts[camera]:
-        conteo_calculado[camera][filtrado] = {}
-        for n in apple_counts[camera][filtrado]:
-            conteo_calculado[camera][filtrado][n] = {}
-            for variante in apple_counts[camera][filtrado][n]:
-                suma_lados = 0
-                for lado in apple_counts[camera][filtrado][n][variante]:
-                    suma_lados+=apple_counts[camera][filtrado][n][variante][lado]
-                  
-                conteo_calculado[camera][filtrado][n][variante] = suma_lados
-
-print('Con lados sumados:')
-print(conteo_calculado)
 
 # Guardar el diccionario en un archivo .json
 import json
-print(f"Guardando resultados en {CWD}/results/apple_counts.json")
-with open(f"{CWD}/results/apple_counts.json", "w") as f:
-    json.dump(conteo_calculado, f, indent=4)
+print(f"Guardando resultados en {directory}/apple_counts.json")
+with open(f"{directory}/apple_counts.json", "w") as f:
+    json.dump(apple_counts, f, indent=4)
