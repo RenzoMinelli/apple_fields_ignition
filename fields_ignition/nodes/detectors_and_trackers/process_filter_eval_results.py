@@ -68,17 +68,18 @@ for filename in os.listdir(directory):
                     apple_counts[tipo][filtrado][n][variante]["izq"] = -1
                     apple_counts[tipo][filtrado][n][variante]["der"] = -1
 
+
                 # Almacena el conteo de manzanas
                 apple_counts[tipo][filtrado][n][variante][lado] = apple_count
                 apple_counts[tipo][filtrado][n][variante]["total"] += apple_count
 
             except (configparser.NoSectionError, configparser.NoOptionError, ValueError) as e:
                 print(f"Error leyendo el archivo {filename}: {e}")
-                break
+                continue
         else:
             print(f"Error: el nombre del archivo {filename} no tiene un nombre adecuado\n \
                   para los archivos resultados de la evaluacion de tracking.")
-            break
+            continue
 
 
 # Imprime el diccionario de resultados
