@@ -4,6 +4,7 @@
   <arg name="folder_path" default="/home/paolo/catkin_ws"/>
   <arg name="post_procesamiento" default="true"/>
   <arg name="config" default="$(arg folder_path)/src/apple_fields_ignition/fields_ignition/nodes/config.ini"/>
+  <arg name="bag_playback_speed" default="0.2"/>
 
   <!-- Camera image left topic -->
   <arg name="camera_image_topic" default="/costar_husky_sensor_config_1/medio/image_raw"/>
@@ -13,7 +14,7 @@
   <arg name="camera_depth_image_topic" default="/costar_husky_sensor_config_1/medio/depth_image"/>
 
   <!-- Play the rosbag and remap camera info topics -->
-  <node pkg="rosbag" type="play" name="rosbag_play" args="-r 0.2 $(arg bag_file_path) $(arg camera_info_topic):=/depth/medio/camera_info" output="log"/>
+  <node pkg="rosbag" type="play" name="rosbag_play" args="-r $(arg bag_playback_speed) $(arg bag_file_path) $(arg camera_info_topic):=/depth/medio/camera_info" output="log"/>
 
   <!-- Remap camera image topic -->
   <node pkg="image_transport" type="republish" name="remap_image" output="screen" args="compressed in:=$(arg camera_image_topic) raw out:=/depth/medio/image_raw" />
