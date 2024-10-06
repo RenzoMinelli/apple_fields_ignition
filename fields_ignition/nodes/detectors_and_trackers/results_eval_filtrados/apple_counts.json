@@ -1,0 +1,614 @@
+{
+    "depth": {
+        "sin_filtrado": {
+            "7": {
+                "con": {
+                    "total": 168,
+                    "izq": 76,
+                    "der": 92
+                },
+                "sin": {
+                    "total": 211,
+                    "izq": 97,
+                    "der": 114
+                }
+            },
+            "10": {
+                "con": {
+                    "total": 159,
+                    "izq": 72,
+                    "der": 87
+                },
+                "sin": {
+                    "total": 212,
+                    "izq": 108,
+                    "der": 104
+                }
+            },
+            "6": {
+                "sin": {
+                    "total": 218,
+                    "izq": 111,
+                    "der": 107
+                },
+                "con": {
+                    "total": 170,
+                    "izq": 80,
+                    "der": 90
+                }
+            },
+            "4": {
+                "sin": {
+                    "total": 201,
+                    "izq": 99,
+                    "der": 102
+                },
+                "con": {
+                    "total": 156,
+                    "izq": 71,
+                    "der": 85
+                }
+            },
+            "9": {
+                "sin": {
+                    "total": 179,
+                    "izq": 89,
+                    "der": 90
+                },
+                "con": {
+                    "total": 149,
+                    "izq": 64,
+                    "der": 85
+                }
+            },
+            "5": {
+                "con": {
+                    "total": 152,
+                    "izq": 75,
+                    "der": 77
+                },
+                "sin": {
+                    "total": 191,
+                    "izq": 97,
+                    "der": 94
+                }
+            },
+            "8": {
+                "sin": {
+                    "total": 207,
+                    "izq": 105,
+                    "der": 102
+                },
+                "con": {
+                    "total": 159,
+                    "izq": 74,
+                    "der": 85
+                }
+            },
+            "3": {
+                "sin": {
+                    "total": 187,
+                    "izq": 93,
+                    "der": 94
+                },
+                "con": {
+                    "total": 154,
+                    "izq": 69,
+                    "der": 85
+                }
+            },
+            "1": {
+                "con": {
+                    "total": 177,
+                    "izq": 83,
+                    "der": 94
+                },
+                "sin": {
+                    "total": 227,
+                    "izq": 111,
+                    "der": 116
+                }
+            },
+            "2": {
+                "con": {
+                    "total": 142,
+                    "izq": 69,
+                    "der": 73
+                },
+                "sin": {
+                    "total": 182,
+                    "izq": 93,
+                    "der": 89
+                }
+            }
+        },
+        "plano": {
+            "7": {
+                "con": {
+                    "total": 117,
+                    "izq": 64,
+                    "der": 53
+                },
+                "sin": {
+                    "total": 137,
+                    "izq": 58,
+                    "der": 79
+                }
+            },
+            "9": {
+                "con": {
+                    "total": 102,
+                    "izq": 55,
+                    "der": 47
+                },
+                "sin": {
+                    "total": 105,
+                    "izq": 68,
+                    "der": 37
+                }
+            },
+            "3": {
+                "con": {
+                    "total": 114,
+                    "izq": 54,
+                    "der": 60
+                },
+                "sin": {
+                    "total": 120,
+                    "izq": 67,
+                    "der": 53
+                }
+            },
+            "6": {
+                "con": {
+                    "total": 127,
+                    "izq": 53,
+                    "der": 74
+                },
+                "sin": {
+                    "total": 135,
+                    "izq": 50,
+                    "der": 85
+                }
+            },
+            "2": {
+                "sin": {
+                    "total": 120,
+                    "izq": 66,
+                    "der": 54
+                },
+                "con": {
+                    "total": 97,
+                    "izq": 51,
+                    "der": 46
+                }
+            },
+            "5": {
+                "con": {
+                    "total": 95,
+                    "izq": 49,
+                    "der": 46
+                },
+                "sin": {
+                    "total": 120,
+                    "izq": 70,
+                    "der": 50
+                }
+            },
+            "1": {
+                "sin": {
+                    "total": 151,
+                    "izq": 102,
+                    "der": 49
+                },
+                "con": {
+                    "total": 104,
+                    "izq": 74,
+                    "der": 30
+                }
+            },
+            "8": {
+                "con": {
+                    "total": 92,
+                    "izq": 42,
+                    "der": 50
+                },
+                "sin": {
+                    "total": 127,
+                    "izq": 63,
+                    "der": 64
+                }
+            },
+            "10": {
+                "con": {
+                    "total": 117,
+                    "izq": 64,
+                    "der": 53
+                },
+                "sin": {
+                    "total": 132,
+                    "izq": 90,
+                    "der": 42
+                }
+            },
+            "4": {
+                "sin": {
+                    "total": 141,
+                    "izq": 78,
+                    "der": 63
+                },
+                "con": {
+                    "total": 123,
+                    "izq": 59,
+                    "der": 64
+                }
+            }
+        },
+        "filas_posteriores": {
+            "6": {
+                "sin": {
+                    "total": 218,
+                    "izq": 111,
+                    "der": 107
+                },
+                "con": {
+                    "total": 170,
+                    "izq": 80,
+                    "der": 90
+                }
+            },
+            "1": {
+                "con": {
+                    "total": 177,
+                    "izq": 83,
+                    "der": 94
+                },
+                "sin": {
+                    "total": 227,
+                    "izq": 111,
+                    "der": 116
+                }
+            },
+            "9": {
+                "sin": {
+                    "total": 179,
+                    "izq": 89,
+                    "der": 90
+                },
+                "con": {
+                    "total": 149,
+                    "izq": 64,
+                    "der": 85
+                }
+            },
+            "10": {
+                "sin": {
+                    "total": 212,
+                    "izq": 108,
+                    "der": 104
+                },
+                "con": {
+                    "total": 159,
+                    "izq": 72,
+                    "der": 87
+                }
+            },
+            "4": {
+                "sin": {
+                    "total": 201,
+                    "izq": 99,
+                    "der": 102
+                },
+                "con": {
+                    "total": 156,
+                    "izq": 71,
+                    "der": 85
+                }
+            },
+            "7": {
+                "con": {
+                    "total": 168,
+                    "izq": 76,
+                    "der": 92
+                },
+                "sin": {
+                    "total": 211,
+                    "izq": 97,
+                    "der": 114
+                }
+            },
+            "8": {
+                "con": {
+                    "total": 159,
+                    "izq": 74,
+                    "der": 85
+                },
+                "sin": {
+                    "total": 207,
+                    "izq": 105,
+                    "der": 102
+                }
+            },
+            "5": {
+                "con": {
+                    "total": 152,
+                    "izq": 75,
+                    "der": 77
+                },
+                "sin": {
+                    "total": 191,
+                    "izq": 97,
+                    "der": 94
+                }
+            },
+            "3": {
+                "sin": {
+                    "total": 187,
+                    "izq": 93,
+                    "der": 94
+                },
+                "con": {
+                    "total": 154,
+                    "izq": 69,
+                    "der": 85
+                }
+            },
+            "2": {
+                "sin": {
+                    "total": 182,
+                    "izq": 93,
+                    "der": 89
+                },
+                "con": {
+                    "total": 142,
+                    "izq": 69,
+                    "der": 73
+                }
+            }
+        },
+        "punto_medio": {
+            "3": {
+                "sin": {
+                    "total": 95,
+                    "izq": 46,
+                    "der": 49
+                },
+                "con": {
+                    "total": 77,
+                    "izq": 34,
+                    "der": 43
+                }
+            },
+            "10": {
+                "con": {
+                    "total": 78,
+                    "izq": 35,
+                    "der": 43
+                },
+                "sin": {
+                    "total": 106,
+                    "izq": 55,
+                    "der": 51
+                }
+            },
+            "7": {
+                "sin": {
+                    "total": 105,
+                    "izq": 48,
+                    "der": 57
+                },
+                "con": {
+                    "total": 85,
+                    "izq": 39,
+                    "der": 46
+                }
+            },
+            "8": {
+                "con": {
+                    "total": 79,
+                    "izq": 37,
+                    "der": 42
+                },
+                "sin": {
+                    "total": 103,
+                    "izq": 52,
+                    "der": 51
+                }
+            },
+            "6": {
+                "con": {
+                    "total": 84,
+                    "izq": 41,
+                    "der": 43
+                },
+                "sin": {
+                    "total": 109,
+                    "izq": 55,
+                    "der": 54
+                }
+            },
+            "4": {
+                "con": {
+                    "total": 78,
+                    "izq": 35,
+                    "der": 43
+                },
+                "sin": {
+                    "total": 102,
+                    "izq": 51,
+                    "der": 51
+                }
+            },
+            "1": {
+                "sin": {
+                    "total": 117,
+                    "izq": 57,
+                    "der": 60
+                },
+                "con": {
+                    "total": 88,
+                    "izq": 41,
+                    "der": 47
+                }
+            },
+            "5": {
+                "con": {
+                    "total": 76,
+                    "izq": 38,
+                    "der": 38
+                },
+                "sin": {
+                    "total": 95,
+                    "izq": 49,
+                    "der": 46
+                }
+            },
+            "9": {
+                "sin": {
+                    "total": 90,
+                    "izq": 44,
+                    "der": 46
+                },
+                "con": {
+                    "total": 73,
+                    "izq": 32,
+                    "der": 41
+                }
+            },
+            "2": {
+                "con": {
+                    "total": 74,
+                    "izq": 37,
+                    "der": 37
+                },
+                "sin": {
+                    "total": 92,
+                    "izq": 46,
+                    "der": 46
+                }
+            }
+        },
+        "kmeans": {
+            "2": {
+                "sin": {
+                    "total": 82,
+                    "izq": 41,
+                    "der": 41
+                },
+                "con": {
+                    "total": 57,
+                    "izq": 28,
+                    "der": 29
+                }
+            },
+            "6": {
+                "con": {
+                    "total": 68,
+                    "izq": 32,
+                    "der": 36
+                },
+                "sin": {
+                    "total": 91,
+                    "izq": 45,
+                    "der": 46
+                }
+            },
+            "10": {
+                "sin": {
+                    "total": 93,
+                    "izq": 52,
+                    "der": 41
+                },
+                "con": {
+                    "total": 60,
+                    "izq": 27,
+                    "der": 33
+                }
+            },
+            "4": {
+                "con": {
+                    "total": 71,
+                    "izq": 32,
+                    "der": 39
+                },
+                "sin": {
+                    "total": 91,
+                    "izq": 41,
+                    "der": 50
+                }
+            },
+            "3": {
+                "sin": {
+                    "total": 77,
+                    "izq": 39,
+                    "der": 38
+                },
+                "con": {
+                    "total": 64,
+                    "izq": 29,
+                    "der": 35
+                }
+            },
+            "8": {
+                "sin": {
+                    "total": 91,
+                    "izq": 44,
+                    "der": 47
+                },
+                "con": {
+                    "total": 65,
+                    "izq": 32,
+                    "der": 33
+                }
+            },
+            "1": {
+                "con": {
+                    "total": 80,
+                    "izq": 35,
+                    "der": 45
+                },
+                "sin": {
+                    "total": 101,
+                    "izq": 42,
+                    "der": 59
+                }
+            },
+            "5": {
+                "con": {
+                    "total": 70,
+                    "izq": 35,
+                    "der": 35
+                },
+                "sin": {
+                    "total": 93,
+                    "izq": 51,
+                    "der": 42
+                }
+            },
+            "9": {
+                "con": {
+                    "total": 62,
+                    "izq": 29,
+                    "der": 33
+                },
+                "sin": {
+                    "total": 68,
+                    "izq": 38,
+                    "der": 30
+                }
+            },
+            "7": {
+                "sin": {
+                    "total": 89,
+                    "izq": 47,
+                    "der": 42
+                },
+                "con": {
+                    "total": 73,
+                    "izq": 35,
+                    "der": 38
+                }
+            }
+        }
+    }
+}
