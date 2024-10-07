@@ -86,6 +86,26 @@ for filename in os.listdir(directory):
 print("Resultados:")
 print(apple_counts)
 
+# Calculo de error relativo
+for tipo in apple_counts:
+    for filtrado in apple_counts[tipo]:
+        for n in apple_counts[tipo][filtrado]:
+            for variante in apple_counts[tipo][filtrado][n]:
+                estimate = apple_counts[tipo][filtrado][n][variante]["total"]
+                er = abs(estimate - ground_truth_total[f"{n}"])/ground_truth_total[f"{n}"]
+                apple_counts[tipo][filtrado][n][variante]["ER"] = er
+
+# Calculo promedios de error
+for tipo in apple_counts:
+    for filtrado in apple_counts[tipo]:
+        suma_error_con = 0
+        suma_error_sin = 0
+        for n in apple_counts[tipo][filtrado]:
+            suma_error_con += apple_counts[tipo][filtrado][n]["con"]["ER"]
+            suma_error_sin += apple_counts[tipo][filtrado][n]["sin"]["ER"]
+        apple_counts[tipo][filtrado]["avg_error_con"] = suma_error_con/10
+        apple_counts[tipo][filtrado]["avg_error_sin"] = suma_error_sin/10
+
 
 # Guardar el diccionario en un archivo .json
 import json
