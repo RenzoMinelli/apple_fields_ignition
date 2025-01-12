@@ -133,6 +133,7 @@ def generar_graficos_separados(carpeta, mundos_reales):
             ax.set_title(mundo, fontsize=12)  # Mantener título del gráfico individual
             ax.set_ylabel("Valor")
             ax.set_xlabel("Filtro")
+            ax.legend()
 
     plt.tight_layout()
     plt.show()
@@ -158,6 +159,7 @@ def generar_graficos_separados(carpeta, mundos_reales):
                 ax.axhline(y=datos["real"], color='purple', linestyle='--', label=f"Real: {datos['real']}")
             if "mitad real" in datos:
                 ax.axhline(y=datos["mitad real"], color='yellow', linestyle='-.', label=f"Mitad Real: {datos['mitad real']}")
+            
             ax.set_title(mundo, fontsize=12)  # Mantener título del gráfico individual
             ax.set_ylabel("Valor")
             ax.set_xlabel("Filtro")
