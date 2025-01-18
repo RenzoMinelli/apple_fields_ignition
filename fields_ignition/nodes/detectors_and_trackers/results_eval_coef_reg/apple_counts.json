@@ -2,86 +2,86 @@
     "resultados": {
         "depth": {
             "sin_filtrado": {
-                "avg_error_normal": 1.1897005756411023,
-                "avg_error_coef": 0.028673519995822207,
-                "avg_error_reg": 0.05969002443425356,
-                "std_normal": 0.07527088915113016,
-                "std_coef": 0.01485413421255387,
-                "std_reg": 0.06674959631901972
+                "avg_error_normal": 1.1897,
+                "avg_error_coef": 0.0287,
+                "avg_error_reg": 0.0597,
+                "std_normal": 0.0753,
+                "std_coef": 0.0149,
+                "std_reg": 0.0667
             },
             "filas_posteriores": {
-                "avg_error_normal": 1.1817539042288996,
-                "avg_error_coef": 0.028839088046469535,
-                "avg_error_reg": 0.060343513823208066,
-                "std_normal": 0.07687921004934536,
-                "std_coef": 0.01650909554615461,
-                "std_reg": 0.06740094333573307
+                "avg_error_normal": 1.1818,
+                "avg_error_coef": 0.0288,
+                "avg_error_reg": 0.0603,
+                "std_normal": 0.0769,
+                "std_coef": 0.0165,
+                "std_reg": 0.0674
             },
             "kmeans": {
-                "avg_error_normal": 0.20421985114439853,
-                "avg_error_coef": 0.035647364256755826,
-                "avg_error_reg": 0.06673075083556636,
-                "std_normal": 0.05619956921981373,
-                "std_coef": 0.02683099656964365,
-                "std_reg": 0.08920383403202546
+                "avg_error_normal": 0.2042,
+                "avg_error_coef": 0.0356,
+                "avg_error_reg": 0.0667,
+                "std_normal": 0.0562,
+                "std_coef": 0.0268,
+                "std_reg": 0.0892
             },
             "punto_medio": {
-                "avg_error_normal": 0.2649793750475056,
-                "avg_error_coef": 0.030379546332004653,
-                "avg_error_reg": 0.05947910816725702,
-                "std_normal": 0.047103464559531356,
-                "std_coef": 0.016631918303693684,
-                "std_reg": 0.07170839151506334
+                "avg_error_normal": 0.265,
+                "avg_error_coef": 0.0304,
+                "avg_error_reg": 0.0595,
+                "std_normal": 0.0471,
+                "std_coef": 0.0166,
+                "std_reg": 0.0717
             },
             "plano": {
-                "avg_error_normal": 0.5824407542186772,
-                "avg_error_coef": 0.0349031189915825,
-                "avg_error_reg": 0.06714271822761735,
-                "std_normal": 0.07215950927616017,
-                "std_coef": 0.026756701505139133,
-                "std_reg": 0.08155071447100001
+                "avg_error_normal": 0.5824,
+                "avg_error_coef": 0.0349,
+                "avg_error_reg": 0.0671,
+                "std_normal": 0.0722,
+                "std_coef": 0.0268,
+                "std_reg": 0.0816
             }
         },
         "stereo": {
             "sin_filtrado": {
-                "avg_error_normal": 1.2076584188689312,
-                "avg_error_coef": 0.045794757916288446,
-                "avg_error_reg": 0.04538243897866321,
-                "std_normal": 0.1432730678544509,
-                "std_coef": 0.05532982997640674,
-                "std_reg": 0.04928479266005222
+                "avg_error_normal": 1.2077,
+                "avg_error_coef": 0.0458,
+                "avg_error_reg": 0.0454,
+                "std_normal": 0.1433,
+                "std_coef": 0.0553,
+                "std_reg": 0.0493
             },
             "filas_posteriores": {
-                "avg_error_normal": 1.1015946666382712,
-                "avg_error_coef": 0.042541485116304956,
-                "avg_error_reg": 0.039598168851101755,
-                "std_normal": 0.11708073214864477,
-                "std_coef": 0.04374717487155571,
-                "std_reg": 0.03661925514141346
+                "avg_error_normal": 1.1016,
+                "avg_error_coef": 0.0425,
+                "avg_error_reg": 0.0396,
+                "std_normal": 0.1171,
+                "std_coef": 0.0437,
+                "std_reg": 0.0366
             },
             "kmeans": {
-                "avg_error_normal": 0.1972043386139526,
-                "avg_error_coef": 0.05107918214029766,
-                "avg_error_reg": 0.0529610757137832,
-                "std_normal": 0.09097060206703557,
-                "std_coef": 0.07208930324011846,
-                "std_reg": 0.07866211395945152
+                "avg_error_normal": 0.1972,
+                "avg_error_coef": 0.0511,
+                "avg_error_reg": 0.053,
+                "std_normal": 0.091,
+                "std_coef": 0.0721,
+                "std_reg": 0.0787
             },
             "punto_medio": {
-                "avg_error_normal": 0.2345808682928593,
-                "avg_error_coef": 0.04371857102704765,
-                "avg_error_reg": 0.05052700405855631,
-                "std_normal": 0.07135264552464719,
-                "std_coef": 0.05716441039918323,
-                "std_reg": 0.07078906662593155
+                "avg_error_normal": 0.2346,
+                "avg_error_coef": 0.0437,
+                "avg_error_reg": 0.0505,
+                "std_normal": 0.0714,
+                "std_coef": 0.0572,
+                "std_reg": 0.0708
             },
             "plano": {
-                "avg_error_normal": 0.5820833267767141,
-                "avg_error_coef": 0.04677212536552041,
-                "avg_error_reg": 0.04917908454604697,
-                "std_normal": 0.0871821527653083,
-                "std_coef": 0.028347823600945316,
-                "std_reg": 0.06946006714871485
+                "avg_error_normal": 0.5821,
+                "avg_error_coef": 0.0468,
+                "avg_error_reg": 0.0492,
+                "std_normal": 0.0872,
+                "std_coef": 0.0283,
+                "std_reg": 0.0695
             }
         }
     },

@@ -395,9 +395,9 @@ for tipo in ["stereo", "depth"]:
             suma_error_coef += detecciones[tipo][n][filtrado]["ER_COEF"]
             suma_error_reg += detecciones[tipo][n][filtrado]["ER_REG"]
 
-        detecciones["resultados"][tipo][filtrado]["avg_error_normal"] = suma_error_normal/6
-        detecciones["resultados"][tipo][filtrado]["avg_error_coef"] = suma_error_coef/6
-        detecciones["resultados"][tipo][filtrado]["avg_error_reg"] = suma_error_reg/6
+        detecciones["resultados"][tipo][filtrado]["avg_error_normal"] = round(suma_error_normal/6,4)
+        detecciones["resultados"][tipo][filtrado]["avg_error_coef"] = round(suma_error_coef/6,4)
+        detecciones["resultados"][tipo][filtrado]["avg_error_reg"] = round(suma_error_reg/6,4)
 
 # calculo de desviacion estandar
 
@@ -417,9 +417,9 @@ for tipo in ["stereo", "depth"]:
         desviacion_coef = np.std(desviacion_coef_datos, ddof=1)
         desviacion_reg = np.std(desviacion_reg_datos, ddof=1)
 
-        detecciones["resultados"][tipo][filtrado]["std_normal"] = desviacion_normal
-        detecciones["resultados"][tipo][filtrado]["std_coef"] = desviacion_coef
-        detecciones["resultados"][tipo][filtrado]["std_reg"] = desviacion_reg
+        detecciones["resultados"][tipo][filtrado]["std_normal"] = round(desviacion_normal,4)
+        detecciones["resultados"][tipo][filtrado]["std_coef"] = round(desviacion_coef,4)
+        detecciones["resultados"][tipo][filtrado]["std_reg"] = round(desviacion_reg,4)
 
 # Guardar el diccionario en un archivo .json
 import json
