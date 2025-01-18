@@ -1,6 +1,5 @@
 import os
-import configparser
-import re
+import numpy as np
 
 ground_truth_total = {
     "1":392, # test_1
@@ -400,6 +399,27 @@ for tipo in ["stereo", "depth"]:
         detecciones["resultados"][tipo][filtrado]["avg_error_coef"] = suma_error_coef/6
         detecciones["resultados"][tipo][filtrado]["avg_error_reg"] = suma_error_reg/6
 
+# calculo de desviacion estandar
+
+for tipo in ["stereo", "depth"]:
+    for filtrado in filtros:
+        desviacion_normal_datos = []
+        desviacion_coef_datos = []
+        desviacion_reg_datos = []
+
+        for n in range(1, 7):
+            n = f"{n}"
+            desviacion_normal_datos.append(detecciones[tipo][n][filtrado]["ER_NORMAL"])
+            desviacion_coef_datos.append(detecciones[tipo][n][filtrado]["ER_COEF"])
+            desviacion_reg_datos.append(detecciones[tipo][n][filtrado]["ER_REG"])
+
+        desviacion_normal = np.std(desviacion_normal_datos, ddof=1)
+        desviacion_coef = np.std(desviacion_coef_datos, ddof=1)
+        desviacion_reg = np.std(desviacion_reg_datos, ddof=1)
+
+        detecciones["resultados"][tipo][filtrado]["std_normal"] = desviacion_normal
+        detecciones["resultados"][tipo][filtrado]["std_coef"] = desviacion_coef
+        detecciones["resultados"][tipo][filtrado]["std_reg"] = desviacion_reg
 
 # Guardar el diccionario en un archivo .json
 import json
