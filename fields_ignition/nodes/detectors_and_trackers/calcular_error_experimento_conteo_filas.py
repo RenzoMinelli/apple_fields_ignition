@@ -6,7 +6,7 @@ import configparser
 mundos = ["1x5", "3x5", "real"]
 filtros = ["sin_filtrado", "filas_posteriores", "kmeans", "punto_medio", "plano"]
 tipos_camara = ["stereo", "depth"]
-recorridos = ["completo", "mitad"] # ver si sacamas el mundo mitad para el analisis
+recorridos = ["completo", "mitad"] 
 
 ground_truth_total = {
     "1x5_completo":350,
@@ -90,7 +90,7 @@ for tipo in tipos_camara:
                 conteo = detecciones[tipo][filtrado][mundo][recorrido]["conteo"]
 
                 er = abs(conteo - ground_truth_total[f"{mundo}_{recorrido}"])/ground_truth_total[f"{mundo}_{recorrido}"]
-                detecciones[tipo][filtrado][mundo][recorrido]["ER"] = er
+                detecciones[tipo][filtrado][mundo][recorrido]["ER"] = round(er,4)
 
 # Guardar el diccionario en un archivo .json
 import json
