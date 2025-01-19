@@ -53,13 +53,6 @@
       args="$(arg sensor_prefix)/left/camera_info@sensor_msgs/CameraInfo[ignition.msgs.CameraInfo">
       <remap from="$(arg sensor_prefix)/left/camera_info" to="left/camera_info" />
     </node>
-    <node
-      pkg="ros_ign_bridge"
-      type="parameter_bridge"
-      name="ros_ign_bridge_camera_medio"
-      args="$(arg sensor_prefix_depth)/camera_info@sensor_msgs/CameraInfo[ignition.msgs.CameraInfo">
-      <remap from="$(arg sensor_prefix_depth)/camera_info" to="medio/camera_info" />
-    </node>
 
     <node
       pkg="ros_ign_image"
@@ -86,6 +79,8 @@
       <remap from="$(arg sensor_prefix)/right/image_raw" to="right/image_raw" />
     </node>
 
+    <!--Depth camera -->
+
     <node
       pkg="ros_ign_image"
       type="image_bridge"
@@ -95,7 +90,14 @@
       <remap from="$(arg sensor_prefix_depth)/image" to="medio/image_raw" />
     </node>
 
-    <!--Depth camera -->
+    <node
+      pkg="ros_ign_bridge"
+      type="parameter_bridge"
+      name="ros_ign_bridge_camera_medio"
+      args="$(arg sensor_prefix_depth)/camera_info@sensor_msgs/CameraInfo[ignition.msgs.CameraInfo">
+      <remap from="$(arg sensor_prefix_depth)/camera_info" to="medio/camera_info" />
+    </node>
+
     <node
       pkg="ros_ign_image"
       type="image_bridge"
@@ -104,6 +106,5 @@
     >
       <remap from="$(arg sensor_prefix_depth)/depth_image" to="medio/depth_image" />
     </node>
-
   </group>
 </launch>
